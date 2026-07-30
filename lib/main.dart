@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'faq_service.dart';
+import 'faq_repository.dart';
 import 'character_view.dart';
 
 void main() {
@@ -36,6 +37,7 @@ class _BotScreenState extends State<BotScreen> {
   final SpeechToText _speech = SpeechToText();   // 音声認識（第1段階：標準）
   final AudioPlayer _player = AudioPlayer();     // 音声再生
   final FaqService _faqService = FaqService();   // FAQ検索
+  final FaqRepository _repo = FaqRepository();   // FAQデータの取得
 
   // --- 画面の状態 ---
   bool _speechReady = false;   // 音声認識の初期化が済んだか
@@ -43,6 +45,8 @@ class _BotScreenState extends State<BotScreen> {
   String _recognized = '';     // 認識された質問文
   String _answer = '';         // 表示する回答（字幕）
   CharacterState _charState = CharacterState.idle; // キャラの表情
+  String _dataVersion = '';    // 表示中のFAQデータの版
+  String _dataSource = '';     // そのデータの出所
 
   @override
   void initState() {
@@ -51,7 +55,18 @@ class _BotScreenState extends State<BotScreen> {
   }
 
   Future<void> _init() async {
-    await _faqService.load();
+    // 1. まずローカル（キャッシュ→同梱）を読む。通信を待たずにすぐ使える。
+    final local = await _repo.loadLocal();
+    _faqService.loadFromJson(local.json);
+    if (mounted) {
+      setState(() {
+        _dataVersion = local.version;
+        _dataSource = local.sourceLabel;
+      });
+    }
+    debugPrint('FAQ読み込み: ${_faqService.count}件 (${local.sourceLabel} / ${local.version})');
+
+    // 2. 音声認識を初期化
     _speechReady = await _speech.initialize(
       onError: (e) {
         debugPrint('音声認識エラー: ${e.errorMsg}');
@@ -59,11 +74,29 @@ class _BotScreenState extends State<BotScreen> {
       },
       onStatus: (s) => debugPrint('音声認識ステータス: $s'),
     );
-    debugPrint('初期化結果: $_speechReady');
     if (!_speechReady && mounted) {
       setState(() => _answer = '音声認識を初期化できませんでした');
     }
-    setState(() {});
+    if (mounted) setState(() {});
+
+    // 3. 裏で最新データを取りに行く。失敗しても表示中のデータで動き続ける。
+    _refreshInBackground();
+  }
+
+  Future<void> _refreshInBackground() async {
+    final remote = await _repo.fetchRemote();
+    if (remote == null || !mounted) return;
+    if (remote.version == _dataVersion) {
+      debugPrint('FAQは最新です（${remote.version}）');
+      return;
+    }
+    if (_faqService.loadFromJson(remote.json)) {
+      setState(() {
+        _dataVersion = remote.version;
+        _dataSource = remote.sourceLabel;
+      });
+      debugPrint('FAQを更新しました: ${_faqService.count}件 (${remote.version})');
+    }
   }
 
   /// 「押して話す」ボタンを押したときの処理
@@ -140,6 +173,22 @@ class _BotScreenState extends State<BotScreen> {
         title: const Text('白川郷 音声案内'),
         backgroundColor: const Color(0xFF2C5F2D),
         foregroundColor: Colors.white,
+        actions: [
+          // 職員が更新の反映を確認するための表示
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('データ $_dataSource',
+                    style: const TextStyle(fontSize: 11, color: Colors.white70)),
+                Text(_dataVersion,
+                    style: const TextStyle(fontSize: 11, color: Colors.white70)),
+              ],
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),

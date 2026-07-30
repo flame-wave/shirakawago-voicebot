@@ -19,6 +19,7 @@ import io
 import json
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -226,9 +227,15 @@ def main():
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    version = datetime.now().strftime("%Y-%m-%d %H:%M")
+    payload = {
+        "version": version,          # 端末側が更新の有無を判定するために使う
+        "count": len(faqs),
+        "faqs": faqs,
+    }
     with out.open("w", encoding="utf-8") as f:
-        json.dump({"faqs": faqs}, f, ensure_ascii=False, indent=2)
-    print(f"\n書き出しました: {out}")
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    print(f"\n書き出しました: {out}（版: {version}）")
 
     if not errors:
         print("問題は見つかりませんでした。")
