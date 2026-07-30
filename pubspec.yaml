@@ -1,0 +1,30 @@
+name: shirakawa_bot
+description: 白川郷バスターミナル 音声案内チャットボット（プロトタイプ）
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 音声認識（第1段階：端末標準のエンジンを利用）
+  speech_to_text: ^7.0.0
+
+  # 事前生成した音声ファイルの再生
+  audioplayers: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  # FAQデータと音声ファイルをアプリに同梱
+  assets:
+    - assets/faq.json
+    - assets/audio/
+    - assets/character/

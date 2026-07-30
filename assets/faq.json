@@ -1,0 +1,140 @@
+{
+  "faqs": [
+    {
+      "id": "shuyu_time",
+      "questions": ["村内 どのくらい", "周遊 時間", "何時間 かかる", "見学 時間", "回る 時間"],
+      "answer": "おおよそ2時間から3時間で、村内全体をお回りいただけます。",
+      "audio": "shuyu_time.wav",
+      "link": "",
+      "category": "sightseeing"
+    },
+    {
+      "id": "shuttle_observatory",
+      "questions": ["展望台 バス", "シャトルバス", "展望台 行き方", "展望台 どうやって"],
+      "answer": "展望台行きのシャトルバスは、和田家前から毎日9時から15時40分まで、20分間隔で運行しております。毎時00分、20分、40分の出発で、12時台は運休です。料金は片道300円、降車時に現金でお支払いください。小学生は半額、幼児は座席を使わない場合は無料、身障者手帳をお持ちの方は半額です。なお、ペットのご乗車はできません。",
+      "audio": "shuttle_observatory.wav",
+      "link": "https://shirakawa-go.gr.jp/events/141/",
+      "category": "bus"
+    },
+    {
+      "id": "gassho_facilities",
+      "questions": ["合掌造り 見学", "見学施設", "中 入れる", "入館料", "見学 料金"],
+      "answer": "合掌造りの見学施設は、各施設おひとり300円から400円、民家園のみおひとり800円となります。",
+      "audio": "gassho_facilities.wav",
+      "link": "https://shirakawa-go.gr.jp/active/",
+      "category": "sightseeing"
+    },
+    {
+      "id": "village_bus",
+      "questions": ["村内 バス", "周遊バス", "観光バス", "移動 バス"],
+      "answer": "村内は小さなエリアですので、観光用の周遊バスはございません。徒歩でのご見学をお楽しみください。なお、展望台へのシャトルバスはございます。",
+      "audio": "village_bus.wav",
+      "link": "",
+      "category": "bus"
+    },
+    {
+      "id": "trash",
+      "questions": ["ゴミ箱", "ごみ どこ", "捨てる 場所", "ゴミ 捨てる"],
+      "answer": "申し訳ございませんが、環境保全の観点からゴミ箱は設置しておりません。ご購入されたお店への返却か、お持ち帰りをお願いいたします。",
+      "audio": "trash.wav",
+      "link": "",
+      "category": "manner"
+    },
+    {
+      "id": "luggage",
+      "questions": ["荷物 預ける", "コインロッカー", "荷物置き場", "手荷物", "スーツケース"],
+      "answer": "白川郷バスターミナル内にコインロッカーがございます。また、同じ敷地の付近に荷物預かり所がございます。どちらもいっぱいの場合は観光協会でお預かりしております。受付は8時から17時、当日のみのお預け・お引き取りとなります。料金は中小型が500円、大型が1000円です。",
+      "audio": "luggage.wav",
+      "link": "",
+      "category": "facility"
+    },
+    {
+      "id": "snow_boots",
+      "questions": ["スノーブーツ", "長靴 借りる", "ブーツ レンタル", "靴 レンタル"],
+      "answer": "スノーブーツのレンタルは白川郷バスターミナル内にございます。サイズは23センチから27センチまで、各サイズ3足ずつご用意しております。数に限りがあり、ご予約はできません。貸出時間は8時30分から17時、料金は当日返却が1000円、2日間が1500円です。",
+      "audio": "snow_boots.wav",
+      "link": "",
+      "category": "facility"
+    },
+    {
+      "id": "restaurants",
+      "questions": ["食事 どこ", "レストラン", "ご飯 食べる", "飲食店", "お店 食事", "ランチ"],
+      "answer": "村内の食事施設をご案内しております。団体様は早めのご予約が必要です。多くの店舗が不定休となっておりますので、事前にご確認ください。詳しい一覧は画面のリンクをご覧ください。",
+      "audio": "restaurants.wav",
+      "link": "https://shirakawa-go.gr.jp/events/245/",
+      "category": "food"
+    },
+    {
+      "id": "currency_exchange",
+      "questions": ["両替", "外貨", "換金", "ドル 円"],
+      "answer": "外貨自動両替機は白川郷バスターミナル内に設置しております。米ドル、ユーロ、イギリスポンド、オーストラリアドル、中国人民元、韓国ウォン、香港ドル、台湾ドル、インドネシアルピー、タイバーツ、シンガポールドル、マレーシアリンギットの12通貨から、日本円への両替が可能です。",
+      "audio": "currency_exchange.wav",
+      "link": "",
+      "category": "facility"
+    },
+    {
+      "id": "visit_hours",
+      "questions": ["何時まで", "見学 時間帯", "営業時間", "夜 見られる", "早朝"],
+      "answer": "世界遺産集落は住民の方が生活されています。そのため、集落内にご宿泊の方以外のご見学は、8時から17時の時間帯でお願いしております。村営駐車場の営業時間も8時から17時です。ライトアップなどのイベント開催日は除きます。",
+      "audio": "visit_hours.wav",
+      "link": "",
+      "category": "manner"
+    },
+    {
+      "id": "accessible_parking",
+      "questions": ["障害者 駐車場", "障がい者 駐車", "車椅子 駐車場", "身障者 駐車"],
+      "answer": "障がい者用の駐車場はございますが、すべて有料で、障がい者割引はございません。白川郷バスターミナルに2台、みだしま駐車場に2台ご用意しております。バスターミナルの区画は、車椅子をご予約の方や車椅子をご持参の方など、足の不自由な方が優先となります。",
+      "audio": "accessible_parking.wav",
+      "link": "",
+      "category": "accessibility"
+    },
+    {
+      "id": "wheelchair",
+      "questions": ["車椅子 借りる", "車いす レンタル", "車椅子 貸出"],
+      "answer": "車椅子は、雨や雪の日でなければお貸しいただけます。事前のご予約も可能です。冬期間は路面状況が悪いため、貸出を中止しております。また、車椅子でご利用いただけるトイレは村内に5か所ございます。",
+      "audio": "wheelchair.wav",
+      "link": "https://shirakawa-go.gr.jp/download/",
+      "category": "accessibility"
+    },
+    {
+      "id": "snowfall",
+      "questions": ["雪 いつ", "雪 積もる", "初雪", "雪 時期", "積雪"],
+      "answer": "近年の傾向では、毎年12月初旬に初雪が観測されます。当村は豪雪地帯のため、12月下旬から2月下旬は雪の積もった状態が続きます。お出かけ前に天気予報をご確認ください。",
+      "audio": "snowfall.wav",
+      "link": "https://weather.yahoo.co.jp/weather/jp/21/5220/21604.html",
+      "category": "season"
+    },
+    {
+      "id": "studless",
+      "questions": ["スタッドレス", "タイヤ", "冬 車", "ノーマルタイヤ", "チェーン"],
+      "answer": "雪の降る時季は、必ずスタッドレスタイヤをご装着のうえお越しください。路面は大変滑りやすくなっております。",
+      "audio": "studless.wav",
+      "link": "",
+      "category": "season"
+    },
+    {
+      "id": "sakura_kouyou",
+      "questions": ["桜 いつ", "紅葉 いつ", "見ごろ", "開花", "花見"],
+      "answer": "毎年の気温により変動いたしますので、必ずご自身でご確認ください。桜は例年4月15日頃に開花を迎えます。紅葉は例年10月末から11月初旬が見ごろです。",
+      "audio": "sakura_kouyou.wav",
+      "link": "",
+      "category": "season"
+    },
+    {
+      "id": "bus_next",
+      "questions": ["次のバス", "バス 何時", "次の便", "バスの時間", "時刻表"],
+      "answer": "バスの時刻表は、案内所前の掲示またはバス会社の窓口でご確認いただけます。詳しくは係員にお尋ねください。",
+      "audio": "bus_next.wav",
+      "link": "",
+      "category": "bus"
+    },
+    {
+      "id": "toilet",
+      "questions": ["トイレ どこ", "お手洗い", "トイレ 場所", "手洗い"],
+      "answer": "お手洗いのご案内は、村内マップをご覧ください。車椅子でご利用いただけるトイレは村内に5か所ございます。",
+      "audio": "toilet.wav",
+      "link": "https://shirakawa-go.gr.jp/download/",
+      "category": "facility"
+    }
+  ]
+}
