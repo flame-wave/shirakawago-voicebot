@@ -13,8 +13,20 @@ dependencies:
   # 音声認識（第1段階：端末標準のエンジンを利用）
   speech_to_text: ^7.0.0
 
-  # 事前生成した音声ファイルの再生
+  # 用意した音声ファイルの再生
   audioplayers: ^6.1.0
+
+  # 音声ファイルが無い回答を端末の音声合成で読み上げる
+  flutter_tts: ^4.2.0
+
+  # 詳細ページへのQRコード表示
+  qr_flutter: ^4.1.0
+
+  # FAQデータのオンライン取得
+  http: ^1.2.2
+
+  # 取得したデータを端末内に保存する場所を得る
+  path_provider: ^2.1.4
 
 dev_dependencies:
   flutter_test:
@@ -23,8 +35,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # FAQデータと音声ファイルをアプリに同梱
+  # FAQデータ・音声・画像をアプリに同梱
   assets:
     - assets/faq.json
     - assets/audio/
     - assets/character/
+    - assets/photo/

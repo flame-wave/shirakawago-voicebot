@@ -81,6 +81,7 @@ def is_true(cell) -> bool:
 
 
 def build(source: str, assets_dir: Path | None):
+    """戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数)"""
     raw = load_workbook_bytes(source)
     book = pd.read_excel(io.BytesIO(raw), sheet_name=None, dtype=object)
 
@@ -122,6 +123,18 @@ def build(source: str, assets_dir: Path | None):
         elif len(questions) < 2:
             warnings.append(f"{fid}: 質問例が1つだけです。言い方を増やすと認識しやすくなります")
 
+        # どの質問にも出てくる語だけの質問例は、他の質問まで拾ってしまう
+        GENERIC = {"どこ", "場所", "時間", "いつ", "何時", "料金", "値段",
+                   "ある", "ありますか", "教えて", "できる"}
+        for q in questions:
+            words = [w for w in q.split() if w]
+            if words and all(w in GENERIC for w in words):
+                warnings.append(
+                    f"{fid}: 質問例「{q}」は一般的な語だけのため、"
+                    "関係ない質問にも反応する恐れがあります。"
+                    "内容を表す語（例: ごみ、トイレ）を足してください"
+                )
+
         answer = cell_str(row.get("回答"))
         if not answer:
             errors.append(f"FAQ {line}行目({fid}): 回答が空です")
@@ -156,6 +169,7 @@ def build(source: str, assets_dir: Path | None):
         })
 
     # ---- 多言語シートの取り込み
+    pending = 0
     if tr is not None:
         by_id = {f["id"]: f for f in faqs}
         for idx, row in tr.iterrows():
@@ -178,7 +192,13 @@ def build(source: str, assets_dir: Path | None):
                 continue
             answer = cell_str(row.get("回答"))
             if not answer:
-                errors.append(f"多言語 {line}行目({fid}/{lang}): 回答が空です")
+                # 質問例だけ書かれている場合、黙って捨てると原因が分からないので知らせる
+                if split_lines(row.get("質問例")):
+                    warnings.append(
+                        f"多言語 {line}行目({fid}/{lang}): 質問例は入力されていますが回答が空です。"
+                        "回答を入れないとこの言語では反応しません"
+                    )
+                pending += 1  # 未翻訳。エラーではない
                 continue
             by_id[fid]["translations"][lang] = {
                 "questions": split_lines(row.get("質問例")),
@@ -186,7 +206,7 @@ def build(source: str, assets_dir: Path | None):
                 "audio": "",
             }
 
-    return faqs, errors, warnings
+    return faqs, errors, warnings, pending
 
 
 # ---------------------------------------------------------------- 実行
@@ -204,12 +224,14 @@ def main():
     assets_dir = Path(args.assets) if args.assets else None
 
     print("読み込み中...")
-    faqs, errors, warnings = build(args.source, assets_dir)
+    faqs, errors, warnings, pending = build(args.source, assets_dir)
 
     print(f"\n読み込み結果: 有効な質問 {len(faqs)} 件")
     n_tr = sum(len(f["translations"]) for f in faqs)
-    if n_tr:
-        print(f"  多言語の回答: {n_tr} 件")
+    print(f"  多言語の回答: {n_tr} 件" + (f"（未翻訳 {pending} 件）" if pending else ""))
+    for lang in ("en", "zh", "ko"):
+        c = sum(1 for f in faqs if lang in f["translations"])
+        print(f"    {lang}: {c}/{len(faqs)} 件")
 
     if warnings:
         print(f"\n【確認】{len(warnings)} 件")

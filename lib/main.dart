@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-import 'package:audioplayers/audioplayers.dart';
+
 import 'faq_service.dart';
 import 'faq_repository.dart';
 import 'character_view.dart';
+import 'voice_service.dart';
+import 'answer_view.dart';
+import 'app_language.dart';
+import 'language_selector.dart';
+import 'question_log.dart';
+import 'log_screen.dart';
 
 void main() {
   runApp(const ShirakawaBotApp());
@@ -33,20 +39,26 @@ class BotScreen extends StatefulWidget {
 }
 
 class _BotScreenState extends State<BotScreen> {
-  // --- 部品（前回決めた差し替え可能な単位） ---
-  final SpeechToText _speech = SpeechToText();   // 音声認識（第1段階：標準）
-  final AudioPlayer _player = AudioPlayer();     // 音声再生
+  // --- 部品（差し替え可能な単位） ---
+  final SpeechToText _speech = SpeechToText();   // 音声認識
   final FaqService _faqService = FaqService();   // FAQ検索
   final FaqRepository _repo = FaqRepository();   // FAQデータの取得
+  final VoiceService _voice = VoiceService();    // 読み上げ（音声ファイル／端末音声）
+  final QuestionLog _log = QuestionLog();       // 質問の記録
 
   // --- 画面の状態 ---
-  bool _speechReady = false;   // 音声認識の初期化が済んだか
-  bool _listening = false;     // 今「聞き取り中」か
-  String _recognized = '';     // 認識された質問文
-  String _answer = '';         // 表示する回答（字幕）
-  CharacterState _charState = CharacterState.idle; // キャラの表情
-  String _dataVersion = '';    // 表示中のFAQデータの版
-  String _dataSource = '';     // そのデータの出所
+  bool _speechReady = false;
+  bool _listening = false;
+  String _recognized = '';
+  String _answer = '';
+  String _photo = '';   // 表示中の回答の写真
+  String _link = '';    // 表示中の回答のリンク（QRコード）
+  CharacterState _charState = CharacterState.idle;
+  String _dataVersion = '';
+  String _dataSource = '';
+  AppLanguage _lang = AppLanguage.ja;      // 選択中の言語
+  bool _isFallback = false;                // 翻訳未整備で日本語を表示中か
+  Set<String> _speechLocales = {};         // 端末が対応する認識ロケール
 
   @override
   void initState() {
@@ -54,7 +66,19 @@ class _BotScreenState extends State<BotScreen> {
     _init();
   }
 
+  @override
+  void dispose() {
+    _voice.dispose();
+    super.dispose();
+  }
+
   Future<void> _init() async {
+    // 読み上げ終了で待機表情に戻す
+    _voice.onComplete = () {
+      if (mounted) setState(() => _charState = CharacterState.idle);
+    };
+    await _voice.init();
+
     // 1. まずローカル（キャッシュ→同梱）を読む。通信を待たずにすぐ使える。
     final local = await _repo.loadLocal();
     _faqService.loadFromJson(local.json);
@@ -72,10 +96,37 @@ class _BotScreenState extends State<BotScreen> {
         debugPrint('音声認識エラー: ${e.errorMsg}');
         if (mounted) setState(() => _answer = '認識エラー: ${e.errorMsg}');
       },
-      onStatus: (s) => debugPrint('音声認識ステータス: $s'),
+      onStatus: (s) {
+        debugPrint('音声認識ステータス: $s');
+        // 無音が続いて自動終了した場合も、ボタンの表示を戻す
+        if ((s == 'notListening' || s == 'done') && mounted && _listening) {
+          setState(() {
+            _listening = false;
+            if (_charState == CharacterState.listening) {
+              _charState = CharacterState.idle;
+            }
+          });
+        }
+      },
     );
     if (!_speechReady && mounted) {
       setState(() => _answer = '音声認識を初期化できませんでした');
+    }
+
+    // 端末がどの言語の音声認識に対応しているかを調べておく
+    if (_speechReady) {
+      try {
+        final locales = await _speech.locales();
+        _speechLocales = locales.map((l) => l.localeId).toSet();
+        debugPrint('認識可能なロケール: ${_speechLocales.length}件');
+        for (final lang in AppLanguage.values) {
+          if (!_supportsSpeech(lang)) {
+            debugPrint('  ${lang.label} (${lang.speechLocale}) は非対応');
+          }
+        }
+      } catch (e) {
+        debugPrint('ロケール一覧の取得に失敗: $e');
+      }
     }
     if (mounted) setState(() {});
 
@@ -99,20 +150,59 @@ class _BotScreenState extends State<BotScreen> {
     }
   }
 
-  /// 「押して話す」ボタンを押したときの処理
+  /// 端末がその言語の音声認識に対応しているか
+  bool _supportsSpeech(AppLanguage lang) {
+    if (_speechLocales.isEmpty) return true; // 取得できていないときは試させる
+    final target = lang.speechLocale.toLowerCase().replaceAll('-', '_');
+    final prefix = target.split('_').first;
+    return _speechLocales.any((id) {
+      final normalized = id.toLowerCase().replaceAll('-', '_');
+      return normalized == target || normalized.startsWith('${prefix}_');
+    });
+  }
+
+  /// 言語ボタンが押されたときの処理
+  Future<void> _changeLanguage(AppLanguage lang) async {
+    if (lang == _lang) return;
+    await _speech.stop();
+    await _voice.stop();
+    await _voice.setLanguage(lang);
+    setState(() {
+      _lang = lang;
+      _listening = false;
+      _recognized = '';
+      _photo = '';
+      _link = '';
+      _isFallback = false;
+      _charState = CharacterState.idle;
+      // その言語で音声が使えない場合は、その旨を先に伝える
+      _answer = _supportsSpeech(lang)
+          ? ''
+          : UiStrings.of('speechUnavailable', lang);
+    });
+    debugPrint('言語を切り替え: ${lang.label}');
+  }
+
+  /// 「押して話す」を押したときの処理
   Future<void> _startListening() async {
     if (!_speechReady) return;
+    await _voice.stop(); // 読み上げ中なら止めて質問を優先する
     setState(() {
       _listening = true;
       _recognized = '';
       _answer = '';
-      _charState = CharacterState.listening; // 聞き取り中の表情へ
+      _photo = '';
+      _link = '';
+      _isFallback = false;
+      _charState = CharacterState.listening;
     });
     await _speech.listen(
-      localeId: 'ja_JP', // 第1段階は日本語。多言語化は後の段階で切替
+      localeId: _lang.speechLocale,
+      // もう一度押すまで待つ方式なので、自動で切れるまでの時間を長めにとる
+      listenFor: const Duration(seconds: 60),
+      pauseFor: const Duration(seconds: 10),
       onResult: (result) {
         setState(() => _recognized = result.recognizedWords);
-        // 認識が確定したらFAQ検索へ進む
         if (result.finalResult) {
           _handleQuestion(_recognized);
         }
@@ -122,60 +212,107 @@ class _BotScreenState extends State<BotScreen> {
 
   Future<void> _stopListening() async {
     await _speech.stop();
+    if (!mounted) return;
     setState(() {
       _listening = false;
-      // まだ回答に進んでいなければ待機表情へ戻す
       if (_charState == CharacterState.listening) {
         _charState = CharacterState.idle;
       }
     });
   }
 
-  /// 認識した質問文をFAQ検索にかけ、回答表示と音声再生を行う
+  /// ボタンを押すたびに開始と終了を切り替える。
+  /// 押し続ける方式だと、指が少し離れただけで録音が切れてしまうため。
+  Future<void> _toggleListening() async {
+    if (_listening) {
+      await _stopListening();
+    } else {
+      await _startListening();
+    }
+  }
+
+  /// 認識した質問をFAQ検索にかけ、表示と読み上げを行う
   Future<void> _handleQuestion(String question) async {
     setState(() => _listening = false);
 
-    final faq = _faqService.search(question);
-
-    if (faq == null) {
-      // 該当なし＝ガードレール発動、職員へ誘導
-      setState(() {
-        _answer = '申し訳ございません。その質問は案内所の係員にお尋ねください。';
-        _charState = CharacterState.idle; // 待機表情へ戻す
-      });
+    // 何も聞き取れていない場合は、案内も記録もせずに待機に戻す
+    if (question.trim().isEmpty) {
+      setState(() => _charState = CharacterState.idle);
       return;
     }
 
-    // 回答表示＋喋っている表情へ
+    final faq = _faqService.search(question, _lang);
+
+    if (faq == null) {
+      // 該当なし＝ガードレール発動、職員へ誘導
+      final fallback = UiStrings.of('staffReferral', _lang);
+      setState(() {
+        _answer = fallback;
+        _photo = '';
+        _link = '';
+        _isFallback = false;
+        _charState = CharacterState.talking;
+      });
+      // 画面が見えない方にも伝わるよう、この案内も読み上げる
+      final mode = await _voice.speakText(fallback);
+      // 答えられなかった質問こそ、FAQ拡充の材料になる
+      await _log.add(LogEntry(
+        at: DateTime.now(),
+        lang: _lang.code,
+        recognized: question,
+        faqId: null,
+        category: '',
+        translationFallback: false,
+        voiceMode: mode.name,
+      ));
+      return;
+    }
+
+    final localized = faq.answerFor(_lang);
     setState(() {
-      _answer = faq.answer;
+      _answer = localized.text;
+      _photo = faq.photo;
+      _link = faq.link;
+      _isFallback = localized.isFallback;
       _charState = CharacterState.talking;
     });
 
-    // 事前生成したテト音声を再生（assets/audio/ に配置）
-    try {
-      await _player.play(AssetSource('audio/${faq.audio}'));
-      // 再生が終わったら待機表情に戻す
-      _player.onPlayerComplete.first.then((_) {
-        if (mounted) setState(() => _charState = CharacterState.idle);
-      });
-    } catch (e) {
-      // 音声ファイルが無くても字幕は出るので処理は止めない
-      debugPrint('音声再生エラー: $e');
-      setState(() => _charState = CharacterState.idle);
-    }
+    // 音声ファイルがあればそれを、無ければ端末音声で読み上げる
+    final mode = await _voice.speak(faq, _lang);
+    final note = localized.isFallback ? ' (日本語で代替)' : '';
+    debugPrint('読み上げ方法: $mode / 言語: ${_lang.label}$note');
+
+    await _log.add(LogEntry(
+      at: DateTime.now(),
+      lang: _lang.code,
+      recognized: question,
+      faqId: faq.id,
+      category: faq.category,
+      translationFallback: localized.isFallback,
+      voiceMode: mode.name,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
+    final photoWidget = AnswerView.photoWidget(_photo);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('白川郷 音声案内'),
         backgroundColor: const Color(0xFF2C5F2D),
         foregroundColor: Colors.white,
         actions: [
-          // 職員が更新の反映を確認するための表示
-          Padding(
+          // 職員が更新の反映を確認するための表示。
+          // 長押しで質問記録の画面を開く（観光客には見えない導線）。
+          GestureDetector(
+            onLongPress: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => LogScreen(log: _log)),
+              );
+            },
+            child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -187,6 +324,7 @@ class _BotScreenState extends State<BotScreen> {
                     style: const TextStyle(fontSize: 11, color: Colors.white70)),
               ],
             ),
+            ),
           ),
         ],
       ),
@@ -195,43 +333,50 @@ class _BotScreenState extends State<BotScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // キャラクター表示エリア（状態に応じて表情が切り替わる）
-            // 画像は assets/character/ に idle.png / listening.png / talking.png を配置。
-            // 将来Live2Dにする場合も、この CharacterView を差し替えるだけでよい。
+            // 言語切り替え（手動選択）
+            LanguageSelector(current: _lang, onChanged: _changeLanguage),
+            const SizedBox(height: 16),
+
+            // 上部：キャラクター（＋写真がある回答なら横に並べる）
             Expanded(
               flex: 3,
-              child: CharacterView(state: _charState),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: photoWidget != null ? 2 : 1,
+                    child: CharacterView(state: _charState),
+                  ),
+                  if (photoWidget != null) ...[
+                    const SizedBox(width: 16),
+                    Expanded(flex: 3, child: photoWidget),
+                  ],
+                ],
+              ),
             ),
             const SizedBox(height: 16),
 
-            // 認識した質問の表示
+            // 認識した質問
             Text(
-              _recognized.isEmpty ? '「押して話す」を押して質問してください' : '質問: $_recognized',
+              _recognized.isEmpty
+                  ? UiStrings.of('prompt', _lang)
+                  : '${UiStrings.of('question', _lang)}: $_recognized',
               style: const TextStyle(fontSize: 18, color: Colors.black54),
             ),
             const SizedBox(height: 12),
 
-            // 回答の字幕表示（騒音対策・聴覚配慮）
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: const Color(0xFFC3D2BC)),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                _answer.isEmpty ? '　' : _answer,
-                style: const TextStyle(fontSize: 22, height: 1.4),
-              ),
+            // 回答（字幕＋QRコード）
+            AnswerView(
+              answer: _answer,
+              photo: _photo,
+              link: _link,
+              lang: _lang,
+              isFallback: _isFallback,
             ),
             const SizedBox(height: 24),
 
-            // 押して話すボタン（押している間だけ聞き取る方式）
+            // 押して話すボタン
             GestureDetector(
-              onTapDown: (_) => _startListening(),
-              onTapUp: (_) => _stopListening(),
-              onTapCancel: () => _stopListening(),
+              onTap: _toggleListening,
               child: Container(
                 height: 90,
                 decoration: BoxDecoration(
@@ -242,7 +387,9 @@ class _BotScreenState extends State<BotScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    _listening ? '聞き取り中…（指を離すと終了）' : '押して話す',
+                    _listening
+                        ? UiStrings.of('listening', _lang)
+                        : UiStrings.of('pressToTalk', _lang),
                     style: const TextStyle(
                       fontSize: 24,
                       color: Colors.white,

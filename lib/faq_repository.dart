@@ -45,7 +45,7 @@ class FaqRepository {
   ///
   /// 例（GitHubで配信する場合）:
   ///   https://raw.githubusercontent.com/ユーザ名/リポジトリ名/main/assets/faq.json
-  static const String remoteUrl = 'https://raw.githubusercontent.com/flame-wave/shirakawago-voicebot/main/assets/faq.json';
+  static const String remoteUrl = '';
 
   /// 通信の待ち時間。現地の回線が遅い場合を考えて短めにする。
   static const Duration fetchTimeout = Duration(seconds: 8);
@@ -59,17 +59,20 @@ class FaqRepository {
 
   /// 起動時に呼ぶ。キャッシュがあればそれを、無ければ同梱データを返す。
   Future<FaqData> loadLocal() async {
-    try {
-      final file = await _cacheFile();
-      if (await file.exists()) {
-        final raw = await file.readAsString();
-        if (_isValid(raw)) {
-          return FaqData(raw, FaqSource.cache, _versionOf(raw));
+    // Webにはファイル保存領域がないため、キャッシュは使わず同梱データを読む
+    if (!kIsWeb) {
+      try {
+        final file = await _cacheFile();
+        if (await file.exists()) {
+          final raw = await file.readAsString();
+          if (_isValid(raw)) {
+            return FaqData(raw, FaqSource.cache, _versionOf(raw));
+          }
+          debugPrint('キャッシュが壊れているため無視します');
         }
-        debugPrint('キャッシュが壊れているため無視します');
+      } catch (e) {
+        debugPrint('キャッシュ読み込みエラー: $e');
       }
-    } catch (e) {
-      debugPrint('キャッシュ読み込みエラー: $e');
     }
 
     final raw = await rootBundle.loadString('assets/faq.json');
@@ -83,6 +86,7 @@ class FaqRepository {
       return null;
     }
 
+    String raw;
     try {
       final res =
           await http.get(Uri.parse(remoteUrl)).timeout(fetchTimeout);
@@ -93,21 +97,33 @@ class FaqRepository {
       }
 
       // 文字化けを避けるため、明示的にUTF-8として解釈する
-      final raw = utf8.decode(res.bodyBytes);
+      raw = utf8.decode(res.bodyBytes);
+    } catch (e) {
+      debugPrint('オンライン取得に失敗（オフラインで継続）: $e');
+      return null;
+    }
 
-      // 壊れたデータでキャッシュを上書きしないよう、保存前に検査する
-      if (!_isValid(raw)) {
-        debugPrint('取得したデータが不正な形式のため破棄します');
-        return null;
-      }
+    // 壊れたデータでキャッシュを上書きしないよう、保存前に検査する
+    if (!_isValid(raw)) {
+      debugPrint('取得したデータが不正な形式のため破棄します');
+      return null;
+    }
 
+    // 保存の失敗は取得の失敗とは別扱いにする。
+    // 保存できなくても今回取得したデータは使えるため、ここで捨てない。
+    await _saveCache(raw);
+
+    return FaqData(raw, FaqSource.remote, _versionOf(raw));
+  }
+
+  /// キャッシュへの保存。失敗しても呼び出し側の処理は続行させる。
+  Future<void> _saveCache(String raw) async {
+    if (kIsWeb) return; // Webにはファイル保存領域がないため何もしない
+    try {
       final file = await _cacheFile();
       await file.writeAsString(raw);
-
-      return FaqData(raw, FaqSource.remote, _versionOf(raw));
     } catch (e) {
-      debugPrint('オンライン更新に失敗（オフラインで継続）: $e');
-      return null;
+      debugPrint('キャッシュ保存に失敗（動作は継続）: $e');
     }
   }
 
