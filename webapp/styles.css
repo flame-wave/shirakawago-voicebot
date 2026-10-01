@@ -1,0 +1,1240 @@
+/* 画面の見た目。実機（Flutter）の配置・色をそのまま再現している。
+   色はアプリと同じ値を使う:
+     緑 #2C5F2D / 朱 #B85042 / 薄緑 #EDF4E6 / 枠 #C3D2BC / 文字 #2B2B2B */
+
+:root {
+  --green: #2C5F2D;
+  --green-dark: #1F3D20;
+  --red: #B85042;
+  --pale: #EDF4E6;
+  --border: #C3D2BC;
+  --ink: #2B2B2B;
+  --sub: #5A6B58;
+}
+
+* { box-sizing: border-box; }
+
+/* display を指定した要素でも hidden 属性で確実に隠れるようにする */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+/* スマートフォンはアドレスバーの分だけ高さが変わるため、
+   対応しているブラウザでは実際に見えている高さを使う */
+@supports (height: 100dvh) {
+  html, body { height: 100dvh; }
+}
+
+body {
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP",
+    "Meiryo", system-ui, sans-serif;
+  color: var(--ink);
+  background: #fff;
+  /* 案内端末なので、文字の選択や長押しメニューは出さない */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+
+/* ── 上部のバー ───────────────────────────── */
+
+.appbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 8px 0 16px;
+  background: var(--green);
+  color: #fff;
+}
+
+.appbar h1 {
+  /* 題字は譲る側。ボタンが押せることの方が大事なので、入らなければ削る。
+     min-width:0 を入れないと、flex の中では縮まずにバーを押し広げてしまう。 */
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: clamp(17px, 2.4vmin, 30px);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 現在地の表示（上のバー）。押すと選び直せる。 */
+.place-pill {
+  flex: 0 1 auto;
+  margin-left: auto;
+  min-width: 0;
+  max-width: 46vw;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: inherit;
+  font-size: clamp(11px, 1.5vmin, 15px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* キャラクターの切り替え。現在地の表示と同じ見た目にそろえる。 */
+.char-pill {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 36vw;
+  height: 30px;
+  margin-left: 8px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: inherit;
+  font-size: clamp(11px, 1.5vmin, 15px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* 現在地のボタンが隠れている（据え置き端末）ときは、こちらを右端へ寄せる */
+.place-pill[hidden] + .char-pill {
+  margin-left: auto;
+}
+
+/* キャラクターの一覧。名前だけでは誰か分からないので、絵を並べて選ばせる。 */
+.char-menu-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.char-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.char-choice img {
+  /* 縦長の立ち絵も横長のゆるキャラも、同じ枠に収める */
+  width: 100%;
+  height: 90px;
+  object-fit: contain;
+}
+
+.char-choice.selected {
+  border-color: var(--green);
+  background: var(--pale);
+  font-weight: 600;
+}
+
+/* 現在地を選ぶ小さな画面 */
+.place-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.place-menu-box {
+  width: min(420px, 100%);
+  padding: 20px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.place-menu-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--green-dark);
+}
+
+.place-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.place-menu-list button {
+  height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.place-menu-list button.selected {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  font-weight: bold;
+}
+
+.place-menu-list .hint-line {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--sub);
+}
+
+.place-menu-close {
+  width: 100%;
+  height: 44px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pale);
+  color: var(--green-dark);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.data-status {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 8px 12px;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+
+/* 狭い画面では、データの版表示は隠す。
+   職員が更新を確かめるためのもので、観光客には要らない。
+   これを残すと、現在地とキャラクターのボタンが押せる幅を失う。 */
+@media (max-width: 600px) {
+  .data-status { display: none; }
+}
+
+/* ── 全体の枠 ───────────────────────────── */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 56px);
+  padding: 18px 20px 20px;
+  /* 中身（流れる質問の列）が画面の幅を押し広げないようにする */
+  overflow: hidden;
+  min-width: 0;
+}
+
+.screen > * { min-width: 0; max-width: 100%; }
+
+/* ── 会話の領域 ───────────────────────────── */
+
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  /* 下に並ぶもの（よくある質問・入力欄・ボタン・言語）が増えても、
+     会話の領域が消えてしまわないようにする */
+  min-height: 140px;
+  border-radius: 18px;
+  overflow: hidden;
+  /* 寸法はすべて会話領域の大きさ（cqw = 幅の1% / cqh = 高さの1%）から決める。
+     画面が大きくなれば吹き出しも文字も比例して大きくなり、
+     キャラクターの口元と吹き出しの尻尾の位置もずれない。 */
+  container-type: size;
+
+  --gutter: 16px; /* 会話領域の端からの余白 */
+  --tail: 18px; /* 吹き出しの尻尾の出っ張り */
+  /* キャラクターの高さ。
+     高さいっぱい（--char-fill）に立たせたいが、横長のキャラクターでは
+     幅＝高さ×縦横比 が画面を覆ってしまうので、幅の方でも頭打ちにする。
+     68cqw は「これ以上は画面を覆う」という最後の歯止めで、
+     普段は効かない（効く大きさにすると主役の立ち絵まで縮んでしまう）。
+     ふだんの大きさは「キャラクター」シートの「大きさ」で決める。
+     --char-scale は高さの方だけに掛ける。両方に掛けると、
+     狭い画面で二重に小さくなって豆粒になる。 */
+  --char-fill: 102cqh;
+  --char-scale: 1;
+  --char-h: min(
+    calc(var(--char-fill) * var(--char-scale)),
+    calc(68cqw / var(--char-aspect))
+  );
+
+  /* 立ち絵の形と、その中での顔の位置。
+       --char-aspect: 画像の 幅÷高さ
+       --face-ratio : 立ち絵の右端から顔の左端まで（高さに対する割合）
+       --mouth-ratio: 立ち絵の上端から口元まで（高さに対する割合）
+     この3つは「キャラクター」シートの値から決まる。
+     既定値は、選ばれたキャラクターに合わせて js/character.js が上書きする。
+     立ち絵ごとに縦横の比も顔の位置も違うため、同じ数字では吹き出しが合わない。 */
+  --char-aspect: 0.538;
+  --face-ratio: 0.31;  /* 顔の広さ（高さに対する割合） */
+  --mouth-ratio: 0.14; /* 口の高さ（上端からの割合） */
+  --char-w: calc(var(--char-h) * var(--char-aspect));
+  --face: calc(var(--char-h) * var(--face-ratio));
+  --mouth: calc(
+    (100cqh - var(--char-h)) * (1 - var(--char-rise, 0))
+    + 6px + var(--char-h) * var(--mouth-ratio)
+  );
+
+  /* 立ち位置。既定は右端に寄せる（狭い画面はこのまま） */
+  /* 立ち絵を画面の端から少しはみ出させて大きく見せる。
+     ただし、ゆるキャラのように絵として完結しているものは切ると変なので、
+     横長のキャラクターでは js/character.js が --char-bleed を 0 にする。 */
+  --char-bleed: 1;
+  --char-right: calc(-20px * var(--char-bleed));
+
+  /* 会話領域の右端から、顔の左端までの距離 */
+  --face-line: calc(var(--char-right) + var(--face));
+
+  /* 顔の手前まで広げたときの幅（これ以上広げると顔に掛かる） */
+  --s-max: calc(100cqw - var(--gutter) - var(--tail) - var(--face-line) - 4px);
+
+  /* 吹き出しの最大の幅。広い画面では広げすぎない */
+  --s: min(46cqw, var(--s-max));
+
+  /* 回答の文字の大きさ。会話領域の大きさに比例させる */
+  --font: clamp(17px, min(5.1cqh, 3.7cqw), 46px);
+
+  /* 吹き出しの上に置く「質問」の高さぶん */
+  --q-space: clamp(32px, calc(var(--font) * 1.8), 64px);
+
+  /* 会話領域の上端から口元までの距離（吹き出しの置き場所の基準）。
+     背の高いキャラクターは口が上にあり、ゆるキャラは下にある。 */
+  --mouth-from-talk: max(0px, calc(var(--mouth) - var(--gutter) - var(--q-space)));
+
+  /* 吹き出しの最低の高さ。口元まで届かせたいが、中身が2行でも
+     縦長の空き箱にならないよう、ここで頭打ちにする。 */
+  --bubble-min: clamp(88px, calc(var(--mouth-from-talk) + 32px), 34cqh);
+
+  /* 届かない分は、吹き出しごと下へずらす。
+     こうすると、背の低いキャラクターでも尻尾がちょうど口元に来る。 */
+  --talk-drop: max(0px, calc(var(--mouth-from-talk) + 32px - var(--bubble-min)));
+
+  /* 写真を出す高さ。押さなくても読める大きさにする */
+  --media-h: min(52cqh, 420px);
+
+  /* QRだけのときに空けておく高さ */
+  --qr-h: 160px;
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* キャラクター。
+   左右の位置は --char-right（既定は右端、広い画面では右半分の中央）。
+   上下の位置は --char-rise（0＝下端に立たせる、1＝上端まで持ち上げる）。
+   人物は地面に立たせるが、ゆるキャラは地面に立つものではないので
+   持ち上げて、顔を吹き出しの高さに合わせる。 */
+.character {
+  position: absolute;
+  right: var(--char-right);
+  bottom: calc(-6px + (100cqh - var(--char-h)) * var(--char-rise, 0));
+  height: var(--char-h);
+  display: flex;
+  align-items: flex-end;
+  /* ゆっくり上下させて呼吸を表す */
+  animation: breathe 4.2s ease-in-out infinite alternate;
+}
+
+@keyframes breathe {
+  from { transform: translateY(-5px); }
+  to { transform: translateY(5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .character { animation: none; }
+}
+
+.character-img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+/* 画像がまだ無いときの仮表示 */
+.character-placeholder {
+  width: 200px;
+  height: 240px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 84px;
+  background: rgba(237, 244, 230, 0.8);
+  border-radius: 16px;
+}
+
+/* 質問・回答。右端（尻尾の位置）を口元の手前に固定し、
+   文字が増えたら左へ、足りなければ下へ伸びる。
+   キャラクターの顔より右には出ないので、顔が隠れることはない。 */
+.talk {
+  position: absolute;
+  left: auto;
+  right: calc(var(--face-line) + 4px); /* 尻尾の先が顔の手前に来る位置 */
+  /* 上に質問を置くぶん下げ、さらに口元の高さに合わせて下げる */
+  top: calc(var(--gutter) + var(--q-space) + var(--talk-drop));
+  width: calc(var(--s) + var(--tail));
+  max-height: calc(100% - var(--gutter) * 2 - var(--q-space) - var(--talk-drop));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* 右端（尻尾の側）でそろえる */
+  min-height: 0;
+}
+
+/* 聞き取った質問（観光客側の発話）。
+   回答の下に置く。上に置くと回答が押し下げられ、尻尾が口元からずれるため。 */
+.question-bubble {
+  position: absolute;
+  bottom: calc(100% + 8px); /* 吹き出しのすぐ上 */
+  right: var(--tail);
+  max-width: 100%;
+  margin: 0;
+  padding: 8px 14px;
+  /* 長い質問でも2行までにして、上へ伸びすぎないようにする */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  background: var(--pale);
+  border-radius: 14px;
+  font-size: clamp(14px, calc(var(--font) * 0.66), 28px);
+  color: var(--green);
+}
+
+.answer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* 写真・QRも吹き出しの右端にそろえる */
+  min-height: 0;
+}
+
+/* 回答の吹き出し。右側のキャラクターに向けて尻尾を出す。 */
+.bubble {
+  position: relative;
+  margin-right: var(--tail);
+  padding: clamp(14px, calc(var(--font) * 1.05), 40px);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  /* 文字の量に合わせて伸びる。
+     写真やQRが付くときは、そちらの場所を先に確保してから縮む
+     （写真・QRは flex: none、吹き出しだけが縮む）。
+     それでも入り切らない長文のときに限り、中でスクロールする。 */
+  width: fit-content;
+  min-width: min(62%, 280px);
+  max-width: 100%;
+  flex: 0 1 auto;
+  /* 尻尾が口元に届く高さ（届かない分は吹き出しごと下へずらしている）。
+     長い回答のときは、この高さを超えて伸びる。 */
+  min-height: var(--bubble-min);
+  max-height: 100%;
+  display: flex;
+}
+
+.bubble::before,
+.bubble::after {
+  content: "";
+  position: absolute;
+  /* 口元の高さに合わせる。吹き出しごと下げた分は差し引く。
+     それでも外へ出るときは、吹き出しの中に収める
+     （はみ出すと尻尾だけが宙に浮く。100% は吹き出しの高さ）。 */
+  top: clamp(
+    6px,
+    calc(var(--mouth-from-talk) - var(--talk-drop)),
+    calc(100% - 20px)
+  );
+  width: 0;
+  height: 0;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+}
+
+.bubble::before {
+  right: -19px;
+  margin-top: -13px;
+  border-left: 19px solid var(--border);
+}
+
+.bubble::after {
+  right: -16px;
+  margin-top: -11px;
+  border-top-width: 11px;
+  border-bottom-width: 11px;
+  border-left: 16px solid #fff;
+}
+
+.bubble-inner {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0; /* 長い単語やURLがあっても、吹き出しが横に破綻しないように */
+}
+
+.answer-pending {
+  margin: 0 0 8px;
+  font-size: clamp(13px, calc(var(--font) * 0.59), 24px);
+  color: var(--red);
+}
+
+.answer-text {
+  margin: 0;
+  font-size: var(--font);
+  line-height: 1.6;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+/* AIが作った回答であることの断り書き */
+.answer-ai {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  font-size: clamp(12px, calc(var(--font) * 0.53), 20px);
+  line-height: 1.5;
+  color: var(--sub);
+}
+
+/* 回答がまだ無いときの案内 */
+.answer-text.empty {
+  font-size: calc(var(--font) * 0.82);
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 写真とQRコード。会話領域の下側に大きく出す。
+   押さなくても読める大きさにし、キャラクターには重ねてよい。
+   吹き出しとは重ならないよう、吹き出し側の高さを下で制限している。 */
+.answer-media {
+  position: absolute;
+  left: var(--gutter);
+  bottom: var(--gutter);
+  max-width: calc(100cqw - var(--gutter) * 2);
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.answer-photo-box {
+  height: var(--media-h);
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* 写真やQRが出ているときは、吹き出しがその上までで収まるようにする
+   （重ならないよう、下の帯のぶんだけ吹き出しの高さを制限する） */
+.stage:has(.answer-media:not([hidden])) .talk {
+  max-height: calc(100% - var(--gutter) * 2 - var(--q-space)
+    - var(--talk-drop) - var(--qr-h) - 12px);
+}
+
+.stage:has(.answer-photo-box:not([hidden])) .talk {
+  max-height: calc(100% - var(--gutter) * 2 - var(--q-space)
+    - var(--talk-drop) - var(--media-h) - 12px);
+}
+
+.answer-photo {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: 100%;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+/* 写真は押すと大きく見られる（案内図は小さいままだと読めない） */
+.answer-photo { cursor: zoom-in; }
+
+.answer-photo-hint {
+  flex: none;
+  margin: 4px 0 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: clamp(11px, calc(var(--font) * 0.4), 16px);
+  color: var(--sub);
+}
+
+/* 拡大した写真 */
+.photo-view {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.photo-view-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.photo-view-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.answer-qr-box {
+  width: 124px;
+  flex: none;
+  text-align: center;
+}
+
+.answer-qr {
+  padding: 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.answer-qr svg {
+  display: block;
+  width: 108px;
+  height: 108px;
+}
+
+.answer-qr-caption {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+/* 観光客の端末で出すリンク。QRコードの代わりなので同じ場所に置く。
+   歩きながら押すことを考えて、指の当たる大きさを確保する。 */
+.answer-link {
+  display: inline-block;
+  min-height: 44px;
+  padding: 11px 18px;
+  border-radius: 22px;
+  background: var(--green);
+  color: #fff;
+  font-size: clamp(14px, 3.4cqw, 18px);
+  font-weight: 600;
+  line-height: 22px;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.answer-link:active {
+  background: #244d25;
+}
+
+/* ── 押して話すボタン ───────────────────────── */
+
+.talk-button {
+  flex: none;
+  height: clamp(72px, 9vmin, 120px);
+  margin-top: 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: clamp(20px, 3.2vmin, 40px);
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.talk-button.listening {
+  background: var(--red);
+}
+
+.talk-button:disabled {
+  background: #9AAE9B;
+  cursor: default;
+}
+
+/* ── よくある質問（右から左へ流れる） ─────────── */
+
+.faq-strip {
+  flex: none;
+  margin-top: 12px;
+  overflow: hidden;
+  /* 端を薄くして、流れが画面の外へ続いているように見せる */
+  mask-image: linear-gradient(90deg, transparent, #000 24px,
+    #000 calc(100% - 24px), transparent);
+}
+
+.faq-track {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  /* 同じ並びを2回置いてあるので、半分進んだ時点で元と同じ絵になる */
+  to { transform: translateX(-50%); }
+}
+
+/* 触れている間は止める（動いている札は押しにくいため） */
+.faq-strip:hover .faq-track,
+.faq-strip:active .faq-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-track { animation: none; }
+  .faq-strip { overflow-x: auto; }
+}
+
+.chip {
+  flex: none;
+  padding: 0 clamp(12px, 1.6vmin, 22px);
+  height: clamp(36px, 4.4vmin, 58px);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--pale);
+  color: var(--green);
+  font-family: inherit;
+  font-size: clamp(13px, 1.9vmin, 24px);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chip:active {
+  background: var(--green);
+  color: #fff;
+}
+
+/* ── 文字で質問する ───────────────────────── */
+
+.typed {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.typed-input {
+  flex: 1;
+  height: clamp(44px, 5.5vmin, 72px);
+  padding: 0 14px;
+  font-size: clamp(15px, 2.2vmin, 28px);
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.typed-send {
+  height: clamp(44px, 5.5vmin, 72px);
+  padding: 0 clamp(16px, 2.4vmin, 32px);
+  border: none;
+  border-radius: 10px;
+  background: var(--green);
+  color: #fff;
+  font-size: clamp(15px, 2.2vmin, 28px);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ── 言語切り替え ───────────────────────────── */
+
+.languages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  flex: none;
+}
+
+.lang-button {
+  flex: 1 1 0;
+  min-width: 96px;
+  height: clamp(42px, 5.2vmin, 68px);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: clamp(14px, 2.1vmin, 26px);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.lang-button.selected {
+  background: var(--green);
+  border: 2px solid var(--green);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* ── 画面が広いとき（PCなど） ─────────────────── */
+
+@media (min-width: 721px) {
+  /* 画面を左右に分け、右半分のちょうど真ん中に立たせる。
+     （立ち絵の中心が会話領域の75%の位置に来るように右端からの距離を決める） */
+  .stage { --char-right: calc(25cqw - var(--char-w) / 2); }
+}
+
+/* ── 画面が狭いとき（スマートフォンなど） ───────── */
+
+@media (max-width: 720px) {
+  .screen { padding: 12px; }
+
+  /* 幅が足りないため、顔の手前に収める計算をやめて幅の割合で決める。
+     キャラクターは少し小さくして右端に寄せ、吹き出しとの重なりを抑える。 */
+  .stage {
+    --gutter: 12px;
+    --char-fill: 90cqh;
+    --char-right: calc(-9cqw * var(--char-bleed)); /* 右端から少しはみ出させる */
+    --s: var(--s-max);     /* 幅が足りないので、顔の手前まで目一杯使う */
+  }
+
+  /* 幅が狭くなるぶん、写真とQRも小さくする */
+  .stage { --media-h: min(40cqh, 240px); --qr-h: 130px; }
+  .answer-media { gap: 10px; }
+  .answer-qr-box { width: 96px; }
+  .answer-qr svg { width: 80px; height: 80px; }
+
+  .faq-strip { margin-top: 8px; }
+  .typed { margin-top: 8px; }
+  .languages { margin-top: 8px; gap: 6px; }
+  .lang-button { flex: 1 1 30%; min-width: 0; }
+}
+
+/* ── 画面が縦に短いとき（横向きのスマートフォンなど） ─────── */
+
+@media (max-height: 620px) {
+  .screen { padding: 10px 12px 12px; }
+  .stage { min-height: 110px; }
+  .faq-strip, .typed, .languages { margin-top: 6px; }
+  .chip { height: 32px; font-size: 13px; }
+  .typed-input, .typed-send { height: 40px; font-size: 15px; }
+  .talk-button { height: 52px; margin-top: 8px; font-size: 18px; }
+  .lang-button { height: 36px; font-size: 13px; }
+}
+
+/* ── 職員用の画面 ───────────────────────────── */
+
+/* ── 利用前の同意 ──────────────────────────── */
+
+.consent {
+  position: fixed;
+  inset: 0;
+  z-index: 20;   /* 職員用の画面より前に出す */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(31, 61, 32, 0.92);
+}
+
+.consent-box {
+  display: flex;
+  flex-direction: column;
+  width: min(680px, 100%);
+  max-height: 100%;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* 読める言語に切り替えられないと、同意をいただく意味がない */
+.consent-langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--pale);
+}
+
+.consent-lang {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.consent-lang.on {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 本文だけを流す。ボタンは常に見えている必要がある
+   （最後まで読まないと押せないと、読まずに諦める人が出る） */
+.consent-body {
+  flex: 1 1 auto;
+  padding: 20px 20px 8px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.consent-body h2 {
+  margin: 0 0 4px;
+  color: var(--green);
+  font-size: 22px;
+}
+
+.consent-body h3 {
+  margin: 18px 0 4px;
+  font-size: 15px;
+  color: var(--green-dark);
+}
+
+.consent-body p { margin: 8px 0; }
+
+.consent-body ul {
+  margin: 4px 0;
+  padding-left: 1.3em;
+}
+
+.consent-body li { margin: 3px 0; }
+
+.consent-provider {
+  color: var(--sub);
+  font-size: 14px;
+}
+
+.consent-closing {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--sub);
+  font-size: 14px;
+}
+
+.consent-actions {
+  flex: 0 0 auto;
+  padding: 12px 20px 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.consent-agree,
+.consent-decline {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 26px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.consent-agree {
+  border: none;
+  background: var(--green);
+  color: #fff;
+}
+
+.consent-agree:active { background: var(--green-dark); }
+
+/* 断る方も同じ大きさで並べる。小さくすると選びにくく、選択が形だけになる */
+.consent-decline {
+  margin-top: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--green-dark);
+}
+
+.consent-decline:active { background: var(--pale); }
+
+.consent-hint {
+  margin: 10px 0 0;
+  color: var(--sub);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-height: 520px) {
+  /* 横向きの小さな画面では、本文を詰めてボタンを画面に残す */
+  .consent-body {
+    padding: 14px 16px 4px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .consent-body h2 { font-size: 19px; }
+}
+
+.log-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.log-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 12px;
+  background: var(--green);
+  color: #fff;
+  flex: none;
+}
+
+.log-bar h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.log-bar button {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.log-actions { display: flex; gap: 8px; }
+
+.log-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.log-empty {
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+  margin-top: 80px;
+}
+
+.log-summary {
+  display: flex;
+  padding: 20px;
+  background: var(--pale);
+  border-radius: 12px;
+}
+
+.log-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.log-stat span { font-size: 12px; color: var(--sub); }
+.log-stat strong { font-size: 26px; color: var(--green-dark); }
+
+.log-section { margin-top: 24px; }
+
+.log-section h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--green-dark);
+}
+
+.log-sub {
+  margin: 2px 0 8px;
+  font-size: 12px;
+  color: var(--sub);
+}
+
+.voice-row {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.voice-select {
+  flex: 1;
+  height: 40px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.voice-test {
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--green);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 言語ごとの声の選択。言語名の幅を揃えて、縦に読めるようにする */
+.voice-lang {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.voice-lang-name {
+  flex: 0 0 6em;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.voice-lang-missing .voice-lang-name {
+  color: var(--muted, #777);
+  font-weight: 400;
+}
+
+.voice-lang-none {
+  font-size: 13px;
+  color: var(--muted, #777);
+}
+
+@media (max-width: 480px) {
+  /* 幅が狭いと選択欄が潰れるため、言語名を上の行に出す */
+  .voice-lang {
+    flex-wrap: wrap;
+  }
+
+  .voice-lang-name {
+    flex: 1 0 100%;
+  }
+}
+
+.log-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.log-row.warn {
+  background: #FFF6F5;
+  border-color: #E8C4C0;
+}
+
+.log-row-count { color: var(--sub); }
+
+.log-empty-line { font-size: 14px; color: rgba(0, 0, 0, 0.45); }
+
+.log-all {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.log-all summary { cursor: pointer; }
+.log-all summary .log-sub { display: block; margin: 2px 0 0; }
+
+.log-entry {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid #F0F3EE;
+  font-size: 14px;
+}
+
+.log-time { width: 74px; flex: none; font-size: 12px; color: var(--sub); }
+
+.log-lang {
+  flex: none;
+  align-self: flex-start;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--pale);
+  font-size: 11px;
+  color: var(--green);
+}
+
+.log-text { display: flex; flex-direction: column; gap: 2px; }
+
+.log-meta { font-size: 12px; color: var(--sub); }
+.log-meta.warn { color: var(--red); }
+.log-meta em { font-style: normal; font-size: 11px; color: var(--red); }
+
+.log-more {
+  margin: 12px auto;
+  display: block;
+  border: none;
+  background: transparent;
+  color: var(--green);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.log-note {
+  margin-top: 24px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: rgba(0, 0, 0, 0.45);
+}

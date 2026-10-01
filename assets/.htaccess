@@ -1,0 +1,23 @@
+# 素材（質問回答集・画像・音声）の更新が、設置端末に届くようにする。
+#
+# ブラウザは、指定が無いと「しばらく取りに来なくてよい」と自分で判断する。
+# そのせいで、更新した直後に新しいファイルと古いファイルが混ざり、
+# 「◯◯ is not a function」のような止まり方をすることがある。
+# とくに faq.json は、質問を足すたびに変わる。
+#
+# no-cache は「毎回ダウンロードし直す」ではなく「毎回確かめてから使う」。
+# 変わっていなければ中身は送られてこない（304）ので、通信量はほとんど増えない。
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|js|css|json)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+# 画像・音声は差し替えの頻度が低いので、1時間は確かめずに使ってよい。
+# （差し替えた直後に反映されないときは、強制再読み込みで直る）
+<IfModule mod_headers.c>
+    <FilesMatch "\.(png|jpg|jpeg|gif|svg|webp|wav|mp3|m4a)$">
+        Header set Cache-Control "max-age=3600"
+    </FilesMatch>
+</IfModule>

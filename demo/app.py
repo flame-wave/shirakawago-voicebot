@@ -16,14 +16,15 @@ from pathlib import Path
 import qrcode
 import streamlit as st
 
-from faq_engine import answer_for, load_faqs, search
+from faq_engine import answer_for, load_faqs, load_synonyms, search
 
 # ── 設定 ───────────────────────────────────────────────
 ROOT = Path(__file__).resolve().parent.parent
 FAQ_PATH = ROOT / "assets" / "faq.json"
 PHOTO_DIR = ROOT / "assets" / "photo"
 
-LANGS = {"ja": "日本語", "en": "English", "zh": "中文", "ko": "한국어"}
+LANGS = {"ja": "日本語", "en": "English", "zh": "中文", "ko": "한국어",
+         "es": "Español", "fr": "Français"}
 
 UI = {
     "prompt": {
@@ -31,24 +32,32 @@ UI = {
         "en": "Type your question",
         "zh": "请输入您的问题",
         "ko": "질문을 입력해 주세요",
+        "es": "Escriba su pregunta",
+        "fr": "Saisissez votre question",
     },
     "staff": {
         "ja": "申し訳ございません。その質問は案内所の係員にお尋ねください。",
         "en": "Sorry, I could not find an answer. Please ask the staff at the information desk.",
         "zh": "很抱歉，未能找到答案。请向服务台的工作人员咨询。",
         "ko": "죄송합니다. 안내소 직원에게 문의해 주세요.",
+        "es": "Lo sentimos, no hemos encontrado una respuesta. Pregunte al personal del centro de información.",
+        "fr": "Désolé, nous n'avons pas trouvé de réponse. Veuillez demander au personnel du centre d'information.",
     },
     "pending": {
         "ja": "",
         "en": "English text is not ready yet. Showing Japanese.",
         "zh": "该语言的内容正在准备中，暂以日语显示。",
         "ko": "해당 언어는 준비 중입니다. 일본어로 표시합니다.",
+        "es": "El texto en español aún no está disponible. Se muestra en japonés.",
+        "fr": "Le texte français n'est pas encore disponible. Affichage en japonais.",
     },
     "details": {
         "ja": "詳しくはこちら",
         "en": "Scan for details",
         "zh": "扫码查看详情",
         "ko": "자세한 내용은 스캔",
+        "es": "Escanee para más detalles",
+        "fr": "Scannez pour en savoir plus",
     },
 }
 
@@ -66,6 +75,8 @@ SAMPLES = {
            "Is there a bus to the observatory?"],
     "zh": ["洗手间在哪里", "垃圾扔在哪里"],
     "ko": ["화장실은 어디입니까", "쓰레기는 어디에 버립니까"],
+    "es": ["¿Dónde están los aseos?", "¿Dónde puedo tirar la basura?"],
+    "fr": ["Où sont les toilettes ?", "Où puis-je jeter mes déchets ?"],
 }
 
 st.set_page_config(page_title="白川郷 音声案内 デモ", page_icon="🏘️", layout="wide")
@@ -90,7 +101,7 @@ st.markdown("""
 
 @st.cache_data
 def get_faqs(mtime: float):
-    return load_faqs(FAQ_PATH)
+    return load_faqs(FAQ_PATH) + (load_synonyms(FAQ_PATH),)
 
 
 def qr_image(url: str) -> str:
@@ -107,7 +118,7 @@ if not FAQ_PATH.exists():
     st.error(f"質問回答集が見つかりません: {FAQ_PATH}")
     st.stop()
 
-faqs, version = get_faqs(FAQ_PATH.stat().st_mtime)
+faqs, version, synonyms = get_faqs(FAQ_PATH.stat().st_mtime)
 
 # ── サイドバー ──────────────────────────────────────────
 with st.sidebar:
@@ -164,7 +175,7 @@ with tab_try:
     question = st.text_input(UI["prompt"][lang], key="q")
 
     if question.strip():
-        result = search(faqs, question, lang)
+        result = search(faqs, question, lang, synonyms)
 
         st.markdown("---")
         if not result.hit:
@@ -242,7 +253,7 @@ with tab_check:
         rows = []
         hit = 0
         for line in [x.strip() for x in lines.splitlines() if x.strip()]:
-            r = search(faqs, line, lang)
+            r = search(faqs, line, lang, synonyms)
             hit += r.hit
             rows.append({
                 "質問": line,

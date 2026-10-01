@@ -37,6 +37,39 @@ def contains(keyword: str, text: str) -> bool:
     return False
 
 
+# 入力文に足した語を区切る印。語のまたがり一致を防ぐために挟む。
+SEP = chr(0)
+
+
+def expand(text: str, synonyms: dict, lang: str = "ja") -> str:
+    """言い換え表を使って、入力文に代表語を足す。
+
+    「銀行ありますか」→ 末尾に atm を足す、というように、
+    観光客の言い方を、質問例に書かれている語へ橋渡しする。
+    元の文は消さずに足すだけなので、これまで当たっていたものは当たり続ける。
+    """
+    if not synonyms:
+        return text
+
+    table = {}
+    for key in ("ja", lang):
+        table.update(synonyms.get(key) or {})
+
+    extra = []
+    for rep_word, words in table.items():
+        rep_n = normalize(rep_word)
+        if not rep_n or rep_n in text:
+            continue  # すでに入っているなら足さない
+        for w in words:
+            wn = normalize(w)
+            if wn and wn in text:
+                extra.append(rep_n)
+                break
+    if not extra:
+        return text
+    return text + SEP + SEP.join(extra)
+
+
 @dataclass
 class MatchResult:
     faq: dict | None
@@ -67,15 +100,44 @@ def answer_for(faq: dict, lang: str) -> tuple:
     return faq.get("answer", ""), True
 
 
-def search(faqs: list, text: str, lang: str = "ja") -> MatchResult:
+COMMON = "共通"
+
+
+def place_of(faq: dict) -> str:
+    return faq.get("place") or COMMON
+
+
+def search(faqs: list, text: str, lang: str = "ja",
+           synonyms: dict | None = None, place: str | None = None) -> MatchResult:
     """
     質問例のスペースは「かつ」を意味する。
     「ごみ どこ」は、ごみ と どこ の両方が含まれるときだけ一致する。
+
+    synonyms を渡すと、言い換え表で入力文を補ってから照合する。
+
+    place（いまいる案内所）を渡すと、その案内所向けの回答を先に探し、
+    無ければ「共通」の回答を探す。どこにいるか分からないときは共通だけを見る。
+    ロッカーやATMのように、案内所ごとに答えが違うものがあるため。
     """
-    t = normalize(text)
+    t = expand(normalize(text), synonyms or {}, lang)
     if not t:
         return MatchResult(None, 0)
 
+    if place:
+        here = [f for f in faqs if place_of(f) == place]
+        hit = _search_within(here, t, lang)
+        if hit.hit:
+            return hit
+        return _search_within([f for f in faqs if place_of(f) == COMMON], t, lang)
+
+    if any("place" in f for f in faqs):
+        # 場所の情報があるのに現在地が分からない場合は、共通の回答だけを使う
+        faqs = [f for f in faqs if place_of(f) == COMMON]
+    return _search_within(faqs, t, lang)
+
+
+def _search_within(faqs: list, t: str, lang: str) -> MatchResult:
+    """正規化済みの文 t で、渡されたFAQの中から最も確度の高いものを選ぶ。"""
     best, best_score, best_ex, best_kw = None, 0, "", []
 
     for faq in faqs:
@@ -99,3 +161,9 @@ def load_faqs(path) -> tuple:
     """(FAQ一覧, 版) を返す。"""
     data = json.loads(Path(path).read_text(encoding="utf-8"))
     return data.get("faqs", []), data.get("version", "不明")
+
+
+def load_synonyms(path) -> dict:
+    """言い換え表を返す。入っていなければ空。"""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    return data.get("synonyms", {})

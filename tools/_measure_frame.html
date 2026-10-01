@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>寸法を測る枠</title>
+<!--
+  案内アプリを、指定した大きさの枠の中で開くためのページ。
+
+  ヘッドレスのブラウザは、窓を500pxより狭くできない。
+  スマートフォンの幅（393px）で確かめるには、枠の中で開く必要がある。
+  tools/measure_layout.py から使う。人が開くものではない。
+-->
+<style>
+  html, body { margin: 0; background: #888; }
+  iframe { display: block; border: 0; }
+</style>
+</head>
+<body>
+<script>
+  const q = new URLSearchParams(location.search);
+  const w = Number(q.get('w')) || 393;
+  const h = Number(q.get('h')) || 852;
+  const target = q.get('target') || '/webapp/';
+
+  const frame = document.createElement('iframe');
+  frame.width = w;
+  frame.height = h;
+  frame.src = target + (target.includes('?') ? '&' : '?') + 'measure=1';
+  document.body.appendChild(frame);
+
+  // 枠の中のアプリが測り終えるのを待ち、結果をこちら側へ写す
+  const started = Date.now();
+  const timer = setInterval(() => {
+    let found = null;
+    try {
+      found = frame.contentDocument.getElementById('measure-result');
+    } catch (_) {
+      // 読み込み中はまだ触れない
+    }
+    if (found) {
+      clearInterval(timer);
+      const pre = document.createElement('pre');
+      pre.id = 'measure-result';
+      pre.textContent = found.textContent;
+      pre.style.display = 'none';   // 写真に写り込まないように
+      document.body.appendChild(pre);
+    } else if (Date.now() - started > 15000) {
+      clearInterval(timer);
+      const pre = document.createElement('pre');
+      pre.id = 'measure-error';
+      pre.textContent = '枠の中のアプリから結果を受け取れませんでした';
+      document.body.appendChild(pre);
+    }
+  }, 150);
+</script>
+</body>
+</html>

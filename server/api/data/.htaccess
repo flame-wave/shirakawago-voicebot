@@ -1,0 +1,4 @@
+# 質問の記録は外から見えてはいけない
+Require all denied
+Order allow,deny
+Deny from all

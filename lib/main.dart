@@ -8,6 +8,7 @@ import 'voice_service.dart';
 import 'answer_view.dart';
 import 'app_language.dart';
 import 'language_selector.dart';
+import 'background_view.dart';
 import 'question_log.dart';
 import 'log_screen.dart';
 
@@ -295,8 +296,6 @@ class _BotScreenState extends State<BotScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final photoWidget = AnswerView.photoWidget(_photo);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('白川郷 音声案内'),
@@ -313,77 +312,107 @@ class _BotScreenState extends State<BotScreen> {
               );
             },
             child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('データ $_dataSource',
-                    style: const TextStyle(fontSize: 11, color: Colors.white70)),
-                Text(_dataVersion,
-                    style: const TextStyle(fontSize: 11, color: Colors.white70)),
-              ],
-            ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('データ $_dataSource',
+                      style: const TextStyle(fontSize: 11, color: Colors.white70)),
+                  Text(_dataVersion,
+                      style: const TextStyle(fontSize: 11, color: Colors.white70)),
+                ],
+              ),
             ),
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 言語切り替え（手動選択）
-            LanguageSelector(current: _lang, onChanged: _changeLanguage),
-            const SizedBox(height: 16),
-
-            // 上部：キャラクター（＋写真がある回答なら横に並べる）
+            // 会話の領域。キャラクターを大きく置き、その左に吹き出しを重ねる。
             Expanded(
-              flex: 3,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: photoWidget != null ? 2 : 1,
-                    child: CharacterView(state: _charState),
-                  ),
-                  if (photoWidget != null) ...[
-                    const SizedBox(width: 16),
-                    Expanded(flex: 3, child: photoWidget),
-                  ],
-                ],
+              child: LayoutBuilder(
+                builder: (context, box) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: Stack(
+                    clipBehavior: Clip.hardEdge,
+                    children: [
+                      // 背景（白川郷の集落＋近未来的な意匠）
+                      const Positioned.fill(child: BackgroundView()),
+
+                      // キャラクター（右寄せ・下端に立たせる）
+                      // 全身をそのまま使い、ゆっくり上下させて呼吸を表す
+                      Positioned(
+                        right: -20,
+                        bottom: -6,
+                        height: box.maxHeight * 1.02,
+                        child: CharacterView(state: _charState),
+                      ),
+
+                      // 左：質問・回答の吹き出しと、その下の写真・QR
+                      Positioned(
+                        left: 16,
+                        top: 16,
+                        width: box.maxWidth * 0.54,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // 聞き取った質問（観光客側の発話）
+                            if (_recognized.isNotEmpty)
+                              Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEDF4E6),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Text(
+                                  '${UiStrings.of('question', _lang)}: $_recognized',
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Color(0xFF2C5F2D)),
+                                ),
+                              ),
+                            // 回答（吹き出し）と、その下の写真・QR
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: box.maxHeight * 0.72,
+                              ),
+                              child: AnswerView(
+                                answer: _answer,
+                                photo: _photo,
+                                link: _link,
+                                lang: _lang,
+                                isFallback: _isFallback,
+                                placeholder: UiStrings.of('prompt', _lang),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    ),
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // 認識した質問
-            Text(
-              _recognized.isEmpty
-                  ? UiStrings.of('prompt', _lang)
-                  : '${UiStrings.of('question', _lang)}: $_recognized',
-              style: const TextStyle(fontSize: 18, color: Colors.black54),
-            ),
-            const SizedBox(height: 12),
-
-            // 回答（字幕＋QRコード）
-            AnswerView(
-              answer: _answer,
-              photo: _photo,
-              link: _link,
-              lang: _lang,
-              isFallback: _isFallback,
-            ),
-            const SizedBox(height: 24),
-
-            // 押して話すボタン
+            // 押して話すボタン（1回押すと開始、もう1回で終了）
             GestureDetector(
               onTap: _toggleListening,
               child: Container(
-                height: 90,
+                height: 92,
                 decoration: BoxDecoration(
                   color: _listening
                       ? const Color(0xFFB85042)
                       : const Color(0xFF2C5F2D),
-                  borderRadius: BorderRadius.circular(45),
+                  borderRadius: BorderRadius.circular(46),
                 ),
                 child: Center(
                   child: Text(
@@ -399,6 +428,10 @@ class _BotScreenState extends State<BotScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
+
+            // 言語切り替え（ボタンのすぐ下に置き、迷わないようにする）
+            LanguageSelector(current: _lang, onChanged: _changeLanguage),
           ],
         ),
       ),

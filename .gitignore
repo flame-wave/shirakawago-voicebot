@@ -43,3 +43,18 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Python（管理画面・ツール用の仮想環境）
+.venv/
+__pycache__/
+
+# 中継サーバの設定（APIキーを含むため）。
+# 名前を変えた控え（config1.php, config.bak など）も一緒に除く。
+# 1つでも取りこぼすと、APIキーがそのまま公開される。
+server/api/config*.php
+!server/api/config.sample.php
+server/api/data/*.json
+server/api/data/*.jsonl
+
+# 寸法を確かめるときの画面写真（tools/measure_layout.py --shot）
+tools/_shots/

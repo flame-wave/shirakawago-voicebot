@@ -1,0 +1,10 @@
+# 設定ファイル（APIキー）と記録を、外から直接開けないようにする。
+<FilesMatch "^(config|config\.sample)\.php$">
+    Require all denied
+</FilesMatch>
+
+# 古いサーバ（Apache 2.2）向けの書き方も併記しておく
+<FilesMatch "^(config|config\.sample)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2C5F2D">
+<title>白川郷 音声案内</title>
+<link rel="stylesheet" href="styles.css">
+<!-- QRコードの生成（同梱。外部への通信は行わない） -->
+<script src="vendor/qrcode.js"></script>
+</head>
+<body>
+
+<header class="appbar">
+  <h1>白川郷 音声案内</h1>
+  <!-- いまどの案内所の近くにいるか。
+       ロッカーやATMのように、案内所ごとに答えが違う質問で使う。 -->
+  <button class="place-pill" id="placeButton" type="button">📍 現在地を選ぶ</button>
+
+  <!-- キャラクターの切り替え。好みのものを選んでもらう。 -->
+  <button class="char-pill" id="characterButton" type="button">🧑 キャラクター</button>
+
+  <!-- 職員が更新の反映を確認するための表示。 -->
+  <div class="data-status" id="dataStatus" role="status">
+    <span>データ <span id="dataSource"></span></span>
+    <span id="dataVersion"></span>
+  </div>
+</header>
+
+<main class="screen">
+  <!-- 会話の領域。キャラクターを大きく置き、その左に吹き出しを重ねる。 -->
+  <div class="stage" id="stage">
+    <canvas class="background" id="background"></canvas>
+
+    <!-- キャラクター（右寄せ・下端に立たせる） -->
+    <div class="character" id="character">
+      <img class="character-img" alt="">
+      <div class="character-placeholder" hidden></div>
+    </div>
+
+    <!-- 質問・回答の吹き出し -->
+    <div class="talk">
+      <!-- 聞き取った質問。吹き出しの上に出す（LINEのような並び） -->
+      <div class="question-bubble" id="questionBubble" hidden></div>
+
+      <div class="answer" id="answer">
+        <div class="bubble">
+          <div class="bubble-inner">
+            <p class="answer-pending" hidden></p>
+            <p class="answer-text"></p>
+            <p class="answer-ai" hidden></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 写真とQRコード。会話領域の下側に大きく出す。
+         吹き出しには重ならないが、キャラクターには重なってよい。 -->
+    <div class="answer-media" hidden>
+      <figure class="answer-photo-box" hidden>
+        <img class="answer-photo" alt="">
+        <figcaption class="answer-photo-hint"></figcaption>
+      </figure>
+      <!-- 詳しい案内への入口。
+           据え置き端末ではQRコード、観光客の端末では押せるリンクを出す。 -->
+      <div class="answer-qr-box">
+        <div class="answer-qr" hidden></div>
+        <p class="answer-qr-caption" hidden></p>
+        <a class="answer-link" hidden target="_blank" rel="noopener noreferrer"></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- よくある質問。右から左へ流し、触れている間は止まる。
+       押すとその質問をそのまま聞いたことになる（声を出さずに使える）。 -->
+  <div class="faq-strip" id="faqStrip">
+    <div class="faq-track" id="faqTrack"></div>
+  </div>
+
+  <!-- 文字で質問する入口。声を出せない場所や、動作確認に使う。 -->
+  <form class="typed" id="typedForm">
+    <input class="typed-input" id="typedInput" type="text" autocomplete="off"
+           enterkeyhint="send">
+    <button class="typed-send" id="typedSend" type="submit"></button>
+  </form>
+
+  <!-- 押して話すボタン（1回押すと開始、もう1回で終了） -->
+  <button class="talk-button" id="talkButton" type="button"></button>
+
+  <!-- 言語切り替え（ボタンのすぐ下に置き、迷わないようにする） -->
+  <nav class="languages" id="languages"></nav>
+</main>
+
+<!-- 写真の拡大（案内図などは小さいままだと読めないため） -->
+<div class="photo-view" id="photoView" hidden>
+  <img class="photo-view-img" id="photoViewImg" alt="">
+  <button class="photo-view-close" id="photoViewClose" type="button"></button>
+</div>
+
+<!-- 現在地の選択（上のバーの表示を押すと出る） -->
+<div class="place-menu" id="placeMenu" hidden>
+  <div class="place-menu-box">
+    <p class="place-menu-title" id="placeMenuTitle"></p>
+    <div class="place-menu-list" id="placeMenuList"></div>
+    <button class="place-menu-close" id="placeMenuClose" type="button"></button>
+  </div>
+</div>
+
+<!-- キャラクターの選択（上のバーのボタンを押すと出る） -->
+<div class="place-menu" id="characterMenu" hidden>
+  <div class="place-menu-box">
+    <p class="place-menu-title" id="characterMenuTitle"></p>
+    <div class="char-menu-list" id="characterMenuList"></div>
+    <button class="place-menu-close" id="characterMenuClose" type="button"></button>
+  </div>
+</div>
+
+<!-- 利用前の同意（記録することを伝える）。
+     観光客の端末では初回だけ、据え置き端末では次の方のたびに出す。 -->
+<div class="consent" id="consentScreen" hidden></div>
+
+<!-- 職員用の設定（?setup=1 を付けて開いたときだけ使う）。
+     質問の記録は管理者画面で見る。この端末からは見られない。 -->
+<div class="log-screen" id="setupScreen" hidden></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

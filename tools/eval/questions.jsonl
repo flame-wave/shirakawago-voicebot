@@ -1,0 +1,135 @@
+{"text": "展望台までバスで行きたいんですけど", "expect": ["shuttle_observatory", "observatory_access_bt", "observatory_access_deai", "observatory_access_common"]}
+{"text": "シャトルバスの乗り場はどこですか", "expect": ["shuttle_observatory"]}
+{"text": "展望台行きのバスはいくらですか", "expect": ["shuttle_observatory"]}
+{"text": "子供もバス代かかりますか", "expect": ["shuttle_observatory"]}
+{"text": "タクシーを呼んでもらえますか", "expect": ["taxi"]}
+{"text": "この辺でタクシーは使えますか", "expect": ["taxi"]}
+{"text": "配車をお願いできますか", "expect": ["taxi"]}
+{"text": "寺尾の駐車場に戻りたいんですけど", "expect": ["terao_shuttle_bt", "terao_shuttle_deai", "terao_shuttle_common"]}
+{"text": "車を停めた駐車場まではどうやって帰りますか", "expect": ["terao_shuttle_bt", "terao_shuttle_deai", "terao_shuttle_common"]}
+{"text": "寺尾行きのバスは何時に出ますか", "expect": ["terao_shuttle_bt", "terao_shuttle_deai", "terao_shuttle_common"]}
+{"text": "お金をおろせるところはありますか", "expect": ["atm_bt", "atm_deai", "atm_common"]}
+{"text": "ATMはどこにありますか", "expect": ["atm_bt", "atm_deai", "atm_common"]}
+{"text": "海外のカードが使えるATMはありますか", "expect": ["atm_bt", "atm_deai", "atm_common"]}
+{"text": "この近くに銀行はありますか", "expect": ["atm_bt", "atm_deai", "atm_common"]}
+{"text": "帰りのバスはどこから乗りますか", "expect": ["bus_return", "bus_return_common"]}
+{"text": "高速バスの乗り場を教えてください", "expect": ["bus_return", "bus_return_common"]}
+{"text": "予約していないんですけどバスに乗れますか", "expect": ["bus_return", "bus_return_common"]}
+{"text": "両替したいんですけど", "expect": ["currency_exchange_bt", "currency_exchange_deai", "currency_exchange_common"]}
+{"text": "ドルを円に替えられますか", "expect": ["currency_exchange_bt", "currency_exchange_deai", "currency_exchange_common"]}
+{"text": "千円札を百円玉にできますか", "expect": ["currency_exchange_bt", "currency_exchange_deai", "currency_exchange_common"]}
+{"text": "荷物を預けたいです", "expect": ["luggage_bt", "luggage_deai", "luggage_common"]}
+{"text": "スーツケースを置ける場所はありますか", "expect": ["luggage_bt", "luggage_deai", "luggage_common"]}
+{"text": "コインロッカーは空いていますか", "expect": ["luggage_bt", "luggage_deai", "luggage_common"]}
+{"text": "大きい鞄をどこかに置いておけますか", "expect": ["luggage_bt", "luggage_deai", "luggage_common"]}
+{"text": "駐車場代はいくらですか", "expect": ["parking_payment"]}
+{"text": "駐車料金はカードで払えますか", "expect": ["parking_payment"]}
+{"text": "駐車場の支払いはどこでしますか", "expect": ["parking_payment"]}
+{"text": "記念スタンプはありますか", "expect": ["stamp_bt", "stamp_deai", "stamp_common"]}
+{"text": "御朱印はもらえますか", "expect": ["stamp_bt", "stamp_deai", "stamp_common"]}
+{"text": "切手は売っていますか", "expect": ["stamp_bt", "stamp_deai", "stamp_common"]}
+{"text": "入村料はかかりますか", "expect": ["admission_fee"]}
+{"text": "見学するのにお金はいりますか", "expect": ["admission_fee", "gassho_facilities"]}
+{"text": "入場料はいくらですか", "expect": ["admission_fee", "gassho_facilities"]}
+{"text": "あの山の名前は何ですか", "expect": ["mountain_names", "mountain_names_common"]}
+{"text": "正面に見える山はなんという山ですか", "expect": ["mountain_names", "mountain_names_common"]}
+{"text": "白山は見えますか", "expect": ["mountain_names", "mountain_names_common"]}
+{"text": "展望台へはどうやって行きますか", "expect": ["observatory_access_bt", "observatory_access_deai", "observatory_access_common"]}
+{"text": "展望台まで歩いてどのくらいかかりますか", "expect": ["observatory_access_bt", "observatory_access_deai", "observatory_access_common"]}
+{"text": "城山展望台への道を教えてください", "expect": ["observatory_access_bt", "observatory_access_deai", "observatory_access_common"]}
+{"text": "どのくらいで回れますか", "expect": ["shuyu_time"]}
+{"text": "観光にどれくらい時間がかかりますか", "expect": ["shuyu_time"]}
+{"text": "半日あれば足りますか", "expect": ["shuyu_time"]}
+{"text": "白水湖に行きたいです", "expect": ["waterfall_lake"]}
+{"text": "滝は見られますか", "expect": ["waterfall_lake"]}
+{"text": "ベジタリアンでも食べられるお店はありますか", "expect": ["halal_vegetarian"]}
+{"text": "ハラールに対応したお店はありますか", "expect": ["halal_vegetarian"]}
+{"text": "肉が食べられないんですけど何かありますか", "expect": ["halal_vegetarian"]}
+{"text": "名物は何ですか", "expect": ["recommended_food"]}
+{"text": "おすすめの食べ物を教えてください", "expect": ["recommended_food"]}
+{"text": "何を食べたらいいですか", "expect": ["recommended_food"]}
+{"text": "この辺の郷土料理は何ですか", "expect": ["recommended_food"]}
+{"text": "障害者用の駐車場はありますか", "expect": ["accessible_parking_bt", "accessible_parking_deai", "accessible_parking_common"]}
+{"text": "車椅子で停められる駐車スペースはありますか", "expect": ["accessible_parking_bt", "accessible_parking_deai", "accessible_parking_common"]}
+{"text": "車椅子を借りたいです", "expect": ["wheelchair"]}
+{"text": "車いすの貸し出しはありますか", "expect": ["wheelchair"]}
+{"text": "歩くのが大変なんですが何か借りられますか", "expect": ["wheelchair"]}
+{"text": "熊が出ると聞いたんですが大丈夫ですか", "expect": ["bear"]}
+{"text": "クマに注意と書いてありました", "expect": ["bear"]}
+{"text": "アイコスは吸えますか", "expect": ["heated_tobacco", "smoking_area"]}
+{"text": "電子タバコならどこでもいいですか", "expect": ["heated_tobacco"]}
+{"text": "加熱式たばこの喫煙所はどこですか", "expect": ["heated_tobacco", "smoking_area"]}
+{"text": "写真を撮ってもいいですか", "expect": ["photo_manner"]}
+{"text": "住んでいる方を撮影してもいいですか", "expect": ["photo_manner"]}
+{"text": "撮影で気をつけることはありますか", "expect": ["photo_manner"]}
+{"text": "たばこを吸いたいんですけど", "expect": ["smoking_area", "heated_tobacco"]}
+{"text": "喫煙所はどこですか", "expect": ["smoking_area", "heated_tobacco"]}
+{"text": "どこで吸えますか", "expect": ["smoking_area", "heated_tobacco"]}
+{"text": "雪遊びはできますか", "expect": ["snow_play", "snow_play_common"]}
+{"text": "雪合戦をしてもいいですか", "expect": ["snow_play", "snow_play_common"]}
+{"text": "そり滑りができる場所はありますか", "expect": ["snow_play", "snow_play_common"]}
+{"text": "ゴミ箱はどこですか", "expect": ["trash"]}
+{"text": "これ捨てたいんですけど", "expect": ["trash"]}
+{"text": "ごみはどうすればいいですか", "expect": ["trash"]}
+{"text": "空き缶を捨てる場所はありますか", "expect": ["trash"]}
+{"text": "今日泊まれる宿はありますか", "expect": ["accommodation_today"]}
+{"text": "当日でも予約できますか", "expect": ["accommodation_today"]}
+{"text": "飛び込みで泊まれるところを探しています", "expect": ["accommodation_today"]}
+{"text": "すみれ荘はどこですか", "expect": ["guesthouse_access_bt", "guesthouse_access_deai", "guesthouse_access_common"]}
+{"text": "ゲストハウスKeiへの行き方を教えてください", "expect": ["guesthouse_access_bt", "guesthouse_access_deai", "guesthouse_access_common"]}
+{"text": "かやぶきの宿に行きたいです", "expect": ["guesthouse_access_bt", "guesthouse_access_deai", "guesthouse_access_common"]}
+{"text": "忘れ物をしました", "expect": ["lost_item_bt", "lost_item_deai", "lost_item_common"]}
+{"text": "財布を落としたかもしれません", "expect": ["lost_item_bt", "lost_item_deai", "lost_item_common"]}
+{"text": "バスに傘を置いてきてしまいました", "expect": ["lost_item_bt", "lost_item_deai", "lost_item_common"]}
+{"text": "結の庄に行きたいんですけど", "expect": ["yuinosho_bt", "yuinosho_deai", "yuinosho_common"]}
+{"text": "結の庄まで歩いてどのくらいですか", "expect": ["yuinosho_bt", "yuinosho_deai", "yuinosho_common"]}
+{"text": "結の庄の送迎はありますか", "expect": ["yuinosho_bt", "yuinosho_deai", "yuinosho_common"]}
+{"text": "次のバスは何時ですか", "expect": ["bus_next"]}
+{"text": "時刻表はどこで見られますか", "expect": ["bus_next"]}
+{"text": "バスの時間が知りたいです", "expect": ["bus_next"]}
+{"text": "村内を回るバスはありますか", "expect": ["village_bus"]}
+{"text": "周遊バスに乗りたいです", "expect": ["village_bus"]}
+{"text": "トイレはどこですか", "expect": ["toilet"]}
+{"text": "お手洗いを探しています", "expect": ["toilet"]}
+{"text": "多目的トイレはありますか", "expect": ["toilet"]}
+{"text": "合掌造りの中は見られますか", "expect": ["gassho_facilities"]}
+{"text": "見学施設の入館料はいくらですか", "expect": ["gassho_facilities", "admission_fee"]}
+{"text": "家の中に入れますか", "expect": ["gassho_facilities"]}
+{"text": "食事ができるところはありますか", "expect": ["restaurants"]}
+{"text": "ランチはどこで食べられますか", "expect": ["restaurants"]}
+{"text": "お昼ご飯を食べたいです", "expect": ["restaurants"]}
+{"text": "桜はいつ咲きますか", "expect": ["sakura_kouyou"]}
+{"text": "紅葉の見ごろはいつですか", "expect": ["sakura_kouyou"]}
+{"text": "雪はいつ頃降りますか", "expect": ["snowfall"]}
+{"text": "冬は雪が積もっていますか", "expect": ["snowfall"]}
+{"text": "冬タイヤは必要ですか", "expect": ["studless"]}
+{"text": "スタッドレスじゃないとだめですか", "expect": ["studless"]}
+{"text": "チェーンは要りますか", "expect": ["studless"]}
+{"text": "自転車で入ってもいいですか", "expect": ["bicycle"]}
+{"text": "サイクリングはできますか", "expect": ["bicycle"]}
+{"text": "ハイキングコースはありますか", "expect": ["hiking"]}
+{"text": "山に登れますか", "expect": ["hiking"]}
+{"text": "犬を連れて入れますか", "expect": ["pets"]}
+{"text": "ペット同伴は大丈夫ですか", "expect": ["pets"]}
+{"text": "川で遊んでもいいですか", "expect": ["river"]}
+{"text": "水遊びはできますか", "expect": ["river"]}
+{"text": "何時まで見学できますか", "expect": ["visit_hours"]}
+{"text": "夜も見られますか", "expect": ["visit_hours"]}
+{"text": "朝早くから入れますか", "expect": ["visit_hours"]}
+{"text": "白川郷の歴史を教えてください", "expect": []}
+{"text": "合掌造りはいつからあるんですか", "expect": []}
+{"text": "近くに温泉はありますか", "expect": []}
+{"text": "金沢まではどうやって行きますか", "expect": []}
+{"text": "コンビニはありますか", "expect": []}
+{"text": "充電できる場所はありますか", "expect": []}
+{"text": "病院はどこですか", "expect": []}
+{"text": "今日の天気はどうなりますか", "expect": []}
+{"text": "子供とはぐれてしまいました", "expect": []}
+{"text": "英語を話せる方はいますか", "expect": []}
+{"text": "傘を貸してもらえますか", "expect": []}
+{"text": "お土産はどこで買えますか", "expect": []}
+{"text": "どぶろく祭りとはなに", "expect": ["festival_overview"]}
+{"text": "どぶろく祭りって何ですか", "expect": ["festival_overview"]}
+{"text": "どんなお祭りなんですか", "expect": ["festival_overview"]}
+{"text": "祭りの見どころを教えてください", "expect": ["festival_overview"]}
+{"text": "白川八幡神社はどこですか", "expect": ["festival_shrine_access_bt", "festival_shrine_access_deai", "festival_shrine_access_common"]}
