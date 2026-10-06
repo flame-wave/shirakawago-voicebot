@@ -277,7 +277,7 @@ body {
      ふだんの大きさは「キャラクター」シートの「大きさ」で決める。
      --char-scale は高さの方だけに掛ける。両方に掛けると、
      狭い画面で二重に小さくなって豆粒になる。 */
-  --char-fill: 102cqh;
+  --char-fill: 100cqh;
   --char-scale: 1;
   --char-h: min(
     calc(var(--char-fill) * var(--char-scale)),
@@ -296,16 +296,20 @@ body {
   --mouth-ratio: 0.14; /* 口の高さ（上端からの割合） */
   --char-w: calc(var(--char-h) * var(--char-aspect));
   --face: calc(var(--char-h) * var(--face-ratio));
+  /* 会話領域の上端から口元まで。
+     立ち絵の上端は (領域の高さ − 立ち絵の高さ) × (1 − 高さ位置) の所にある
+     （.character の bottom と対になる式。片方だけ変えると尻尾がずれる）。 */
   --mouth: calc(
     (100cqh - var(--char-h)) * (1 - var(--char-rise, 0))
-    + 6px + var(--char-h) * var(--mouth-ratio)
+    + var(--char-h) * var(--mouth-ratio)
   );
 
   /* 立ち位置。既定は右端に寄せる（狭い画面はこのまま） */
-  /* 立ち絵を画面の端から少しはみ出させて大きく見せる。
-     ただし、ゆるキャラのように絵として完結しているものは切ると変なので、
-     横長のキャラクターでは js/character.js が --char-bleed を 0 にする。 */
-  --char-bleed: 1;
+  /* 以前は立ち絵を画面の端から少しはみ出させて大きく見せていた。
+     しかし細身のキャラクターでは切り落とす幅が体の2割を超えてしまい、
+     腕や裾が画面の外に消えた。立ち絵は必ず全身が入るようにする。
+     （変数は位置の式で使っているので残してある。0＝切らない） */
+  --char-bleed: 0;
   --char-right: calc(-20px * var(--char-bleed));
 
   /* 会話領域の右端から、顔の左端までの距離 */
@@ -357,7 +361,9 @@ body {
 .character {
   position: absolute;
   right: var(--char-right);
-  bottom: calc(-6px + (100cqh - var(--char-h)) * var(--char-rise, 0));
+  /* 0 は下端に立たせる。立ち絵は切らないので、下へはみ出させない
+     （--mouth の式と対になっている）。 */
+  bottom: calc((100cqh - var(--char-h)) * var(--char-rise, 0));
   height: var(--char-h);
   display: flex;
   align-items: flex-end;
@@ -830,7 +836,7 @@ body {
   .stage {
     --gutter: 12px;
     --char-fill: 90cqh;
-    --char-right: calc(-9cqw * var(--char-bleed)); /* 右端から少しはみ出させる */
+    --char-right: calc(-9cqw * var(--char-bleed)); /* 既定では0（切らない） */
     --s: var(--s-max);     /* 幅が足りないので、顔の手前まで目一杯使う */
   }
 
@@ -859,6 +865,183 @@ body {
 }
 
 /* ── 職員用の画面 ───────────────────────────── */
+
+/* ── 見え方の調整（職員用・?tune=1） ───────────── */
+
+/* 画面の左下に小さく置く。立ち絵と吹き出しは右側なので、
+   つまみを動かしながら結果を同時に見られる。 */
+.tune {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 15;
+  width: min(330px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.tune-box { padding: 12px 14px 14px; }
+
+.tune-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.tune-close {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tune-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tune-row select,
+.tune-row input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.tune-row button {
+  flex: 0 0 auto;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--pale);
+  color: var(--green-dark);
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* つまみ1つぶん。名前・つまみ・いまの値・説明を1かたまりにする */
+.tune-knob {
+  display: grid;
+  grid-template-columns: 5em 1fr 3em;
+  align-items: center;
+  gap: 4px 8px;
+  margin-bottom: 8px;
+}
+
+.tune-knob-name { font-weight: 600; }
+
+.tune-knob input[type="range"] { width: 100%; }
+
+.tune-knob output {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tune-knob-hint {
+  grid-column: 1 / -1;
+  color: var(--sub);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.tune-copy-label {
+  margin: 12px 0 6px;
+  font-weight: 600;
+}
+
+.tune-copy { font-variant-numeric: tabular-nums; }
+
+.tune-note {
+  margin: 4px 0 0;
+  color: var(--sub);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* 立ち絵を直接つまんで動かすための取っ手（調整モードのときだけ出る）。
+   会話領域に重ねて置く。立ち絵そのものには触らない。 */
+.tune-handles {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;   /* 取っ手だけが反応する */
+}
+
+.tune-h {
+  position: absolute;
+  pointer-events: auto;
+  touch-action: none;     /* つまんで動かすので、画面のスクロールは止める */
+}
+
+/* 立ち絵そのもの。つまんで上下に動かす。 */
+.tune-h-move {
+  border: 2px dashed rgba(44, 95, 45, 0.65);
+  border-radius: 10px;
+  background: rgba(44, 95, 45, 0.06);
+  cursor: grab;
+}
+
+.tune-h-move:active { cursor: grabbing; }
+
+.tune-h-label {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 8px;
+  border-radius: 9px;
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* 左上の角。斜めに引くと大きさが変わる。 */
+.tune-h-size {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--green);
+  border-radius: 3px;
+  background: #fff;
+  cursor: nwse-resize;
+}
+
+/* 口の位置。吹き出しの尻尾が向く先。 */
+.tune-h-mouth {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--red);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: ns-resize;
+}
+
+/* 吹き出しが来てよい右端。これより右へは吹き出しが出ない。 */
+.tune-h-face {
+  width: 12px;
+  margin-left: -6px;
+  border-left: 2px dashed var(--red);
+  cursor: ew-resize;
+}
 
 /* ── 利用前の同意 ──────────────────────────── */
 

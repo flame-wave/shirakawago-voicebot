@@ -15,6 +15,7 @@
 
 import base64
 import io
+import re
 from datetime import date, datetime
 from pathlib import Path
 
@@ -89,6 +90,24 @@ def lines(value) -> list:
     """改行区切りのセルを配列にする。"""
     raw = text(value).replace("\r\n", "\n").replace("\r", "\n")
     return [x.strip() for x in raw.split("\n") if x.strip()]
+
+
+def as_number(value):
+    """数字だけの文字列は数値に戻す。
+
+    管理画面の表はすべて文字として扱うので、そのまま書くと Excel に
+    「0.45」という文字列が入る。Excelで開いたときに数値として扱えず、
+    並べ替えや手計算ができなくなるため、ここで戻している。
+    """
+    if not isinstance(value, str):
+        return value
+    body = value.strip()
+    if not body:
+        return value
+    try:
+        return int(body) if re.fullmatch(r"-?\d+", body) else float(body)
+    except ValueError:
+        return value
 
 
 def is_enabled(value) -> bool:
@@ -287,7 +306,8 @@ class FaqBook:
             for t in titles:
                 value = values.get(t, "")
                 # 空文字はセルを空にする（cell(value=None) では消えない）
-                self._put(ws, header, r, t, value if value != "" else None)
+                self._put(ws, header, r, t,
+                          as_number(value) if value != "" else None)
 
     def voice_sets(self) -> list:
         """「音声セット」シートの一覧（VOICEVOXなどで作った音声）。"""

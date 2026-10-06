@@ -71,6 +71,14 @@ export const showLink = !isKiosk;
 /// 見え方を確かめたいときに使う。指定が無ければ空。
 export const fixedCharacter = (params.get('character') || '').trim();
 
+/// キャラクターの見え方を、画面を見ながら合わせる画面を出すかどうか。
+///
+///   webapp/?tune=1
+///
+/// つまみを動かすと立ち絵と吹き出しがその場で動く。
+/// 決まった数値を管理画面の「キャラクター」へ書き写して使う。
+export const showTune = params.get('tune') === '1';
+
 /// 職員用の設定（読み上げの声の選択）を出すかどうか。
 ///
 /// 画面の長押しのような隠し操作にすると、観光客に偶然見つかる。

@@ -28,6 +28,7 @@ export class VoiceService {
     this._audio = new Audio();
     this._sets = []; // 用意した音声の種類（faq.json から渡される）
     this._settings = {}; // 言語ごとの読み上げの設定（faq.json から渡される）
+    this._readings = []; // 読み間違いの直し（faq.json から渡される）
     this._lang = 'ja';
     this._voices = [];
     /// 読み上げが終わったときに呼ばれる（表情を待機に戻すために使う）
@@ -57,6 +58,34 @@ export class VoiceService {
   /// その端末に入っている声と突き合わせて決める。
   setSettings(settings) {
     this._settings = (settings && typeof settings === 'object') ? settings : {};
+  }
+
+  /// 読み間違いの直しを受け取る（管理画面の「読み方」）。
+  ///
+  /// 合成音声は「荻町」を「はぎまち」、「朴葉味噌」を「ぼくようみそ」のように
+  /// 読み間違える。地名や料理名は観光案内でいちばん大事な語なので、
+  /// 読み上げに回す直前だけカタカナに差し替える。
+  /// 画面に出る文字は差し替えない（漢字のままの方が読みやすい）。
+  setReadings(readings) {
+    const list = Array.isArray(readings) ? readings : [];
+    // 長い語から先に直す。「八幡神社」を直してから「白川八幡神社」を直すと、
+    // 前半だけ差し替わって「しらかわハチマンジンジャ」のように半端になる。
+    this._readings = list
+      .filter((r) => r && r.text && r.reading)
+      .slice()
+      .sort((a, b) => b.text.length - a.text.length);
+  }
+
+  get readings() {
+    return this._readings;
+  }
+
+  /// 読み上げる文章に、読み方の直しを当てる（日本語のときだけ）。
+  applyReadings(text, lang = this._lang) {
+    if (lang !== 'ja' || !text) return text;
+    let out = String(text);
+    for (const r of this._readings) out = out.split(r.text).join(r.reading);
+    return out;
   }
 
   /// その言語で優先する声の並び。設定が無ければ config.js の既定を使う。
@@ -277,7 +306,8 @@ export class VoiceService {
       return Promise.resolve(VoiceMode.failed);
     }
     try {
-      const u = new SpeechSynthesisUtterance(text);
+      // 読み間違いを直してから渡す（画面の文字はそのまま）
+      const u = new SpeechSynthesisUtterance(this.applyReadings(text));
       u.lang = TTS_LANGUAGE[this._lang];
       const voice = this._voiceFor(this._lang);
       if (voice) u.voice = voice;

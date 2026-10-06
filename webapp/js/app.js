@@ -16,8 +16,9 @@ import { CharacterView, CharacterState } from './character.js';
 import { AnswerView } from './answer-view.js';
 import { QuestionLog, logStats } from './question-log.js';
 import { SetupScreen } from './setup-screen.js';
+import { TunePanel } from './tune-panel.js';
 import { ConsentScreen, consentState } from './consent.js';
-import { fixedPlace, isKiosk, showSetup } from './deployment.js';
+import { fixedPlace, isKiosk, showSetup, showTune } from './deployment.js';
 
 // --- 部品（差し替え可能な単位） ---
 const speech = new SpeechService(); // 音声認識
@@ -62,6 +63,9 @@ const character = new CharacterView(
 const answerView = new AnswerView(document.getElementById('answer'));
 const setupScreen = new SetupScreen(document.getElementById('setupScreen'), log, voice);
 const consentScreen = new ConsentScreen(document.getElementById('consentScreen'));
+const tunePanel = new TunePanel(
+  document.getElementById('tunePanel'), character,
+  (lang) => changeLanguage(lang));
 
 // --- 画面の状態 ---
 const state = {
@@ -623,6 +627,7 @@ async function init() {
   // 用意した音声の一覧（話者ごと）と、言語ごとの読み上げの設定を渡す
   voice.setSets(faqService.voiceSets);
   voice.setSettings(faqService.voiceSettings);
+  voice.setReadings(faqService.readings);
 
   // 立つキャラクターの一覧。職員が決めた既定を立て、利用者は選び直せる。
   character.setList(faqService.characters);
@@ -672,6 +677,13 @@ async function init() {
 
   // 5. 職員が ?setup=1 を付けて開いたときだけ、設定画面を出す
   if (showSetup) setupScreen.open();
+
+  // 6. ?tune=1 なら、見え方を合わせる画面を出す
+  if (showTune) {
+    // 文章が長いときの伸び方も見られるようにしておく
+    tunePanel.onLongText = showLongSample;
+    tunePanel.open();
+  }
 
   // 6. 記録することをお伝えし、同意をいただく
   wireConsent();
@@ -739,6 +751,23 @@ function resetForNextVisitor() {
   render();
 }
 
+/// 吹き出しが長文でどう伸びるかを見るための試し表示（調整画面から使う）。
+/// 短い文だけで合わせると、本番の長い回答で顔にかぶることがある。
+function showLongSample() {
+  const faq = faqService.all.find((f) => (f.answer || '').length > 90)
+    ?? faqService.all[0];
+  if (!faq) return;
+  const localized = faqService.answerFor(faq, state.lang);
+  state.recognized = faqService.questionsFor(faq, state.lang)[0] ?? '';
+  state.answer = localized.text;
+  state.photo = '';
+  state.link = '';
+  state.isAi = false;
+  state.isFallback = localized.isFallback;
+  character.setState(CharacterState.talking);
+  render();
+}
+
 /// 質問の記録を中継サーバへ送り続ける。
 ///
 /// 1件ごとに送ると通信が細切れになるので、少し間を置いてまとめて送る。
@@ -771,6 +800,7 @@ const MEASURE_TARGETS = {
   '現在地ボタン': '.place-pill',
   'キャラボタン': '.char-pill',
   'データ表示': '.data-status',
+  '会話領域': '.stage',
   'キャラクター': '.character',
   '吹き出し': '.bubble',
   'よくある質問': '.faq-strip',

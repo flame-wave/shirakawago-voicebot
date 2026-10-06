@@ -29,6 +29,14 @@ export const CharacterState = {
 /// 選んだキャラクターを覚えておく場所
 const CHOICE_KEY = 'shirakawa_character';
 
+/// それを覚えたときに「職員が決めた既定」が何だったかを控えておく場所。
+///
+/// 利用者の選択をそのまま優先すると、職員が管理画面で既定を変えても、
+/// 一度でも画面で選んだ端末には永久に古いキャラクターが立ち続ける。
+/// 据え置き端末は同じブラウザを使い続けるので、これが起きると直せない。
+/// そこで「職員が既定を変えたら、覚えている選択は捨てる」ことにする。
+const CHOICE_BASE_KEY = 'shirakawa_character_base';
+
 /// 「キャラクター」シートがまだ無いときに使うもの。
 /// これまでの3枚組をそのまま既定にしてある。
 const FALLBACK = {
@@ -64,6 +72,7 @@ export class CharacterView {
     this._missing = new Set();
     this._list = [FALLBACK];
     this._current = FALLBACK;
+    this._preview = null;   // 調整中の一時的な上書き
     this._applyShape();
     this.setState(CharacterState.idle);
   }
@@ -82,8 +91,34 @@ export class CharacterView {
     const list = (Array.isArray(characters) ? characters : [])
       .filter((c) => c && c.id && c.idle);
     this._list = list.length > 0 ? list : [FALLBACK];
-    // URLの指定 → その端末で選ばれたもの → 職員が決めた既定、の順
-    this.choose(fixedCharacter || this.saved || this._defaultId());
+    // URLの指定 → その端末で選ばれたもの → 職員が決めた既定、の順。
+    // ただし職員が既定を変えていれば、その端末の記憶より職員の設定を通す。
+    const base = this._defaultId();
+    this.choose(fixedCharacter || this._savedFor(base) || base);
+  }
+
+  /// 覚えている選択。職員が既定を変えていれば忘れて '' を返す。
+  _savedFor(defaultId) {
+    const saved = this.saved;
+    if (!saved) return '';
+    let base = '';
+    try {
+      base = localStorage.getItem(CHOICE_BASE_KEY) || '';
+    } catch (_) {
+      // 読めないときは、職員の設定を通す側に倒す
+    }
+    if (base === defaultId) return saved;
+    this._forget();
+    return '';
+  }
+
+  _forget() {
+    try {
+      localStorage.removeItem(CHOICE_KEY);
+      localStorage.removeItem(CHOICE_BASE_KEY);
+    } catch (_) {
+      // 消せなくても、この回は職員の設定が通る
+    }
   }
 
   _defaultId() {
@@ -108,6 +143,8 @@ export class CharacterView {
     if (remember) {
       try {
         localStorage.setItem(CHOICE_KEY, this._current.id);
+        // 「どの既定のときに選んだのか」も一緒に控える
+        localStorage.setItem(CHOICE_BASE_KEY, this._defaultId());
       } catch (_) {
         // 保存できなくても、その場の選択は効く
       }
@@ -117,9 +154,28 @@ export class CharacterView {
     this.setState(this._state);
   }
 
+  /// 調整中だけ、値を一時的に上書きする（画面を見ながら合わせるため）。
+  /// null を渡すと、質問回答集の値に戻す。保存はしない。
+  preview(values) {
+    this._preview = values || null;
+    this._applyShape();
+    this.setState(this._state);
+  }
+
+  /// いま効いている値（調整中なら上書きした値）
+  get shape() {
+    const c = this._current;
+    return {
+      scale: this._preview?.scale ?? c.scale ?? 1,
+      rise: this._preview?.rise ?? c.rise ?? 0,
+      mouth: this._preview?.mouth ?? c.mouth ?? 0.14,
+      face: this._preview?.face ?? c.face ?? 0.31,
+    };
+  }
+
   /// 立ち絵の形を、吹き出しの位置を決める変数に反映する
   _applyShape() {
-    const c = this._current;
+    const c = { ...this._current, ...(this._preview ?? {}) };
     const set = (name, value) => {
       if (typeof value === 'number' && value > 0) {
         this.stage.style.setProperty(name, String(value));
@@ -132,10 +188,12 @@ export class CharacterView {
     set('--face-ratio', c.face);
     set('--char-scale', c.scale);
 
-    // 縦長の立ち絵は、端を少し切った方が大きく見えて自然。
-    // 横長のもの（ゆるキャラ・看板）は絵として完結しているので、切らない。
-    const bleed = (c.aspect ?? 0.538) < 0.7 ? 1 : 0;
-    this.stage.style.setProperty('--char-bleed', String(bleed));
+    // 以前は縦長の立ち絵を画面の端から少しはみ出させて大きく見せていたが、
+    // 細身のキャラクター（ゆい＝縦横比0.36）では切り落とす幅が体の2割を超え、
+    // 腕や裾が画面の外に消えてしまった。見せたいものを切ってしまうので、
+    // はみ出しはやめて必ず全身が入るようにする。
+    // 変数は残してある（CSS側で位置の式に使っているため）。
+    this.stage.style.setProperty('--char-bleed', '0');
 
     // 立ち位置の高さ。0 は下端（人物が地面に立つ）、1 は上端。
     // 0 も意味のある値なので、set（0 を「未設定」とみなす）は使わない。

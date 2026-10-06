@@ -24,6 +24,20 @@ export class AnswerView {
     this.qrCaption = document.querySelector('.answer-qr-caption');
     this.link = document.querySelector('.answer-link');
 
+    // 必ず別のタブで開く。
+    //
+    // target="_blank" は書いてあるが、キオスクモード（--app=）や
+    // ホーム画面に追加したときは無視され、案内アプリ自体が
+    // 外部サイトに置き換わってしまう。そうなると観光客は戻り方が分からず、
+    // 据え置き端末では次の方が外部サイトを見ることになる。
+    // 自分で新しい窓を開き、開けたときだけ元の遷移を止める。
+    this.link.addEventListener('click', (e) => {
+      const url = this.link.getAttribute('href');
+      if (!url) return;
+      const opened = window.open(url, '_blank', 'noopener,noreferrer');
+      if (opened) e.preventDefault();   // 開けなかったときは普通の遷移に任せる
+    });
+
     // 写真が無くても表示は崩さない
     this.photo.addEventListener('error', () => {
       this.photoBox.hidden = true;

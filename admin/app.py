@@ -629,14 +629,15 @@ with tab_publish:
 
     try:
         (faqs, errors, warnings, pending_tr, synonyms, places,
-         voice_sets, reference, char_list, voice_cfg) = build_faq.build_from_bytes(
+         voice_sets, reference, char_list, voice_cfg,
+         readings) = build_faq.build_from_bytes(
             st.session_state["raw"], ROOT / "assets"
         )
     except Exception as e:
         st.error(f"読み取れませんでした: {e}")
         faqs, errors, warnings, pending_tr = [], [str(e)], [], 0
         synonyms, places, voice_sets, reference = {}, [], [], []
-        char_list, voice_cfg = [], {}
+        char_list, voice_cfg, readings = [], {}, []
 
     c1, c2, c3 = st.columns(3)
     c1.metric("案内に出す質問", f"{len(faqs)} 件")
@@ -657,12 +658,21 @@ with tab_publish:
             for w in warnings:
                 st.write("・" + w)
 
+    # いま書き出される内容のうち、現場で効き方が見えにくいものを先に見せる。
+    # 以前、管理画面でキャラクターを変えたのに書き出しを忘れ、
+    # 案内端末には古いキャラクターが立ち続けたことがあった。
+    default_char = next((c["name"] for c in char_list if c.get("default")), None)
+    if default_char:
+        st.caption(f"最初に立つキャラクター: **{default_char}**　"
+                   f"読み方の直し: {len(readings)} 語")
+        st.warning("キャラクターや設定を変えたときは、**この書き出しをするまで"
+                   "案内端末には届きません。**")
+
     json_store = get_json_store()
     st.caption(f"書き出し先: {json_store.label}")
 
-    if st.button("書き出す", type="primary", disabled=bool(errors),
-                 use_container_width=True):
-        payload = {
+    def make_payload():
+        return {
             "version": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "count": len(faqs),
             "faqs": faqs,
@@ -672,7 +682,12 @@ with tab_publish:
             "reference": reference,
             "characters": char_list,
             "voice": voice_cfg,
+            "readings": readings,
         }
+
+    if st.button("書き出す", type="primary", disabled=bool(errors),
+                 use_container_width=True):
+        payload = make_payload()
         try:
             _, sha = json_store.load()
             json_store.save(payload, "質問回答集を反映（管理画面より）", sha)
@@ -685,14 +700,7 @@ with tab_publish:
 
     st.download_button(
         "faq.json をダウンロード",
-        data=json.dumps(
-            {"version": datetime.now().strftime("%Y-%m-%d %H:%M"),
-             "count": len(faqs), "faqs": faqs, "synonyms": synonyms,
-             "places": places, "voice_sets": voice_sets,
-             "reference": reference, "characters": char_list,
-             "voice": voice_cfg},
-            ensure_ascii=False, indent=2,
-        ),
+        data=json.dumps(make_payload(), ensure_ascii=False, indent=2),
         file_name="faq.json",
         mime="application/json",
         use_container_width=True,
@@ -915,6 +923,15 @@ SETTING_SHEETS = {
                 "確かめていないことは書かないでください。"
                 "`【質問回答集より】` で始まる行は自動で作られるので、直接直さないでください。",
         "幅広": ["内容", "備考"],
+    },
+    "読み方": {
+        "説明": "読み上げの読み間違いを直します。合成音声は「荻町」を「はぎまち」、"
+                "「朴葉味噌」を「ぼくようみそ」のように読んでしまうため、"
+                "読み上げるときだけカタカナに差し替えます。",
+        "注意": "**画面に出る文字は変わりません**（読み上げだけに使います）。"
+                "「読み」はカタカナで書いてください。日本語の読み上げにだけ当てます。"
+                "備考に「要確認」と書いてある行は、正しい読みを確かめてから使ってください。",
+        "幅広": ["備考"],
     },
     "キャラクター": {
         "説明": "案内画面に立つキャラクターです。画像は `assets/character/` に置きます。"

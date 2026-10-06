@@ -109,7 +109,7 @@ def cell_date(cell):
 
 
 def build(source: str, assets_dir: Path | None):
-    """戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ)"""
+    """戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ, 読み方)"""
     return build_from_bytes(load_workbook_bytes(source), assets_dir)
 
 
@@ -281,6 +281,38 @@ def read_reference(book) -> list:
     return notes
 
 
+def read_readings(book) -> list:
+    """「読み方」シートを読む。無ければ空。
+
+    合成音声は漢字を文脈で読むため、地名や料理名をよく読み間違える。
+    「荻町」を「はぎまち」、「朴葉味噌」を「ぼくようみそ」のように、
+    観光案内でいちばん大事な語がいちばん間違いやすい。
+
+    読み上げに回す直前にだけカタカナへ差し替える。画面に出る文字は変えない
+    （読む人には漢字の方が分かりやすい）。
+    音声を作るとき（make_voice.py）と、ブラウザで読むとき（voice-service.js）の
+    両方が、この同じ表を見る。
+    """
+    sheet = book.get("読み方")
+    if sheet is None:
+        return []
+
+    out = []
+    for _, row in sheet.iterrows():
+        surface = cell_str(row.get("表記"))
+        reading = cell_str(row.get("読み"))
+        if not surface or not reading or surface.startswith("※"):
+            continue
+        if cell_str(row.get("有効")).upper() in ("FALSE", "0", "×", "NO"):
+            continue
+        out.append({"text": surface, "reading": reading})
+
+    # 長い語から先に差し替える。「八幡神社」を先に直すと
+    # 「白川八幡神社」が半端に差し替わる。
+    out.sort(key=lambda r: -len(r["text"]))
+    return out
+
+
 def read_voice_sets(book) -> list:
     """「音声セット」シートを読む。無ければ空。
 
@@ -367,7 +399,7 @@ def read_synonyms(book) -> dict:
 def build_from_bytes(raw: bytes, assets_dir: Path | None):
     """xlsxのバイト列から変換する。管理画面もここを呼ぶ。
 
-    戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ)
+    戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ, 読み方)
     """
     book = pd.read_excel(io.BytesIO(raw), sheet_name=None, dtype=object)
 
@@ -516,7 +548,8 @@ def build_from_bytes(raw: bytes, assets_dir: Path | None):
 
     return (faqs, errors, warnings, pending, read_synonyms(book), places,
             read_voice_sets(book), read_reference(book),
-            read_characters(book, assets_dir), read_voice_settings(book))
+            read_characters(book, assets_dir), read_voice_settings(book),
+            read_readings(book))
 
 
 # ---------------------------------------------------------------- 実行
@@ -535,7 +568,7 @@ def main():
 
     print("読み込み中...")
     (faqs, errors, warnings, pending, synonyms, places, voice_sets,
-     reference, characters, voice) = build(args.source, assets_dir)
+     reference, characters, voice, readings) = build(args.source, assets_dir)
 
     print(f"\n読み込み結果: 有効な質問 {len(faqs)} 件 / 言い換え {sum(len(v) for v in synonyms.values())} 語"
           + (f" / 参考資料 {len(reference)} 件" if reference else ""))
@@ -572,6 +605,7 @@ def main():
         "reference": reference,      # AIが回答を組み立てるときの下地
         "characters": characters,    # 画面に立つキャラクター（利用者が選べる）
         "voice": voice,              # 言語ごとの読み上げの設定
+        "readings": readings,        # 読み上げの読み間違いを直す表
     }
     with out.open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)

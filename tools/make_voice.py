@@ -55,6 +55,9 @@ AUDIO_COL = "音声ファイル名"
 ID_COL = "ID"
 ENABLED_COL = "有効"
 
+# 読み間違いを直す表。案内アプリのブラウザ読み上げと同じシートを使う。
+READING_SHEET = "読み方"
+
 
 def check_engine(engine: str) -> None:
     try:
@@ -76,6 +79,41 @@ def list_speakers(engine: str) -> None:
         for style in speaker["styles"]:
             print(f"  {style['id']:>3}  {speaker['name']}（{style['name']}）")
     print("\n※ 利用規約は話者ごとに異なります。設置で使う前に必ず確認してください。")
+
+
+def load_readings(wb) -> list:
+    """「読み方」シートを読む。無ければ空。
+
+    VOICEVOXは「荻町」を「はぎまち」、「朴葉味噌」を「ぼくようみそ」と読む。
+    合成に回す文だけカタカナに差し替える（Excelの回答は書き換えない）。
+
+    長い語から先に差し替える。「八幡神社」を先に直してしまうと
+    「白川八幡神社」が半端に差し替わる。
+    """
+    if READING_SHEET not in wb.sheetnames:
+        return []
+    ws = wb[READING_SHEET]
+    header = {cell(ws, 1, c): c for c in range(1, ws.max_column + 1)}
+    if "表記" not in header or "読み" not in header:
+        return []
+
+    out = []
+    for r in range(2, ws.max_row + 1):
+        surface = cell(ws, r, header["表記"])
+        reading = cell(ws, r, header["読み"])
+        if not surface or not reading or surface.startswith("※"):
+            continue
+        if "有効" in header and cell(ws, r, header["有効"]).upper()                 in ("FALSE", "0", "×", "NO"):
+            continue
+        out.append((surface, reading))
+    out.sort(key=lambda pair: -len(pair[0]))
+    return out
+
+
+def apply_readings(text: str, readings: list) -> str:
+    for surface, reading in readings:
+        text = text.replace(surface, reading)
+    return text
 
 
 def synthesize(engine: str, text: str, speaker: int, speed: float) -> bytes:
@@ -184,6 +222,15 @@ def main():
         print(f"FAQシートに「{AUDIO_COL}」列がありません")
         sys.exit(1)
 
+    readings = load_readings(wb)
+    if readings:
+        print(f"読み方の直しを {len(readings)} 語あてます"
+              f"（「{READING_SHEET}」シート）")
+    else:
+        print(f"「{READING_SHEET}」シートが無いため、読み方の直しは当てません。")
+        print("  地名や料理名が読み間違えられる場合は "
+              "python tools/add_readings.py で作れます。")
+
     made, skipped, failed = 0, 0, []
     for r in range(2, ws.max_row + 1):
         fid = cell(ws, r, header[ID_COL])
@@ -210,10 +257,11 @@ def main():
             skipped += 1
             continue
 
+        spoken = apply_readings(text, readings)
         print(f"  作成中: {fid} → {filename}")
         try:
             target.write_bytes(
-                synthesize(args.engine, text, args.speaker, args.speed)
+                synthesize(args.engine, spoken, args.speaker, args.speed)
             )
         except requests.RequestException as e:
             failed.append(f"{fid}: {e}")

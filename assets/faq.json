@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-01 23:54",
+  "version": "2026-10-06 15:38",
   "count": 73,
   "faqs": [
     {
@@ -6108,7 +6108,7 @@
       "face": 0.31,
       "scale": 1.0,
       "rise": 0.0,
-      "default": true,
+      "default": false,
       "aspect": 0.5385
     },
     {
@@ -6121,7 +6121,7 @@
       "face": 0.3,
       "scale": 1.0,
       "rise": 0.0,
-      "default": false,
+      "default": true,
       "aspect": 0.3614
     },
     {
@@ -6130,7 +6130,7 @@
       "idle": "yuru.png",
       "listening": "yuru.png",
       "talking": "yuru.png",
-      "mouth": 0.4,
+      "mouth": 0.45,
       "face": 0.9,
       "scale": 0.48,
       "rise": 0.75,
@@ -6237,5 +6237,183 @@
       "rate": 0.95,
       "pitch": 1.0
     }
-  }
+  },
+  "readings": [
+    {
+      "text": "春駒（はるこま）",
+      "reading": "ハルコマ"
+    },
+    {
+      "text": "白川八幡神社",
+      "reading": "シラカワハチマンジンジャ"
+    },
+    {
+      "text": "鳩谷八幡神社",
+      "reading": "ハトガヤハチマンジンジャ"
+    },
+    {
+      "text": "飯島八幡神社",
+      "reading": "イイジマハチマンジンジャ"
+    },
+    {
+      "text": "野谷荘司山",
+      "reading": "ノダニショウジヤマ"
+    },
+    {
+      "text": "白川連獅子",
+      "reading": "シラカワレンジシ"
+    },
+    {
+      "text": "三方岩岳",
+      "reading": "サンボウイワダケ"
+    },
+    {
+      "text": "今藤商店",
+      "reading": "イマトウショウテン"
+    },
+    {
+      "text": "朴葉味噌",
+      "reading": "ホオバミソ"
+    },
+    {
+      "text": "合掌造り",
+      "reading": "ガッショウヅクリ"
+    },
+    {
+      "text": "五穀豊穣",
+      "reading": "ゴコクホウジョウ"
+    },
+    {
+      "text": "郷土芸能",
+      "reading": "キョウドゲイノウ"
+    },
+    {
+      "text": "窓口机上",
+      "reading": "マドグチノツクエノウエ"
+    },
+    {
+      "text": "白川郷",
+      "reading": "シラカワゴウ"
+    },
+    {
+      "text": "白川村",
+      "reading": "シラカワムラ"
+    },
+    {
+      "text": "和田家",
+      "reading": "ワダケ"
+    },
+    {
+      "text": "白水湖",
+      "reading": "シラミズコ"
+    },
+    {
+      "text": "白水園",
+      "reading": "シラミズエン"
+    },
+    {
+      "text": "猪臥山",
+      "reading": "イブシヤマ"
+    },
+    {
+      "text": "民家園",
+      "reading": "ミンカエン"
+    },
+    {
+      "text": "飛騨牛",
+      "reading": "ヒダギュウ"
+    },
+    {
+      "text": "石豆腐",
+      "reading": "イシドウフ"
+    },
+    {
+      "text": "獅子舞",
+      "reading": "シシマイ"
+    },
+    {
+      "text": "神幸祭",
+      "reading": "シンコウサイ"
+    },
+    {
+      "text": "初穂料",
+      "reading": "ハツホリョウ"
+    },
+    {
+      "text": "記念盃",
+      "reading": "キネンハイ"
+    },
+    {
+      "text": "入村料",
+      "reading": "ニュウソンリョウ"
+    },
+    {
+      "text": "拾得物",
+      "reading": "シュウトクブツ"
+    },
+    {
+      "text": "加熱式",
+      "reading": "カネツシキ"
+    },
+    {
+      "text": "荻町",
+      "reading": "オギマチ"
+    },
+    {
+      "text": "鳩谷",
+      "reading": "ハトガヤ"
+    },
+    {
+      "text": "飯島",
+      "reading": "イイジマ"
+    },
+    {
+      "text": "寺尾",
+      "reading": "テラオ"
+    },
+    {
+      "text": "城山",
+      "reading": "シロヤマ"
+    },
+    {
+      "text": "白山",
+      "reading": "ハクサン"
+    },
+    {
+      "text": "庄川",
+      "reading": "ショウガワ"
+    },
+    {
+      "text": "岩魚",
+      "reading": "イワナ"
+    },
+    {
+      "text": "春駒",
+      "reading": "ハルコマ"
+    },
+    {
+      "text": "還御",
+      "reading": "カンギョ"
+    },
+    {
+      "text": "志納",
+      "reading": "シノウ"
+    },
+    {
+      "text": "徳利",
+      "reading": "トックリ"
+    },
+    {
+      "text": "村内",
+      "reading": "ソンナイ"
+    },
+    {
+      "text": "当村",
+      "reading": "トウソン"
+    },
+    {
+      "text": "紙巻",
+      "reading": "カミマキ"
+    }
+  ]
 }
