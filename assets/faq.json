@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-07 16:10",
+  "version": "2026-10-07 16:11",
   "count": 73,
   "faqs": [
     {
@@ -6446,6 +6446,7 @@
       "order": [
         "stage",
         "faq",
+        "typed",
         "talk",
         "languages"
       ],
