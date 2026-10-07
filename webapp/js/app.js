@@ -3,7 +3,9 @@
 // 「押して話す → 音声認識 → FAQ検索 → 回答表示＆音声再生」の流れを
 // ブラウザ内で完結させる。各処理は差し替え可能な部品として分離してある。
 
-import { LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, ASSET_BASE } from './config.js';
+import {
+  LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, ASSET_BASE, KIOSK_REFRESH_MS, DAILY_RELOAD_HOUR,
+} from './config.js';
 import { LANGUAGES, LABEL, uiString } from './app-language.js';
 import { FaqService } from './faq-service.js';
 import { FaqRepository } from './faq-repository.js';
@@ -620,6 +622,7 @@ async function refreshInBackground() {
     // 以前は起動時にしか当てていなかったため、新しい設定は「もう一度開き直したとき」に
     // やっと出ていた（1回目は前回の写しの設定のまま）。
     applySettings();
+    buildChips();   // よくある質問の札も、新しい質問回答集で作り直す
     render();
     console.info(`FAQを更新しました: ${faqService.count}件 (${remote.version})`);
   }
@@ -726,6 +729,7 @@ function wireConsent() {
 
   if (isKiosk) {
     startIdleWatch(ask);
+    startKioskUpkeep();
     if (showSetup) {
       // 職員が設定画面（?setup=1）を開いて起動したときは、同意画面を後回しにする。
       // 同意画面は設定画面より前に出るので、先に出すと設定のボタンが押せない。
@@ -761,6 +765,56 @@ function startIdleWatch(ask) {
       ask();
     }
   }, 10000);
+}
+
+/// 据え置き端末の手入れ。職員が毎晩開き直さなくて済むようにする。
+///
+///   1. だれも使っていない間（同意画面が出ている間）に、新しい質問回答集を取りに行く。
+///      管理画面で「反映」した内容は、これで届く。
+///   2. 1日に1回、夜中に画面を開き直す。案内アプリそのもの（js・css）を
+///      新しくしたときは、開き直さないと読み込まれないため。
+const RELOADED_KEY = 'shirakawa_reloaded_on';
+
+function startKioskUpkeep() {
+  setInterval(() => {
+    if (consentScreen.open) refreshInBackground();
+  }, KIOSK_REFRESH_MS);
+
+  setInterval(async () => {
+    const now = new Date();
+    if (now.getHours() !== DAILY_RELOAD_HOUR) return;
+    // 使っている方がいるとき、職員が設定画面を開いているときは開き直さない
+    if (!consentScreen.open || showSetup) return;
+    const today = now.toDateString();
+    if (readStore(RELOADED_KEY) === today) return;   // 開き直した直後に、また開き直さない
+    // 通信できないときに開き直すと、エラーの画面のまま止まってしまう。先に確かめる
+    try {
+      const res = await fetch(window.location.href, { cache: 'no-store' });
+      if (!res.ok) return;
+    } catch (_) {
+      return;
+    }
+    // 開き直した日を覚えられない端末では開き直さない（その1時間、開き直し続けてしまう）
+    writeStore(RELOADED_KEY, today);
+    if (readStore(RELOADED_KEY) !== today) return;
+    window.location.reload();
+  }, 60 * 1000);
+}
+
+function readStore(key) {
+  try {
+    return localStorage.getItem(key) || '';
+  } catch (_) {
+    return '';
+  }
+}
+
+function writeStore(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch (_) {
+    // 書けなくても案内は続ける（開き直しだけをやめる）
+  }
 }
 
 /// 次の方のために、画面を最初の状態へ戻す。
