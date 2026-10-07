@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-07 16:02",
+  "version": "2026-10-07 16:10",
   "count": 73,
   "faqs": [
     {
@@ -6458,10 +6458,10 @@
       "character": {
         "scale": 1.0,
         "rise": 0.0,
-        "side": 0.0
+        "side": 0.145
       },
       "bubble": {
-        "width": 0.738,
+        "width": 0.85,
         "text": 1.1
       }
     },
