@@ -589,6 +589,23 @@ function wireInput() {
   // 設定画面は URL に ?setup=1 を足したときだけ開く。
 }
 
+/// 質問回答集に入っている設定を、画面と声に当てる。
+/// 起動時と、新しい質問回答集を受け取ったときの両方で呼ぶ。
+function applySettings() {
+  // 用意した音声の一覧（話者ごと）と、言語ごとの読み上げの設定を渡す
+  voice.setSets(faqService.voiceSets);
+  voice.setSettings(faqService.voiceSettings);
+  voice.setReadings(faqService.readings);
+
+  // 設置形態ごとの画面の形。立ち絵より先に当てる
+  // （立ち絵の大きさは、この倍率を掛けて決まるため）。
+  layout.setList(faqService.layouts);
+
+  // 立つキャラクターの一覧。職員が決めた既定を立て、利用者は選び直せる。
+  character.setList(faqService.characters);
+  renderCharacterPill();
+}
+
 async function refreshInBackground() {
   const remote = await repo.fetchRemote();
   if (remote == null) return;
@@ -599,6 +616,10 @@ async function refreshInBackground() {
   if (faqService.loadFromJson(remote.json)) {
     state.dataVersion = remote.version;
     state.dataSource = remote.sourceLabel;
+    // 質問と回答だけでなく、管理画面で決めた設定（画面の形・キャラクター・声）も当て直す。
+    // 以前は起動時にしか当てていなかったため、新しい設定は「もう一度開き直したとき」に
+    // やっと出ていた（1回目は前回の写しの設定のまま）。
+    applySettings();
     render();
     console.info(`FAQを更新しました: ${faqService.count}件 (${remote.version})`);
   }
@@ -627,17 +648,7 @@ async function init() {
     state.dataSource = '読込エラー';
   }
 
-  // 用意した音声の一覧（話者ごと）と、言語ごとの読み上げの設定を渡す
-  voice.setSets(faqService.voiceSets);
-  voice.setSettings(faqService.voiceSettings);
-  voice.setReadings(faqService.readings);
-
-  // 設置形態ごとの画面の形。立ち絵より先に当てる
-  // （立ち絵の大きさは、この倍率を掛けて決まるため）。
-  layout.setList(faqService.layouts);
-
-  // 立つキャラクターの一覧。職員が決めた既定を立て、利用者は選び直せる。
-  character.setList(faqService.characters);
+  applySettings();
   wireCharacter();
 
   // 現在地の判定（案内所の一覧は質問回答集に入っている）

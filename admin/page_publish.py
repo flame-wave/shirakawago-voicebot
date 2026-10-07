@@ -40,7 +40,10 @@ def _show_result(result):
             f"<b>反映しました（{escape(_when(result['version']))}）</b><br>"
             f"案内に出す質問：{result['count']} 件　／　今回変わったもの：{result['changed']} 件"
             + (f"（{escape(parts)}）" if parts else "")
-            + "<br>案内端末は、次に画面を開いたときに新しい内容になります。"
+            + "<br>案内端末に届くまで、<b>最大5分ほど</b>かかります"
+              "（配信元の GitHub が5分ごとに新しくするため）。"
+              "5分たってから案内端末の画面を開き直すと、新しい内容になります。"
+              "続けて何度も押す必要はありません。"
               "据え置きの端末は、夜に一度閉じて開き直してください。",
             kind="ok", key="p-result-ok")
     else:
@@ -114,7 +117,7 @@ def render(ctx):
                                 unsafe_allow_html=True)
                     continue
                 for c in group:
-                    with st.container(key=f"ui-trow-p{kind}-{c['id']}"):
+                    with ui.keyed_box(f"ui-trow-p{kind}-{c['id']}"):
                         a, b = st.columns([5, 1], vertical_alignment="center")
                         a.markdown(f'<div class="ui-tcell">{escape(c["label"])}</div>',
                                    unsafe_allow_html=True)
@@ -164,7 +167,7 @@ def render(ctx):
 
 def _list(ctx, rows, level):
     for i, c in enumerate(rows):
-        with st.container(key=f"ui-trow-c{level}{i}"):
+        with ui.keyed_box(f"ui-trow-c{level}{i}"):
             a, b = st.columns([5, 1], vertical_alignment="center")
             head = escape(c["title"])
             if c["label"]:

@@ -189,7 +189,7 @@ def render(ctx):
             picked = []
             for fid, reason, need in targets:
                 it = by_id[fid]
-                with st.container(key=f"ui-trow-b{fid}"):
+                with ui.keyed_box(f"ui-trow-b{fid}"):
                     c = st.columns([0.5, 5, 1.6, 2.4], vertical_alignment="center")
                     key = f"b_pick_{fid}"
                     if key not in ss:

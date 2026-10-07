@@ -14,10 +14,19 @@ Excelで開いて直しても構わない。どちらで編集しても同じフ
 """
 
 import json
+import os
+import time
 from html import escape
 import sys
 from datetime import date, datetime
 from pathlib import Path
+
+# 時刻は日本時間で扱う。Streamlit Cloud の時計は世界標準時（9時間遅れ）なので、
+# そのままだと「前回の反映 10/7 16:13」（日本では 10/8 1:13）のようにずれ、
+# 案内期間の「今日」も夜9時までは前の日になってしまう。
+os.environ["TZ"] = "Asia/Tokyo"
+if hasattr(time, "tzset"):   # Windows には無い（手元のWindowsは元から日本時間）
+    time.tzset()
 
 import streamlit as st
 
@@ -321,12 +330,26 @@ def page_layout():
     before = {k: current[k] for k in ("order", "heights", "character", "bubble")}
     before["tail"] = tail
 
+    # 編集画面の印に、いまの設定の指紋を混ぜる。
+    # 印が同じままだと、編集画面は最初に受け取った設定を持ち続け、
+    # 保存や「最新の内容を読み直す」のあとも古い設定のまま動く。
+    # そのまま次の保存をすると、古い設定で上書きしてしまう
+    # （入力欄を出したのに、次の保存で消えていた）。
+    import hashlib
+    import json
+    rev = hashlib.sha1(json.dumps(before, sort_keys=True, ensure_ascii=False)
+                       .encode("utf-8")).hexdigest()[:10]
     edited = layout_editor(
         value=before,
         shape={"id": LAYOUT_SHAPES.get(place, "phone")},
         character=thumb or {},
-        key=f"layout_{place}",
+        key=f"layout_{place}_{rev}",
+        rev=rev,
     )
+    # 古い編集画面から届いた値（指紋が違う）は使わない
+    if not isinstance(edited, dict) or edited.get("rev") != rev:
+        edited = before
+    edited = {k: v for k, v in edited.items() if k != "rev"}
 
     if standing:
         st.caption(f"立ち絵は「{standing['name']}」で表示しています。"
@@ -348,6 +371,15 @@ def page_layout():
         tail_moved = bool(standing) and edited.get("tail") != tail
 
         def apply_changes(fresh):
+            # この画面を開いたあとに、別のタブなどで同じ端末の形が保存されていたら止める。
+            # この画面の形をそのまま書くと、その保存を黙って消してしまうため。
+            now = next((r for r in fresh.layouts() if r["place"] == place), None)
+            if now is not None and any(now[k] != before[k]
+                                       for k in ("order", "heights", "character", "bubble")):
+                raise X.ExcelError(
+                    f"この画面を開いたあとに、「{place}」の画面が別の所（別のタブなど）で"
+                    "保存されています。上書きしないよう、保存を止めました。"
+                    "左の「最新の内容を読み直す」を押してから、もう一度直してください。")
             fresh.update_layout(place, edited)
             # △は絵ごとの値なので、動かされたときだけ別に書く
             if tail_moved:

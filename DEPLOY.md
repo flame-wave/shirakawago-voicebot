@@ -129,17 +129,18 @@ php -r "echo bin2hex(random_bytes(24));"
 > `allow_origins` を空にしたり `https://example.com` のままにすると、
 > **誰でもAIを呼び出せてしまい、APIの料金を他人に使われる。**
 
-### 2-5. 案内アプリの設定を公開用にする
+### 2-5. 案内アプリの設定（書き換えは要らない）
 
-`webapp/js/config.js` の3行を直す（上げる前に手元で直しておくとよい）。
+`webapp/js/config.js` は、開いたアドレスを見て手元用と公開用を自動で切り替える。
+手元のファイルをそのまま上げてよい。
 
-```js
-export const REMOTE_URL = 'https://raw.githubusercontent.com/＜ユーザ名＞/＜リポジトリ名＞/main/assets/faq.json';
-export const AI_ENDPOINT = '../api/ask.php';
-export const LOG_ENDPOINT = '../api/log.php';
-```
+| | 手元（localhost・127.0.0.1） | 公開先 |
+|---|---|---|
+| `REMOTE_URL` | 空（同梱の faq.json を使う） | GitHub の faq.json |
+| `AI_ENDPOINT` | `../server/api/ask.php` | `../api/ask.php` |
+| `LOG_ENDPOINT` | `../server/api/log.php` | `../api/log.php` |
 
-`ASSET_BASE` は `'../assets/'` のままでよい。
+リポジトリ名を変えたときだけ、`REMOTE_URL` の GitHub のアドレスを直す。
 
 ### 2-6. 動いているか確かめる
 
@@ -192,6 +193,7 @@ Fine-grained personal access token を使う。
 | バスターミナル | `https://＜ドメイン＞/webapp/?place=バスターミナル` |
 | であいの館 | `https://＜ドメイン＞/webapp/?place=であいの館` |
 | 観光客用（QRコードにする） | `https://＜ドメイン＞/webapp/` |
+| 観光客の画面に戻す（確かめる用） | `https://＜ドメイン＞/webapp/?place=観光客` |
 | 職員の設定（ブックマーク） | `https://＜ドメイン＞/webapp/?place=バスターミナル&setup=1` |
 | 見え方の調整（ブックマーク） | `https://＜ドメイン＞/webapp/?tune=1` |
 
@@ -199,7 +201,10 @@ Fine-grained personal access token を使う。
 据え置き（タブレット）と観光客（スマートフォン）で別々に決められるので、
 管理画面の「画面レイアウト」で設置形態を選んで直す。
 
-据え置きはChromeのキオスクモードで起動する。
+現場で使い始めるときの手順と、iPad・Android をキオスクモードにする手順は
+[START_GUIDE.md](START_GUIDE.md) にまとめてある。
+
+据え置きがWindowsのパソコンなら、Chromeのキオスクモードで起動する。
 
 ```
 chrome.exe --kiosk --app=https://＜ドメイン＞/webapp/?place=バスターミナル

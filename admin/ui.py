@@ -99,11 +99,14 @@ CSS = f"""
 [data-testid="stMain"] [role="radiogroup"] > label:has(input:checked) {{
   border: 2px solid {GREEN}; background: {OK_BG}; font-weight: 700;
 }}
-/* チップ型の選択肢（分類など）。選んでいるものをはっきりさせる */
-[data-testid="stMain"] [data-testid="stBaseButton-pills"] {{
+/* チップ型の選択肢（分類など）。選んでいるものをはっきりさせる。
+   Streamlit 1.65 から印が変わった（data-variant と aria-checked）ので、新旧どちらにも当てる */
+[data-testid="stMain"] [data-testid="stBaseButton-pills"],
+[data-testid="stMain"] button[data-variant="pills"] {{
   min-height: 44px; padding: 6px 16px; font-weight: 400;
 }}
-[data-testid="stMain"] [data-testid="stBaseButton-pillsActive"] {{
+[data-testid="stMain"] [data-testid="stBaseButton-pillsActive"],
+[data-testid="stMain"] button[data-variant="pills"][aria-checked="true"] {{
   min-height: 44px; padding: 6px 16px;
   border: 2px solid {GREEN} !important; background: {OK_BG} !important;
   color: {SIDEBAR} !important; font-weight: 700 !important;
@@ -118,14 +121,17 @@ CSS = f"""
 
 /* 画面の中の切り替え（ui.switch）。選んでいるものを濃い緑にする */
 [data-testid="stMain"] [data-testid="stBaseButton-segmented_control"],
-[data-testid="stMain"] [data-testid="stBaseButton-segmented_controlActive"] {{
+[data-testid="stMain"] [data-testid="stBaseButton-segmented_controlActive"],
+[data-testid="stMain"] button[data-variant="segmented_control"] {{
   min-height: 46px; padding: 6px 22px; font-size: 16px;
 }}
-[data-testid="stMain"] [data-testid="stBaseButton-segmented_controlActive"] {{
+[data-testid="stMain"] [data-testid="stBaseButton-segmented_controlActive"],
+[data-testid="stMain"] button[data-variant="segmented_control"][aria-checked="true"] {{
   background: {GREEN} !important; border-color: {GREEN} !important;
   color: #fff !important; font-weight: 700 !important;
 }}
-[data-testid="stMain"] [data-testid="stBaseButton-segmented_controlActive"] * {{
+[data-testid="stMain"] [data-testid="stBaseButton-segmented_controlActive"] *,
+[data-testid="stMain"] button[data-variant="segmented_control"][aria-checked="true"] * {{
   color: #fff !important;
 }}
 
@@ -247,7 +253,8 @@ CSS = f"""
 /* はりつけるのは、箱そのものではなく外側の包み（stLayoutWrapper）。
    箱は自分と同じ大きさの包みに入っているので、箱に sticky を付けても
    動ける余地が無く、はりつかない。 */
-[data-testid="stMain"] [data-testid="stLayoutWrapper"]:has(> [class*="st-key-ui-savebar"]) {{
+[data-testid="stMain"] [data-testid="stLayoutWrapper"]:has(> [class*="st-key-ui-savebar"]),
+[data-testid="stMain"] [data-testid="stLayoutWrapper"]:has(> [data-testid="stVerticalBlock"] > [data-testid="stLayoutWrapper"] > [class*="st-key-ui-savebar"]) {{
   position: sticky; bottom: 0;
   z-index: 50;
 }}
@@ -429,6 +436,20 @@ def apply_theme():
     st.markdown(CSS, unsafe_allow_html=True)
 
 
+def keyed_box(key):
+    """印（key）の付いた箱を、印の無い箱で1枚包んで作る。with ui.keyed_box("…"): の形で使う。
+
+    【なぜ包むか】
+    Streamlit 1.6x では、保存や反映のあと st.rerun() で作り直したときに、
+    その上に知らせ（「反映しました」など）が1つ増えて印の付いた箱の位置がずれると、
+    ずれる前の箱が消えずに残り、薄い色の写しが重なって増えていく
+    （別の画面へ移っても残る）。
+    印の無い箱で包むと、ずれるのは包みの方だけになり、
+    印の付いた箱はいつも包みの中の1番目のまま動かないので、写しが残らない。
+    """
+    return st.container().container(key=key)
+
+
 def nav_badges(badges):
     """サイドバーの行き先の横にバッジを出す。
 
@@ -570,7 +591,7 @@ def notice(text, kind="warn", action=None, key=None):
     action … 右に置くボタンの文字。押されたら True を返す。
     """
     key = key or f"{kind}-{abs(hash(text)) % 10**8}"
-    with st.container(key=f"ui-notice-{kind}-{key}"):
+    with keyed_box(f"ui-notice-{kind}-{key}"):
         icon = f'<span class="ui-notice-icon">{_ICONS.get(kind, "")}</span>'
         if action:
             c1, c2 = st.columns([4, 1.5])
@@ -642,7 +663,7 @@ def box(title, text="", kind="info"):
 
 def option_row(label, value, button, key, is_set=False):
     """「そのほか」の1行。名前・いまの値・ボタン。ボタンが押されたら True。"""
-    with st.container(key=f"ui-row-{key}"):
+    with keyed_box(f"ui-row-{key}"):
         c1, c2, c3 = st.columns([3, 2.2, 1.5], vertical_alignment="center")
         c1.markdown(f'<div class="ui-row-label">{escape(label)}</div>',
                     unsafe_allow_html=True)
@@ -663,7 +684,7 @@ def card(key=None):
         n = st.session_state.get("_ui_card_n", 0) + 1
         st.session_state["_ui_card_n"] = n
         key = f"auto-{n}"
-    return st.container(key=f"ui-card-{key}")
+    return keyed_box(f"ui-card-{key}")
 
 
 @contextmanager
@@ -677,7 +698,7 @@ def save_bar(note="保存しただけでは案内に出ません。最後に「�
     左に一文（保存と反映が別の操作であること）、右にボタンを置く。
     返す箱にボタンを入れると、右寄せで並ぶ。
     """
-    with st.container(key=f"ui-savebar-{key}"):
+    with keyed_box(f"ui-savebar-{key}"):
         left, right = st.columns([3, 2])
         left.markdown(f'<span style="font-size:14px;color:{SUB}">{escape(note)}</span>',
                       unsafe_allow_html=True)

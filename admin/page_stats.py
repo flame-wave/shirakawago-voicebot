@@ -237,7 +237,7 @@ def _top(ctx, rows, items_by_id):
         st.caption("質問回答集の回答が出たものを、多い順に並べています。")
         most = top[0][1] or 1
         for i, (fid, n) in enumerate(top):
-            with st.container(key=f"ui-trow-top{i}"):
+            with ui.keyed_box(f"ui-trow-top{i}"):
                 a, b, c = st.columns([5, 1, 1], vertical_alignment="center")
                 a.markdown(
                     f'<div class="ui-tcell">{i + 1}. {_label(items_by_id, fid)}</div>'
@@ -280,7 +280,7 @@ def _unmatched(ctx, rows):
 
 
 def _unmatched_row(ctx, i, text, n, places):
-    with st.container(key=f"ui-trow-un{i}"):
+    with ui.keyed_box(f"ui-trow-un{i}"):
         a, b, c = st.columns([4.5, 1, 1.8], vertical_alignment="center")
         dots = "".join(f'<span title="{p}" style="display:inline-block;width:10px;height:10px;'
                        f'border-radius:50%;background:{_color(p)};margin-right:3px"></span>'

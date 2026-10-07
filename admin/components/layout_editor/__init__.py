@@ -22,15 +22,17 @@ _DIR = Path(__file__).resolve().parent
 _component = components.declare_component("layout_editor", path=str(_DIR))
 
 
-def layout_editor(value, shape, character=None, key=None, height=620):
+def layout_editor(value, shape, character=None, key=None, height=620, rev=""):
     """編集画面を出し、動かされた結果を返す。
 
     value     … いまの設定（dict）
     shape     … 画面の形 {"w": 1024, "h": 1366, "label": "タブレット（縦）"}
     character … 立ち絵 {"url": データURI, "aspect": 0.36, "mouth": 0.16}
+    rev       … いまの設定の指紋。返す値にも "rev" として付けて返す
+                （どの設定をもとに動かした値かを、呼ぶ側で確かめるため）
     戻り値    … 動かしたあとの設定（動かしていなければ value のまま）
     """
     return _component(
-        value=value, shape=shape, character=character or {},
-        key=key, default=value, height=height,
+        value=value, shape=shape, character=character or {}, rev=rev,
+        key=key, default=dict(value, rev=rev), height=height,
     )

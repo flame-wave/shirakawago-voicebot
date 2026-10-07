@@ -172,7 +172,7 @@ def render(ctx):
         for order, it, n_tr in part:
             fid = it["id"]
             st_name, st_text, st_kind = _state(it, today)
-            with st.container(key=f"ui-trow-{fid}"):
+            with ui.keyed_box(f"ui-trow-{fid}"):
                 c = st.columns(WIDTHS, vertical_alignment="center")
                 # 項目名を押すと「修正」で開く
                 if c[0].button(_head(it["answer"]), key=f"l_open_{fid}", type="tertiary",

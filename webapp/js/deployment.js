@@ -6,6 +6,7 @@
 //   webapp/?place=バスターミナル … バスターミナルの据え置き端末
 //   webapp/?place=であいの館     … であいの館の据え置き端末
 //   webapp/                      … 観光客が自分のスマートフォンで開く
+//   webapp/?place=観光客         … 覚えている役割を忘れて、観光客の画面に戻す
 //
 // 据え置きと観光客で違うのは、主に次の2点。
 //
@@ -42,13 +43,28 @@ function remember(place) {
   }
 }
 
+function forget() {
+  try {
+    localStorage.removeItem(ROLE_KEY);
+  } catch (_) {
+    // 消せない設定でも、その場は観光客として動く
+  }
+}
+
 const params = new URLSearchParams(window.location.search);
 const fromUrl = (params.get('place') || '').trim();
 
+// ?place=観光客 … 覚えている役割を忘れて、観光客の画面に戻す。
+// 一度 ?place=バスターミナル で開いたブラウザは、place を付けずに開いても
+// 据え置きのままになる（下の「前回の役割」）。パソコンで観光客の見え方を
+// 確かめるときに、そこから抜ける入口として使う。
+const asVisitor = fromUrl === VISITOR;
+if (asVisitor) forget();
+
 // URLの指定が最優先。次に前回の役割、最後に config.js の既定。
-let place = fromUrl || saved();
-if (!place && PLACE && PLACE !== 'auto') place = PLACE;
-if (fromUrl) remember(fromUrl);
+let place = asVisitor ? '' : fromUrl || saved();
+if (!place && !asVisitor && PLACE && PLACE !== 'auto') place = PLACE;
+if (fromUrl && !asVisitor) remember(fromUrl);
 
 /// 据え置き端末かどうか。場所が決まっていれば据え置きとみなす。
 export const isKiosk = place !== '';

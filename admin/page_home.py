@@ -28,7 +28,7 @@ def _head(text, n=34):
 
 def _todo(key, kind, title, detail, link=None, button=None):
     """今やることの1行。link=(ページ, query_params, 文字)、button=(文字, 押したときの処理)"""
-    with st.container(key=f"ui-trow-todo-{key}"):
+    with ui.keyed_box(f"ui-trow-todo-{key}"):
         a, b = st.columns([5, 1.6], vertical_alignment="center")
         icon = {"warn": "⚠", "info": "ⓘ", "ok": "✓"}[kind]
         color = {"warn": "#6B4200", "info": "#23415C", "ok": "#1F4D21"}[kind]

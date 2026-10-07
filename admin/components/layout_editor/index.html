@@ -278,8 +278,9 @@ function send(type, extra) {
   window.parent.postMessage(
     Object.assign({ isStreamlitMessage: true, type: type }, extra || {}), "*");
 }
+let rev = "";   // いまの設定の指紋（管理画面から受け取り、返す値に付ける）
 function setValue(v) {
-  send("streamlit:setComponentValue", { value: v, dataType: "json" });
+  send("streamlit:setComponentValue", { value: Object.assign({}, v, { rev: rev }), dataType: "json" });
 }
 function setHeight(h) {
   send("streamlit:setFrameHeight", { height: h });
@@ -919,8 +920,11 @@ window.addEventListener("message", (event) => {
 
   // 2回目以降（自分が送った値が返ってくる）は作り直さない。
   // 作り直すと、つまんでいる最中に位置が飛ぶ。
-  if (started) { tellHeight(); return; }
+  // ただし、保存や読み直しで設定そのものが変わったとき（指紋が違う）は、
+  // 新しい設定で作り直す。古い設定のまま動かすと、保存で上書きしてしまう。
+  if (started && (args.rev || "") === rev) { tellHeight(); return; }
   started = true;
+  rev = args.rev || "";
 
   value = JSON.parse(JSON.stringify(args.value || {}));
   value.order = value.order || ["stage"];

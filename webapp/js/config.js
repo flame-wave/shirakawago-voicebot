@@ -5,12 +5,19 @@
 /// assets/ を webapp/ の中に移すなら './assets/' に変える。
 export const ASSET_BASE = '../assets/';
 
-/// FAQデータの配信元URL。ここを設定するとオンライン更新が有効になる。
-/// 空文字のままなら、同梱データ（ASSET_BASE の faq.json）だけで動作する。
+/// 手元のパソコンで試しているかどうか（開いたアドレスで見分ける）。
 ///
-/// 例（GitHubで配信する場合）:
-///   https://raw.githubusercontent.com/ユーザ名/リポジトリ名/main/assets/faq.json
-export const REMOTE_URL = '';
+/// 手元と公開先ではファイルの並びが違う（手元は server/api/、公開先は api/）。
+/// 以前は公開のたびにこのファイルを書き換えていたが、上書きし忘れ・上書きしすぎで
+/// 2度止まったため、開いた場所を見て自動で切り替えるようにした。
+/// これで手元のファイルをそのまま公開先へ上げてよい。
+const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+
+/// FAQデータの配信元URL。ここを設定するとオンライン更新が有効になる。
+/// 空文字なら、同梱データ（ASSET_BASE の faq.json）だけで動作する。
+/// 手元では、直したばかりの faq.json を試せるよう同梱データを使う。
+export const REMOTE_URL = LOCAL ? ''
+  : 'https://raw.githubusercontent.com/flame-wave/shirakawago-voicebot/main/assets/faq.json';
 
 /// 通信の待ち時間。現地の回線が遅い場合を考えて短めにする。
 export const FETCH_TIMEOUT_MS = 8000;
@@ -56,10 +63,8 @@ export const VOICE_PITCH = 1.0;
 
 /// 質問の記録を送る先（server/api/log.php を置いた場所）。
 /// 空にすると送らず、その端末の中だけに残る（管理者画面では見られない）。
-///
-///   手元で試すとき … '../server/api/log.php'
-///   公開するとき   … '../api/log.php'
-export const LOG_ENDPOINT = '../server/api/log.php';
+/// 手元か公開先かで、上の LOCAL を見て自動で切り替わる。
+export const LOG_ENDPOINT = LOCAL ? '../server/api/log.php' : '../api/log.php';
 
 /// 溜まった記録をまとめて送る間隔。
 /// 据え置き端末は電源を入れっぱなしにするため、定期的に送る。
@@ -91,11 +96,9 @@ export const PLACE_TIMEOUT_MS = 6000;
 /// AI回答の中継（server/api/ask.php を置いた場所）。
 /// 空のままなら、質問回答集で答えられないときは職員案内だけになる。
 ///
-/// 置き場所によって書き分ける。
-///   手元で試すとき（リポジトリ直下で php -S を動かす）… '../server/api/ask.php'
-///   公開するとき（api/ を assets/ と並べて置く）    … '../api/ask.php'
+/// 手元か公開先かで、上の LOCAL を見て自動で切り替わる。
 /// APIキーはこちらには書かない。中継サーバの中だけに置く。
-export const AI_ENDPOINT = '../server/api/ask.php';
+export const AI_ENDPOINT = LOCAL ? '../server/api/ask.php' : '../api/ask.php';
 
 /// AIの返事をこの時間まで待つ。過ぎたら職員案内に切り替える。
 /// 観光客を待たせないことを、答えを得ることより優先する。
