@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-07 15:45",
+  "version": "2026-10-07 15:59",
   "count": 73,
   "faqs": [
     {
@@ -6450,7 +6450,7 @@
         "languages"
       ],
       "heights": {
-        "faq": 0.09,
+        "faq": 0.066,
         "typed": 0.0,
         "talk": 0.15,
         "languages": 0.1
