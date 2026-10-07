@@ -46,6 +46,9 @@ COL = {
     "enabled": "有効",
     "show_from": "掲載開始日",
     "show_until": "掲載終了日",
+    # 管理画面で保存した日時。右端に足す列で、無ければ最初の保存のときに作る。
+    # Excel で直接直した分は記録されない（管理画面だけが書く）。
+    "updated": "最終更新",
 }
 
 # 多言語シートの列（この順で固定）
@@ -60,6 +63,19 @@ VSET_COL = {"name": "名前", "folder": "フォルダ", "note": "備考", "defau
 VOICE_SHEET = "読み上げ"
 VOICE_COL = {"lang": "言語", "voices": "優先する声",
              "rate": "速さ", "pitch": "高さ", "note": "備考"}
+
+# 「画面レイアウト」シート。設置形態ごとの画面の形。
+# 値はすべて割合で持つ（px で持つと別の大きさの画面で崩れるため）。
+LAYOUT_SHEET = "画面レイアウト"
+LAYOUT_COL = {
+    "place": "設置場所", "order": "並び順",
+    "faq": "よくある質問の高さ", "typed": "入力欄の高さ",
+    "talk": "話すボタンの高さ", "languages": "言語の高さ",
+    "scale": "キャラクターの大きさ", "rise": "キャラクターの高さ位置",
+    "side": "キャラクターの左右位置",
+    "bubble": "吹き出しの幅", "text": "文字の大きさ", "note": "備考",
+}
+LAYOUT_BLOCKS = ["stage", "faq", "typed", "talk", "languages"]
 
 CHAR_SHEET = "キャラクター"
 CHAR_COL = {"name": "名前", "id": "ID", "idle": "通常",
@@ -162,6 +178,7 @@ class FaqBook:
                 "enabled": is_enabled(self._cell(r, "enabled")),
                 "show_from": text(self._cell(r, "show_from")),
                 "show_until": text(self._cell(r, "show_until")),
+                "updated": text(self._cell(r, "updated"))[:16],
             })
         return items
 
@@ -392,6 +409,81 @@ class FaqBook:
         self._put(ws, header, row, VOICE_COL["rate"], round(float(rate), 2))
         self._put(ws, header, row, VOICE_COL["pitch"], round(float(pitch), 2))
 
+    def layouts(self) -> list:
+        """「画面レイアウト」シートを、編集画面が扱う形で返す。
+
+        シートは1行1設置場所の表だが、編集画面は
+        「並び順・高さ・立ち絵・吹き出し」のまとまりで扱う方が書きやすい。
+        """
+        ws, header = self._sheet(LAYOUT_SHEET)
+        if ws is None:
+            return []
+
+        def ratio(row, key, default=0.0):
+            try:
+                return float(self._get(ws, header, row, LAYOUT_COL[key]))
+            except (TypeError, ValueError):
+                return default
+
+        out = []
+        for r in range(2, ws.max_row + 1):
+            place = self._get(ws, header, r, LAYOUT_COL["place"])
+            if not place or self._is_note(place):
+                continue
+            order = [b.strip()
+                     for b in self._get(ws, header, r, LAYOUT_COL["order"]).split(",")
+                     if b.strip() in LAYOUT_BLOCKS]
+            if "stage" not in order:
+                order = ["stage"] + order
+            out.append({
+                "row": r,
+                "place": place,
+                "order": order,
+                "heights": {k: ratio(r, k) for k in
+                            ("faq", "typed", "talk", "languages")},
+                "character": {"scale": ratio(r, "scale", 1.0),
+                              "rise": ratio(r, "rise"),
+                              "side": ratio(r, "side")},
+                "bubble": {"width": ratio(r, "bubble"),
+                           "text": ratio(r, "text", 1.0)},
+                "note": self._get(ws, header, r, LAYOUT_COL["note"]),
+            })
+        return out
+
+    def update_layout(self, place: str, layout: dict) -> None:
+        """1つの設置場所の画面の形を書き換える。無ければ行を足す。"""
+        ws, header = self._sheet(LAYOUT_SHEET)
+        if ws is None:
+            raise ExcelError(f"「{LAYOUT_SHEET}」シートがありません。"
+                             "`python tools/add_layouts.py` で作れます。")
+
+        row = next((item["row"] for item in self.layouts()
+                    if item["place"] == place), None)
+        if row is None:
+            row = ws.max_row + 1
+            # 下の説明書きの上に入れる
+            while row > 2 and not self._get(ws, header, row - 1, LAYOUT_COL["place"]):
+                row -= 1
+            ws.insert_rows(row)
+            self._put(ws, header, row, LAYOUT_COL["place"], place)
+
+        order = [b for b in layout.get("order", []) if b in LAYOUT_BLOCKS]
+        if "stage" not in order:
+            order = ["stage"] + order
+        self._put(ws, header, row, LAYOUT_COL["order"], ",".join(order))
+
+        for key in ("faq", "typed", "talk", "languages"):
+            value = float(layout.get("heights", {}).get(key) or 0)
+            self._put(ws, header, row, LAYOUT_COL[key], round(value, 3))
+        for key, where in (("scale", "character"), ("rise", "character"),
+                           ("side", "character")):
+            value = float(layout.get(where, {}).get(key) or 0)
+            self._put(ws, header, row, LAYOUT_COL[key], round(value, 3))
+        self._put(ws, header, row, LAYOUT_COL["bubble"],
+                  round(float(layout.get("bubble", {}).get("width") or 0), 3))
+        self._put(ws, header, row, LAYOUT_COL["text"],
+                  round(float(layout.get("bubble", {}).get("text") or 1), 3))
+
     def characters(self) -> list:
         """「キャラクター」シートの一覧。無ければ空。
 
@@ -416,11 +508,42 @@ class FaqBook:
                 "id": self._get(ws, header, r, CHAR_COL["id"])
                       or idle.rsplit(".", 1)[0],
                 "idle": idle,
+                # 表情の絵。空なら通常の絵を使う（1枚だけのキャラクターでも立てるため）
+                "listening": self._get(ws, header, r, CHAR_COL["listening"]),
+                "talking": self._get(ws, header, r, CHAR_COL["talking"]),
                 "default": self._get(ws, header, r, CHAR_COL["default"]).upper()
                            in ("TRUE", "1", "○", "YES"),
+                # 吹き出しの尻尾（△）を口元に向けるための値。
+                # 絵そのものの形なので、設置場所ごとではなく絵ごとに持つ。
+                "mouth": self._ratio(ws, header, r, CHAR_COL["mouth"], 0.14),
+                "face": self._ratio(ws, header, r, CHAR_COL["face"], 0.31),
                 "note": self._get(ws, header, r, CHAR_COL["note"]),
             })
         return out
+
+    def _ratio(self, ws, header, row, title, default):
+        try:
+            return float(self._get(ws, header, row, title))
+        except (TypeError, ValueError):
+            return default
+
+    def update_character_shape(self, character_id: str,
+                               mouth: float, face: float) -> None:
+        """立ち絵の口の位置と顔の広さを書き換える。
+
+        吹き出しの尻尾（△）を口元に向けるための値。
+        絵そのものの形なので、設置場所ごとではなく絵ごとに1つだけ持つ
+        （同じ絵なら、据え置きでも観光客の端末でも口の位置は同じ）。
+        """
+        ws, header = self._sheet(CHAR_SHEET)
+        if ws is None:
+            raise ExcelError(f"「{CHAR_SHEET}」シートがありません")
+        row = next((c["row"] for c in self.characters() if c["id"] == character_id),
+                   None)
+        if row is None:
+            raise ExcelError(f"キャラクター「{character_id}」が見つかりません")
+        self._put(ws, header, row, CHAR_COL["mouth"], round(float(mouth), 3))
+        self._put(ws, header, row, CHAR_COL["face"], round(float(face), 3))
 
     def set_default_character(self, character_id: str) -> None:
         """既定のキャラクターを決める。ほかの行の印は消す。
@@ -453,12 +576,129 @@ class FaqBook:
                     out.append((item["id"], lang))
         return out
 
+    # ---- 翻訳の状態 -------------------------------------------------
+    @staticmethod
+    def read_note(note: str) -> dict:
+        """多言語シートの備考を読む。
+
+        自動翻訳には「自動翻訳（要確認）｜日本語原文: …」と書いてある。
+          machine … 自動翻訳で、まだ人が確かめていない
+          source  … 訳したときの日本語の回答（無ければ None）
+          rest    … それ以外に人が書いたメモ
+        """
+        machine, source, rest = False, None, []
+        for part in (note or "").split("｜"):
+            part = part.strip()
+            if not part:
+                continue
+            if part == MACHINE_MARK:
+                machine = True
+            elif part.startswith("日本語原文:"):
+                source = part[len("日本語原文:"):].strip()
+                # 以前の手直しで、原文のあとに全角空白で区切ってメモを足したものがある
+                # （「…　人手で修正: Shirakawa‑gō → Shirakawa-go」など）。
+                # これを原文の一部と読むと、回答が変わったと誤って判定してしまう。
+                for mark in ("　人手で修正", "　※"):
+                    if mark in source:
+                        source, memo = source.split(mark, 1)
+                        rest.append((mark.strip() + memo).strip())
+                        source = source.strip()
+            else:
+                rest.append(part)
+        return {"machine": machine, "source": source, "rest": rest}
+
+    def translation_status(self, langs) -> dict:
+        """{ID: {言語: 状態}} を返す。状態は次のどれか。
+
+          none    … 訳が無い
+          changed … 訳したあとで日本語の回答が変わった（訳し直しが要る）
+          machine … 自動翻訳で、まだ確かめていない（要確認）
+          ok      … 確かめ済み（または人が入れた訳）
+        """
+        current = {i["id"]: i["answer"] for i in self.faq_rows()}
+        rows = self.translation_rows()
+        out = {}
+        for fid, answer in current.items():
+            per = {}
+            for lang in langs:
+                r = rows.get((fid, lang))
+                text_ = text(self.ls.cell(r, LANG_COL["answer"]).value) if r else ""
+                if not text_:
+                    per[lang] = "none"
+                    continue
+                info = self.read_note(text(self.ls.cell(r, LANG_COL["note"]).value))
+                if info["source"] is not None and info["source"] != answer:
+                    per[lang] = "changed"
+                elif info["machine"]:
+                    per[lang] = "machine"
+                else:
+                    per[lang] = "ok"
+            out[fid] = per
+        return out
+
+    def confirm_translation(self, fid: str, lang: str, questions=None, answer=None) -> None:
+        """訳を確かめ済みにする（「要確認」の印を外す）。直した訳があれば一緒に書く。
+
+        「日本語原文」は残す。あとで日本語が変わったときに、訳し直しが要ると分かるように。
+        """
+        r = self.translation_rows().get((fid, lang.lower()))
+        if r is None:
+            raise ExcelError(f"「{fid}」の{lang}の訳が見つかりません")
+        # cell(..., value=None) は「消す」ではなく「何もしない」ため、
+        # 空にすることがある所は .value へ直接入れる（印だけの備考を消すときに必要）
+        if answer is not None:
+            self.ls.cell(row=r, column=LANG_COL["answer"]).value = answer.strip() or None
+        if questions is not None:
+            self.ls.cell(row=r, column=LANG_COL["questions"]).value = \
+                "\n".join(q for q in questions if q.strip()) or None
+        info = self.read_note(text(self.ls.cell(r, LANG_COL["note"]).value))
+        note = info["rest"][:]
+        if info["source"] is not None:
+            note.append(f"日本語原文: {info['source']}")
+        self.ls.cell(row=r, column=LANG_COL["note"]).value = "｜".join(note) or None
+
     # ---- 書く -----------------------------------------------------
     def _style(self, ws, row: int, cols, wrap_cols=()):
         for c in cols:
             cell = ws.cell(row=row, column=c)
             cell.font = Font(name=FONT, size=10)
             cell.alignment = Alignment(vertical="top", wrap_text=(c in wrap_cols))
+
+    def _ensure_column(self, key: str) -> int:
+        """FAQシートに列が無ければ、右端に足す。戻り値は列番号。
+
+        既存の列は動かさない（Excel で並べ替えている人がいても崩れない）。
+        見出しの見た目は、1列目の見出しに合わせる。
+        """
+        name = COL[key]
+        if name in self.header:
+            return self.header[name]
+        from copy import copy
+        col = max(self.header.values()) + 1
+        head = self.fs.cell(row=1, column=col, value=name)
+        model = self.fs.cell(row=1, column=1)
+        head.font, head.fill = copy(model.font), copy(model.fill)
+        head.alignment, head.border = copy(model.alignment), copy(model.border)
+        self.fs.column_dimensions[head.column_letter].width = 18
+        self.header[name] = col
+        return col
+
+    @staticmethod
+    def now() -> str:
+        return datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    def set_enabled(self, fid: str, enabled: bool) -> None:
+        """案内に出す／出さないを切り替える。
+
+        行は消さない。消すと、いつ何を案内していたかが分からなくなり、
+        記録（利用状況）に残っている質問とも結び付かなくなるため。
+        """
+        found = self.find(fid)
+        if not found:
+            raise ExcelError(f"「{fid}」が見つかりません")
+        self.fs.cell(row=found["row"], column=self.header[COL["enabled"]]).value =             "TRUE" if enabled else "FALSE"
+        col = self._ensure_column("updated")
+        self.fs.cell(row=found["row"], column=col).value = self.now()
 
     def upsert_faq(self, item: dict) -> int:
         """同じIDの行があれば書き換え、無ければ最後に足す。戻り値は行番号。
@@ -482,7 +722,10 @@ class FaqBook:
             "enabled": "TRUE" if item.get("enabled", True) else "FALSE",
             "show_from": item.get("show_from", ""),
             "show_until": item.get("show_until", ""),
+            # 管理画面で保存した日時（一覧の「最終更新」に出す）
+            "updated": self.now(),
         }
+        self._ensure_column("updated")
         for key, value in values.items():
             col = self.header.get(COL[key])
             if col is None:

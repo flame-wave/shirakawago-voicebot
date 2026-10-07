@@ -36,6 +36,8 @@ export class SetupScreen {
   close() {
     this.root.hidden = true;
     this.root.innerHTML = '';
+    // 閉じたあとにすること（据え置き端末では、次の方のために同意画面を出す）
+    if (this.onClose) this.onClose();
   }
 
   render() {
@@ -60,6 +62,18 @@ export class SetupScreen {
         while (await this.log.flush()) {
           // まだ残っていれば続けて送る
         }
+        this.render();
+      };
+    }
+
+    const clear = this.root.querySelector('.log-clear');
+    if (clear) {
+      clear.onclick = () => {
+        // 押し間違いで消えないよう、一度確かめる
+        if (!window.confirm('この端末に残っている記録を消します。元に戻せません。よろしいですか？')) {
+          return;
+        }
+        this.log.clearLocal();
         this.render();
       };
     }
@@ -95,12 +109,17 @@ export class SetupScreen {
       : `未送信の記録 ${pending} 件`
         + ' <button class="log-send" type="button">いま送る</button>';
 
+    const local = this.log.localCount;
     return `<section class="log-section">
       <h3>この端末</h3>
       <p class="log-sub">役割: ${role}</p>
       <p class="log-sub">${sending}</p>
       <p class="log-sub">質問の記録は中継サーバへ送られ、管理者画面で見られます。
       この画面からは見られません。</p>
+      <p class="log-sub">この端末に残っている記録 ${local + pending} 件
+        <button class="log-clear" type="button" ${local + pending === 0 ? 'disabled' : ''}>この端末の記録を消す</button></p>
+      <p class="log-sub">本番を始める前に押します。試しの頃の質問で、
+      「よくある質問」の並び順が偏らないようにするためです。</p>
     </section>`;
   }
 

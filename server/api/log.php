@@ -107,15 +107,25 @@ function clean(array $entry, string $client): ?array
     ];
 }
 
+// 管理画面で記録を消したときの境目。これより前の時刻の記録は受け取らない。
+// 端末に送れずに残っていた試しの頃の記録が、消したあとに届いて戻ってくるのを防ぐ。
+// （受け取らなかった分も「受け取った」と返す。端末に送り直させないため）
+$sincePath = $config['log_since_path'] ?? (__DIR__ . '/data/log_since.txt');
+$since = is_file($sincePath) ? strtotime(trim((string) file_get_contents($sincePath))) : false;
+
 $lines = [];
 foreach (array_slice($request['entries'], 0, MAX_ENTRIES) as $entry) {
     if (!is_array($entry)) {
         continue;
     }
     $row = clean($entry, $client);
-    if ($row !== null) {
-        $lines[] = json_encode($row, JSON_UNESCAPED_UNICODE);
+    if ($row === null) {
+        continue;
     }
+    if ($since !== false && strtotime($row['at']) < $since) {
+        continue;   // 消した境目より前の記録
+    }
+    $lines[] = json_encode($row, JSON_UNESCAPED_UNICODE);
 }
 
 if ($lines === []) {

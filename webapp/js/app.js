@@ -13,6 +13,7 @@ import { AiService } from './ai-service.js';
 import { PlaceService, NOWHERE } from './place-service.js';
 import { BackgroundView } from './background.js';
 import { CharacterView, CharacterState } from './character.js';
+import { LayoutView } from './layout.js';
 import { AnswerView } from './answer-view.js';
 import { QuestionLog, logStats } from './question-log.js';
 import { SetupScreen } from './setup-screen.js';
@@ -60,6 +61,8 @@ const el = {
 const background = new BackgroundView(document.getElementById('background'));
 const character = new CharacterView(
   document.getElementById('character'), document.getElementById('stage'));
+const layout = new LayoutView(
+  document.querySelector('.screen'), document.getElementById('stage'));
 const answerView = new AnswerView(document.getElementById('answer'));
 const setupScreen = new SetupScreen(document.getElementById('setupScreen'), log, voice);
 const consentScreen = new ConsentScreen(document.getElementById('consentScreen'));
@@ -629,6 +632,10 @@ async function init() {
   voice.setSettings(faqService.voiceSettings);
   voice.setReadings(faqService.readings);
 
+  // 設置形態ごとの画面の形。立ち絵より先に当てる
+  // （立ち絵の大きさは、この倍率を掛けて決まるため）。
+  layout.setList(faqService.layouts);
+
   // 立つキャラクターの一覧。職員が決めた既定を立て、利用者は選び直せる。
   character.setList(faqService.characters);
   wireCharacter();
@@ -708,7 +715,14 @@ function wireConsent() {
 
   if (isKiosk) {
     startIdleWatch(ask);
-    ask();          // 起動直後は、次に来た方のために出しておく
+    if (showSetup) {
+      // 職員が設定画面（?setup=1）を開いて起動したときは、同意画面を後回しにする。
+      // 同意画面は設定画面より前に出るので、先に出すと設定のボタンが押せない。
+      // 設定画面を閉じたら、次に来た方のために出す。
+      setupScreen.onClose = ask;
+    } else {
+      ask();        // 起動直後は、次に来た方のために出しておく
+    }
   } else if (consentState() === '') {
     ask();          // 一度お答えいただいた端末では、もう出さない
   }

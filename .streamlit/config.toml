@@ -1,0 +1,54 @@
+# 管理画面の見た目（色と書体）。
+#
+# 色と書体はここで決める。CSS で上書きするより確実で、
+# Streamlit の部品（ボタン・入力欄・進み具合の帯など）すべてに同じ色が行き渡る。
+# 部品ごとの細かい形（カード・注意の帯・下に固定する保存バーなど）は
+# admin/ui.py の CSS で決めている。
+#
+# 色の決まり（職員向け管理画面のデザインのルール）
+#   サイドバー        #1F3D20
+#   主ボタン・選択中  #2C5F2D
+#   背景              #F4F6F1
+#   カード            #FFFFFF（枠 #DDE3D8）
+#   注意              #FFF4DC（枠 #E3B34A、文字 #6B4200）  … ui.py
+#   うまくいった表示  #E8F1E4                              … ui.py
+
+[theme]
+base = "light"
+primaryColor = "#2C5F2D"
+backgroundColor = "#F4F6F1"
+# 入力欄の地の色。カード（白）の上に置くので、白にして枠で見せる
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#1F2A1F"
+linkColor = "#2C5F2D"
+borderColor = "#DDE3D8"
+showWidgetBorder = true
+baseRadius = "10px"
+buttonRadius = "10px"
+# 本文は15〜16px。読みやすさを優先して16px
+baseFontSize = 16
+# BIZ UDPGothic … 誰にでも読みやすいように作られた書体（UD＝ユニバーサルデザイン）
+font = "BIZ UDPGothic:https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap, sans-serif"
+headingFont = "BIZ UDPGothic:https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap, sans-serif"
+
+[theme.sidebar]
+backgroundColor = "#1F3D20"
+secondaryBackgroundColor = "#2A4F2C"
+textColor = "#E6EFE4"
+primaryColor = "#E8F1E4"
+borderColor = "#3A5C3C"
+
+[client]
+# 右上の「Deploy」などの開発者向けのボタンを出さない（職員には不要で、押すと迷う）
+toolbarMode = "minimal"
+
+[server]
+# 質問回答集（Excel）を貼り付けて差し替えることは想定していない
+maxUploadSize = 10
+# ファイルの変更を見張らない。
+# 手元で動かすと、管理画面が保存する Excel（tools/faq_master.xlsx）も見張りの対象になる。
+# Windows の Python 3.14 では、この見張りの処理ごと管理画面が落ちることがあった
+# （Fatal Python error: _PySemaphore_Wakeup）。見張りはプログラムを直したときに
+# 自動で読み直すためだけのもので、職員さんの使い方には要らない。
+# プログラムを直したときは、管理画面を起動し直す。
+fileWatcherType = "none"

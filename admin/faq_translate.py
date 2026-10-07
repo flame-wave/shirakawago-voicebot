@@ -24,9 +24,12 @@ LANGS = {
 # 地図や看板と突き合わせるため、「白山」を Shiroyama と訳されると
 # 別の山を探しに行ってしまう。安いモデルほどこの種の間違いが出る。
 #
-# さらに安くするなら "claude-haiku-4-5"（半額）。
-# そのときは訳したあと tools/check_translations.py を必ず流すこと。
-MODEL = "claude-sonnet-5-5"
+# 2026年10月、料金を抑えるため Haiku に切り替えた（運用者の判断）。
+# 安いモデルほど固有名詞を間違えやすいので、自動翻訳には「要確認」の印を付け、
+# 管理画面の「まとめて翻訳する」で日本語と並べて確かめてから印を外す運用にしている。
+# 地名の訳し間違いが目立つようなら "claude-sonnet-5-5" に戻す。
+# まとめて確かめるときは tools/check_translations.py も使える。
+MODEL = "claude-haiku-4-5"
 
 # オープンなモデル（gpt-oss、Qwen など）を代わりに使うときの既定。
 # Groq の無料枠で動く。安く済ませるなら "openai/gpt-oss-20b"。
@@ -114,7 +117,7 @@ def parse_result(text):
     return json.loads(text[start:end + 1])
 
 
-def translate(items, langs, engine):
+def translate(items, langs, engine, progress=None):
     """翻訳する。戻り値は {id: {lang: {questions, answer}}}
 
     engine は使う翻訳の設定（下の describe_engine 参照）。
@@ -122,13 +125,66 @@ def translate(items, langs, engine):
     （処理はクラウド側で行われ、管理画面はその結果を受け取るだけ）。
 
     件数が多いと返答が長くなるため、少しずつに分けて依頼する。
+    progress … 1回頼み終えるたびに progress(終わった件数, 全件数, それまでの結果) を呼ぶ。
+               画面に進み具合を出すため。途中で止まっても、それまでの結果は残せる。
     """
-    once = _open_model_once if engine["kind"] == "open_model" else _claude_once
+    once = {"open_model": _open_model_once, "fake": _fake_once}.get(
+        engine["kind"], _claude_once)
 
     merged = {}
+    total = len(items)
     for chunk in chunked(items, CHUNK):
         merged.update(_once_splitting(once, chunk, langs, engine))
+        if progress:
+            progress(len(merged), total, merged)
     return merged
+
+
+# ---------------------------------------------------------------- 試し用
+def fake_engine():
+    """決まった訳を返す、試し用の翻訳。
+
+    本物の翻訳（AIのキー）が無い状態で、画面と保存の流れを確かめるために使う。
+    管理画面を CHAATBOT_FAKE_TRANSLATE=1 を付けて起動したときだけ有効になる。
+    職員が使う画面で有効になることは無い。
+    """
+    return {"kind": "fake", "model": "fake", "label": "試し用の翻訳（本物ではありません）"}
+
+
+def _fake_once(items, langs, engine):
+    return {
+        fid: {
+            lang: {"questions": [f"{lang} {q}" for q in v["questions"]],
+                   "answer": f"[{lang}] {v['answer']}"}
+            for lang in langs
+        }
+        for fid, v in items.items()
+    }
+
+
+# ---------------------------------------------------------------- 費用の目安
+# Claude Haiku の料金（1ドルあたり、100万トークンごと）。
+# 料金が変わったらここだけ直す。画面の「費用の目安」はこの値で計算する。
+PRICE_IN = 1.00     # 入力
+PRICE_OUT = 5.00    # 出力
+YEN_PER_USD = 150   # 円に直すときの目安
+
+
+def estimate(items, langs):
+    """翻訳にかかるおおよその費用（円）を返す。(少なめ, 多め)
+
+    日本語は1文字がおよそ1トークン。訳文は言語ごとに日本語の1.5倍ほどの
+    長さになる。毎回付ける指示文のぶんも足す。幅を持たせて出す。
+    """
+    if not items or not langs:
+        return 0.0, 0.0
+    ja = sum(len(v["answer"]) + sum(len(q) for q in v["questions"]) for v in items.values())
+    chunks = (len(items) + CHUNK - 1) // CHUNK
+    tokens_in = ja * 1.2 + chunks * (len(INSTRUCTIONS) * 1.1 + 200)
+    tokens_out = ja * 1.5 * len(langs) + len(items) * len(langs) * 40
+    usd = tokens_in / 1e6 * PRICE_IN + tokens_out / 1e6 * PRICE_OUT
+    yen = usd * YEN_PER_USD
+    return yen * 0.7, yen * 1.5
 
 
 def _once_splitting(once, items, langs, engine):
@@ -339,3 +395,77 @@ def check_questions(questions):
         if max((len(w) for w in words), default=0) < 2:
             problems.append(f"「{q}」は語が短すぎて判定に使えません")
     return problems
+
+
+# ---------------------------------------------------------------- 小さな頼みごと
+# 翻訳と同じ設定（engine）を使って、短い返事をもらう。
+# 管理用の名前を付ける・聞き方の案を出す、といった用途。
+def ask_text(engine, prompt: str, max_tokens: int = 400) -> str:
+    """短い返事を文字で受け取る。設定が無ければ RuntimeError。"""
+    if not engine:
+        raise RuntimeError("AIの設定がされていません")
+    if engine["kind"] == "claude":
+        import anthropic
+        client = anthropic.Anthropic(api_key=engine["api_key"])
+        res = client.messages.create(
+            model=engine["model"], max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return "".join(b.text for b in res.content if getattr(b, "type", "") == "text")
+
+    import requests
+    res = requests.post(
+        f"{engine['base_url']}/chat/completions",
+        headers={"Authorization": f"Bearer {engine['api_key']}",
+                 "Content-Type": "application/json"},
+        json={"model": engine["model"], "max_tokens": max_tokens, "temperature": 0.2,
+              "messages": [{"role": "user", "content": prompt}]},
+        timeout=60,
+    )
+    if res.status_code != 200:
+        raise RuntimeError(f"AIに頼めませんでした（{res.status_code}）")
+    choice = (res.json().get("choices") or [{}])[0]
+    return (choice.get("message") or {}).get("content", "")
+
+
+def make_slug(answer: str, engine) -> str:
+    """回答の内容から、管理用の名前（英小文字と _ だけ）を作る。
+
+    例: 喫煙所の案内 → smoking_area
+    名前は職員には見せないが、Excel と記録で同じ項目を指すのに使う。
+    """
+    text = ask_text(engine, (
+        "次の観光案内の回答を表す、短い英語の名前を1つだけ作ってください。\n"
+        "・英小文字と _ だけ、2〜3語（例: smoking_area, bus_timetable）\n"
+        "・説明や記号は付けず、名前だけを1行で返す\n\n"
+        f"回答: {answer[:300]}"
+    ), max_tokens=40)
+    slug = re.sub(r"[^a-z0-9_]+", "_", text.strip().lower().split("\n")[0]).strip("_")
+    slug = re.sub(r"_+", "_", slug)[:32].strip("_")
+    return slug
+
+
+def suggest_questions(answer: str, existing, engine, count: int = 6) -> list:
+    """回答に合う聞き方の案を出す。
+
+    案内アプリは「質問例の語が全部入っていたら当たる」決め方なので、
+    文ではなく、空白でつないだ短い語の組（例: たばこ 吸える）で出してもらう。
+    """
+    have = "、".join(existing) or "（まだない）"
+    text = ask_text(engine, (
+        "白川郷の観光案内で、観光客がこの回答を聞きたいときの言い方を考えてください。\n"
+        f"・{count}個、1行に1つ\n"
+        "・文ではなく、空白でつないだ短い語の組にする（例: たばこ 吸える／喫煙所）\n"
+        "・語は2〜3個まで。「どこ」「時間」のような一般的な語だけの組にはしない\n"
+        "・すでにある言い方と同じものは出さない\n"
+        "・番号や記号、説明は付けない\n\n"
+        f"回答: {answer[:400]}\n"
+        f"すでにある言い方: {have}"
+    ), max_tokens=300)
+    out = []
+    for line in text.splitlines():
+        q = re.sub(r"^[\s\-・*0-9.)、]+", "", line).replace("　", " ").strip()
+        q = re.sub(r"\s+", " ", q)
+        if q and q not in existing and q not in out and len(q) <= 30:
+            out.append(q)
+    return out[:count]

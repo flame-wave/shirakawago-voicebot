@@ -116,6 +116,27 @@ export class QuestionLog {
     return this._lines(OUTBOX_KEY).length;
   }
 
+  /// この端末の記録の件数（よくある質問の並び順に使っているもの）
+  get localCount() {
+    return this._lines(KEY).length;
+  }
+
+  /// この端末に残っている記録を消す（本番を始める前に、試しの頃の記録を消すため）。
+  ///
+  /// 消すのは2つ。
+  ///   ・この端末の記録 … よくある質問の並び順に使っている。試しの頃の質問で
+  ///                     並び順が偏らないように消す
+  ///   ・送れていない記録 … 中継サーバも、消した日より前の記録は受け取らない
+  ///                     ようになっているが、端末にも残さない方が分かりやすい
+  clearLocal() {
+    try {
+      localStorage.removeItem(KEY);
+      localStorage.removeItem(OUTBOX_KEY);
+    } catch (_) {
+      // 消せなくても案内は続けられる
+    }
+  }
+
   _lines(key = KEY) {
     try {
       const raw = localStorage.getItem(key);

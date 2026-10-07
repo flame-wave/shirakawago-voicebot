@@ -18,6 +18,13 @@ import requests
 # 端末の区別。管理者画面ではこの順に並べる。
 CLIENTS = ["バスターミナル", "であいの館", "観光客"]
 
+# 端末ごとの色。グラフでは、どの画面でも同じ場所に同じ色を使う（色は場所に付ける）。
+# 色覚の違いがあっても3つが見分けられることを確かめた組み合わせ
+# （dataviz の validate_palette で、白地・3系列すべての組で合格）。
+# 水色は白地との差が小さめなので、グラフには必ず数の表を添える。
+CLIENT_COLORS = {"バスターミナル": "#2a78d6", "であいの館": "#eb6834", "観光客": "#1baf7a"}
+OTHER_COLOR = "#8A9A88"
+
 # 回答できた経路
 SOURCES = {
     "faq": "質問回答集",
@@ -37,6 +44,29 @@ def fetch(url, token, kind="question", timeout=30):
     if res.status_code != 200:
         raise RuntimeError(f"記録を読み出せませんでした（{res.status_code}）")
     return parse(res.text)
+
+
+def clear(url, token, before=None, timeout=30):
+    """中継サーバの記録を消す。before（"2026-11-01"）を渡すと、その日より前だけを消す。
+
+    戻り値: {"deleted": 消した件数, "kept": 残した件数, "since": 境目}
+    消したあと、それより前の時刻の記録は中継サーバが受け取らなくなる
+    （案内端末に残っていた古い記録が届いても戻らない）。
+    """
+    body = {"token": token, "action": "clear"}
+    if before:
+        body["before"] = before
+    res = requests.post(url, json=body, timeout=timeout)
+    if res.status_code == 403:
+        raise RuntimeError("記録を消せませんでした。合言葉（log_token）が"
+                           "中継サーバの config.php と一致しているか確認してください。")
+    if res.status_code != 200:
+        raise RuntimeError(f"記録を消せませんでした（{res.status_code}）。"
+                           "中継サーバの logs.php が新しいものか確認してください。")
+    data = res.json()
+    if not data.get("ok"):
+        raise RuntimeError(f"記録を消せませんでした（{data.get('reason', '理由不明')}）")
+    return data
 
 
 def parse(text):

@@ -14,6 +14,7 @@ Excelで開いて直しても構わない。どちらで編集しても同じフ
 """
 
 import json
+from html import escape
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -25,6 +26,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(ROOT / "tools"))
 
 import faq_excel as X
+import publish_diff
+import ui
+from components.layout_editor import layout_editor
 import faq_translate as T
 import log_stats as L
 import build_faq
@@ -32,13 +36,9 @@ from faq_store import VALID_CATEGORIES, GitHubStore, LocalStore, StoreError
 
 st.set_page_config(page_title="音声案内 管理画面", page_icon="🏘️", layout="wide")
 
-st.markdown("""
-<style>
-  .hint { color:#5A6B58; font-size:13px; }
-  .lang-name { color:#2C5F2D; font-weight:bold; font-size:13px; }
-  div[data-testid="stForm"] { border-color:#C3D2BC; }
-</style>
-""", unsafe_allow_html=True)
+# 見た目（色・書体・共通の部品）は ui.py と .streamlit/config.toml にまとめてある。
+# 画面の側では色や CSS を書かないこと。
+ui.apply_theme()
 
 
 # ---------------------------------------------------------------- 設定
@@ -56,7 +56,13 @@ def get_engine():
 
     どちらを選んでも処理はクラウド側で行われるので、
     職員のパソコンには何も入れなくてよい。
+
+    CHAATBOT_FAKE_TRANSLATE=1 を付けて起動したときだけ、決まった訳を返す
+    試し用の翻訳を使う（本物のキーが無い状態で画面の流れを確かめるため）。
     """
+    import os
+    if os.environ.get("CHAATBOT_FAKE_TRANSLATE") == "1":
+        return T.fake_engine()
     return T.describe_engine(
         anthropic_key=secret("anthropic", "api_key"),
         open_model={
@@ -152,750 +158,487 @@ def save_book(apply_changes, message):
     new_sha = store.save(new_raw, message, sha)
     st.session_state["raw"] = new_raw
     st.session_state["sha"] = new_sha
+    # 公開中の内容との食い違いを、次の表示で測り直す
+    st.session_state.pop("published", None)
 
 
-# ---------------------------------------------------------------- 横の欄
-with st.sidebar:
-    st.markdown("### 保存先")
-    st.caption(store.label)
-    st.caption(store.location)
-
-    st.markdown("### 登録数")
-    st.caption(f"{len(items)} 件（うち案内に出す {sum(1 for i in items if i['enabled'])} 件）")
-
-    st.markdown("### 翻訳の状況")
-    for lang, name in T.LANGS.items():
-        n = sum(1 for i in items if lang in done.get(i["id"], set()))
-        st.caption(f"{name}: {n} / {len(items)} 件")
-
-    st.markdown("### 翻訳に使うもの")
-    if engine:
-        st.caption(engine["label"])
-    else:
-        st.warning("翻訳の設定がされていないため、自動翻訳は使えません。"
-                   "日本語のみで保存できます。")
-
-    st.markdown("### 案内画面のキャラクター")
-    characters = book.characters()
-    if not characters:
-        st.caption("「キャラクター」シートがありません。"
-                   "`python tools/add_characters.py` で作れます。")
-    else:
-        names = [c["name"] for c in characters]
-        ids = [c["id"] for c in characters]
-        current = next((i for i, c in enumerate(characters) if c["default"]), 0)
-        picked = st.selectbox(
-            "いつも立たせるキャラクター", range(len(characters)),
-            index=current, format_func=lambda i: names[i],
-            key="character_default",
-            help="案内端末を開いたときのキャラクターです。"
-                 "利用者は案内画面で選び直せます。",
-        )
-        if picked != current:
-            try:
-                save_book(lambda fresh: fresh.set_default_character(ids[picked]),
-                          f"既定のキャラクターを{names[picked]}に変更（管理画面より）")
-                st.success(f"{names[picked]} にしました。"
-                           "「案内アプリへ反映する」から書き出すと反映されます。")
-                st.rerun()
-            except X.ExcelError as e:
-                st.error(str(e))
-            except Exception as e:
-                st.error(f"保存できませんでした: {e}")
-        note = characters[picked]["note"]
-        if note:
-            st.caption(note)
-
-    st.divider()
-    if st.button("最新の内容を読み直す", use_container_width=True):
-        for k in ("raw", "sha", "pending"):
-            st.session_state.pop(k, None)
-        st.rerun()
-
-st.title("白川郷 音声案内　管理画面")
-st.caption("日本語で入力すると、英語・中国語・韓国語・スペイン語・フランス語に自動で翻訳され、"
-           "質問回答集のExcelに追加されます。")
-
-(tab_add, tab_list, tab_bulk, tab_settings, tab_voice,
- tab_publish, tab_stats) = st.tabs(
-    ["質問を追加・修正する", "登録されている質問", "まとめて翻訳する",
-     "その他の設定", "読み上げの声", "案内アプリへ反映する", "利用状況"]
-)
+# ---------------------------------------------------------------- 画面の部品
+def panel_title(title, note=""):
+    """画面の題と一行の説明（共通の部品 ui.page_header を使う）。"""
+    ui.page_header(title, note)
 
 
-# ---------------------------------------------------------------- 入力欄
-def blank():
-    return {
-        "id": "", "place": "", "category": "other", "questions": [], "answer": "",
-        "short": "", "photo": "", "link": "", "audio": "", "chip": "",
-        "enabled": True, "show_from": "", "show_until": "",
-    }
+def tiles(cells):
+    """数値の札（共通の部品 ui.tiles を使う）。"""
+    ui.tiles(cells)
 
 
-def parse_date(value):
+def reload_book():
+    for k in ("raw", "sha", "pending", "published"):
+        st.session_state.pop(k, None)
+
+
+# ---------------------------------------------------------------- 反映の状況
+def published_summary():
+    """いま案内アプリに出ている内容を読む。読めなければ None。
+
+    Excelに保存しただけでは案内端末に届かない。実際に書き出したものと
+    見比べられないと、職員は「直したのに変わらない」で止まってしまう。
+    （現に、キャラクターを変えたのに書き出さず、古いまま公開されていた）
+    """
+    if "published" in st.session_state:
+        return st.session_state["published"]
     try:
-        return date.fromisoformat(value[:10])
-    except (ValueError, TypeError):
-        return date.today()
+        data, _ = get_json_store().load()   # 読み込んだ時点で辞書になっている
+    except Exception:
+        data = None
+    st.session_state["published"] = data
+    return data
 
 
-def edit_form(item, is_new, places):
-    st.markdown("#### 日本語で入力してください")
+def unpublished():
+    """まだ案内アプリに反映していない変更の一覧。読めないときは None。
 
-    c1, c2, c3 = st.columns([2, 1, 1])
-    with c1:
-        fid = st.text_input(
-            "管理用の名前（半角英字。あとから変えないでください）",
-            value=item["id"], disabled=not is_new, placeholder="例: smoking_area",
-        )
-    with c2:
-        place_options = places + ["（新しく入力する）"]
-        idx = place_options.index(item["place"]) if item["place"] in places else 0
-        place = st.selectbox("設置場所", place_options, index=idx)
-        if place == "（新しく入力する）":
-            place = st.text_input("設置場所の名前", value="")
-    with c3:
-        cat_keys = list(VALID_CATEGORIES)
-        category = st.selectbox(
-            "分類", cat_keys,
-            index=cat_keys.index(item["category"]) if item["category"] in cat_keys else 0,
-            format_func=lambda k: VALID_CATEGORIES[k],
-        )
+    書き出しと同じ変換（build_faq）を通して、公開中のものと1件ずつ比べる。
+    サイドバーの「未反映 3」とホームの一覧は、どちらもこれを見る。
+    """
+    return publish_diff.cached(st.session_state, st.session_state["raw"],
+                               published_summary(), ROOT / "assets")
 
-    questions = st.text_area(
-        "観光客の聞き方（1行に1つ）", value="\n".join(item["questions"]),
-        height=130, placeholder="喫煙所\nたばこ 吸える\n喫煙 場所",
-    )
-    st.markdown(
-        "<div class='hint'>1行に1つの言い方を書きます。行の中の空白は「かつ」の意味です。"
-        "「たばこ 吸える」は、たばこ と 吸える の両方が入っているときだけ反応します。</div>",
-        unsafe_allow_html=True,
-    )
 
-    answer = st.text_area(
-        "回答（このまま読み上げられます）", value=item["answer"], height=140,
-        placeholder="喫煙所は……にございます。",
-    )
-    st.markdown(
-        "<div class='hint'>料金や時間の条件は省略せずに書いてください。"
-        "「9時から16時」のように、数字は読み上げやすい形にすると自然に聞こえます。</div>",
-        unsafe_allow_html=True,
-    )
+def publish_gaps():
+    """ホームに出す、反映されていない変更の説明（一行ずつ）。"""
+    changes = unpublished()
+    if not changes:
+        return []
+    return [f"{c['kind']}：{c['label']}" for c in changes]
 
-    short = st.text_area(
-        "読み上げ用の短い回答（任意）", value=item["short"], height=80,
-        placeholder="回答が長いときに、読み上げ向けの短い言い方を書きます",
-    )
 
-    c4, c5 = st.columns(2)
-    with c4:
-        photo = st.text_input("写真のファイル名（任意）", value=item["photo"],
-                              placeholder="例: shuttle_stop.jpg")
-    with c5:
-        link = st.text_input("参考ページのURL（任意）", value=item["link"],
-                             placeholder="https://…")
+# ---------------------------------------------------------------- 画面の上に出す警告
+def translation_warning():
+    """翻訳の設定がまだのとき、画面の上に注意の帯を出す。
 
-    chip = st.text_input(
-        "よくある質問に出す文言（任意）", value=item["chip"],
-        placeholder="例: トイレの場所",
-    )
-    st.markdown(
-        "<div class='hint'>入れると、案内画面の上部に流れる「よくある質問」に並びます。"
-        "押すとその文言で検索するので、<b>この文言でこの回答に当たるか</b>を確かめてください。</div>",
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("#### 掲載の期間（お祭りなど期間限定の案内に使います）")
-    c6, c7 = st.columns([1, 1])
-    with c6:
-        enabled = st.checkbox("案内に表示する", value=item["enabled"])
-    with c7:
-        use_period = st.checkbox(
-            "期間を決める", value=bool(item["show_from"] or item["show_until"]),
-        )
-    show_from = show_until = ""
-    if use_period:
-        c8, c9 = st.columns(2)
-        with c8:
-            show_from = st.date_input(
-                "この日から", value=parse_date(item["show_from"])).isoformat()
-        with c9:
-            show_until = st.date_input(
-                "この日まで", value=parse_date(item["show_until"])).isoformat()
-        st.markdown(
-            "<div class='hint'>期間外になると、書き出しのときに自動で案内から外れます。</div>",
-            unsafe_allow_html=True,
+    以前はサイドバーの下に小さく書いていたため、気づかないまま
+    日本語だけで登録してしまうことがあった。
+    """
+    if engine:
+        return
+    if ui.notice("翻訳の設定がまだです。このまま保存すると**日本語だけ**で登録されます。",
+                 kind="warn", action="翻訳を設定する", key="translation"):
+        st.session_state["show_translation_help"] = True
+    if st.session_state.get("show_translation_help"):
+        st.info(
+            "翻訳の設定は、管理画面を置いている人（管理者）が行います。\n\n"
+            "Streamlit の「Settings → Secrets」に翻訳用のキーを入れると、"
+            "この警告が消えて自動で翻訳されるようになります。"
+            "設定が済むまでは日本語だけで保存し、あとで「まとめて翻訳する」から"
+            "翻訳を足すこともできます。"
         )
 
-    return {
-        "id": fid.strip(),
-        "place": place.strip(),
-        "category": category,
-        "questions": [q.strip() for q in questions.splitlines() if q.strip()],
-        "answer": answer.strip(),
-        "short": short.strip(),
-        "photo": photo.strip(),
-        "link": link.strip(),
-        "audio": item["audio"],
-        "chip": chip.strip(),
-        "enabled": enabled,
-        "show_from": show_from,
-        "show_until": show_until,
-    }
+
+# ---------------------------------------------------------------- ホーム
+def page_home():
+    """ホーム（中身は page_home.py）。今やることを並べる。"""
+    from types import SimpleNamespace
+
+    import page_home as H
+    H.render(SimpleNamespace(
+        book=book, items=items, engine=engine, store=store, unpublished=unpublished,
+        log_source=log_source, translation_warning=translation_warning, pages=PAGE_REFS,
+    ))
 
 
-def validate(item, is_new, existing_ids):
-    errors = []
-    if not item["id"]:
-        errors.append("管理用の名前を入れてください")
-    elif not all(c.islower() or c.isdigit() or c == "_" for c in item["id"]):
-        errors.append("管理用の名前は半角の小文字・数字・アンダースコアだけで書いてください")
-    elif is_new and item["id"] in existing_ids:
-        errors.append(f"「{item['id']}」はすでに使われています")
-    if not item["questions"]:
-        errors.append("観光客の聞き方を1つ以上入れてください")
-    if not item["answer"]:
-        errors.append("回答を入れてください")
-    if item["link"] and not item["link"].startswith(("http://", "https://")):
-        errors.append("参考ページのURLが正しくありません")
-    if item["show_from"] and item["show_until"] and item["show_from"] > item["show_until"]:
-        errors.append("掲載期間の開始日が終了日より後になっています")
-    return errors
+# ---------------------------------------------------------------- 画面レイアウト
+# 据え置きのタブレットと観光客のスマートフォンでは、押しやすい大きさも
+# 見せたいものも違う。設置場所ごとに画面の形を決められるようにする。
+
+# 設置場所ごとに、先に出すプレビューの形。
+# 据え置きはタブレット、観光客はスマートフォン。
+LAYOUT_SHAPES = {
+    "バスターミナル": "tablet-v",
+    "であいの館": "tablet-v",
+    "観光客": "phone",
+}
+
+
+@st.cache_data(show_spinner=False)
+def character_thumb(name: str):
+    """立ち絵の小さな写し（編集画面に出すため）。
+
+    もとの絵は2MBある。編集のたびに送ると重いので、
+    高さ320pxに縮めたものを作って使い回す。
+    """
+    import base64
+    import io
+
+    path = ROOT / "assets" / "character" / name
+    if not path.exists():
+        return None
+    try:
+        from PIL import Image
+    except ImportError:
+        return None
+    try:
+        img = Image.open(path).convert("RGBA")
+        ratio = img.width / img.height
+        img.thumbnail((int(320 * ratio), 320))
+        buf = io.BytesIO()
+        img.save(buf, format="PNG", optimize=True)
+        data = base64.b64encode(buf.getvalue()).decode("ascii")
+        return {"url": f"data:image/png;base64,{data}",
+                "aspect": round(ratio, 4)}
+    except Exception:
+        return None
+
+
+def page_layout():
+    ui.section("画面レイアウト",
+               "設置形態ごとに、画面の並びと大きさを決めます。"
+               "絵の中のブロックを直接つかんで動かせます。")
+
+    rows = book.layouts()
+    if not rows:
+        st.warning("「画面レイアウト」シートがありません。"
+                   "`python tools/add_layouts.py` で作れます。")
+        return
+
+    names = [r["place"] for r in rows]
+    place = st.radio("どの端末の画面を直しますか", names, horizontal=True,
+                     key="layout_place")
+    current = next(r for r in rows if r["place"] == place)
+    if current["note"]:
+        st.caption(current["note"])
+
+    # 立ち絵は、職員が決めた既定のものを出す（実際に立つ絵で確かめられるように）
+    chars = book.characters()
+    standing = next((c for c in chars if c["default"]), chars[0] if chars else None)
+    thumb = character_thumb(standing["idle"]) if standing else None
+
+    # 吹き出しの尻尾（△）の向く先。これは絵そのものの形なので、
+    # 設置場所ごとではなく「キャラクター」シートに1つだけ持つ。
+    tail = ({"mouth": standing["mouth"], "face": standing["face"]} if standing
+            else {"mouth": 0.14, "face": 0.31})
+    before = {k: current[k] for k in ("order", "heights", "character", "bubble")}
+    before["tail"] = tail
+
+    edited = layout_editor(
+        value=before,
+        shape={"id": LAYOUT_SHAPES.get(place, "phone")},
+        character=thumb or {},
+        key=f"layout_{place}",
+    )
+
+    if standing:
+        st.caption(f"立ち絵は「{standing['name']}」で表示しています。"
+                   "△（口の位置・顔の広さ）は**この立ち絵の形**なので、"
+                   "どの端末でも同じ値が使われます。")
+    else:
+        st.caption("立ち絵の設定がありません")
+
+    # 保存すると画面を作り直すので、知らせはここで出す
+    # （作り直す前に出すと、出た瞬間に消えてしまう）。
+    flash = st.session_state.pop("layout_saved", None)
+    if flash:
+        st.success(flash)
+
+    changed = edited != before
+    c1, c2 = st.columns([1, 3])
+    if c1.button("この内容で保存", type="primary", disabled=not changed,
+                 key=f"save_layout_{place}"):
+        tail_moved = bool(standing) and edited.get("tail") != tail
+
+        def apply_changes(fresh):
+            fresh.update_layout(place, edited)
+            # △は絵ごとの値なので、動かされたときだけ別に書く
+            if tail_moved:
+                fresh.update_character_shape(
+                    standing["id"], edited["tail"]["mouth"], edited["tail"]["face"])
+
+        try:
+            save_book(apply_changes,
+                      f"「{place}」の画面レイアウトを変更（管理画面より）")
+            note = (f"△の位置は「{standing['name']}」の立ち絵に保存しました"
+                    "（どの端末にも効きます）。") if tail_moved else ""
+            st.session_state["layout_saved"] = (
+                f"「{place}」の画面を保存しました。" + note
+                + "「案内アプリへ反映する」で書き出すと案内端末に届きます。")
+            st.rerun()
+        except X.ExcelError as e:
+            st.error(str(e))
+        except Exception as e:
+            st.error(f"保存できませんでした: {e}")
+    c2.caption("動かしただけでは保存されません。"
+               if changed else "まだ動かしていません。")
+
+    with st.expander("数値で直す"):
+        sheet_editor("画面レイアウト", title="画面レイアウト（表）",
+                     note="編集画面で動かした結果がこの表に入ります。"
+                          "細かい数字を直接入れたいときに使います。")
+
+
+# ---------------------------------------------------------------- キャラクター
+def page_character():
+    ui.section("キャラクター",
+               "案内画面に立つ絵です。絵を見ながら、案内端末を開いたときに立つものを選びます。"
+               "利用者は案内画面で選び直せます。")
+
+    chars = book.characters()
+    if not chars:
+        st.warning("「キャラクター」シートがありません。"
+                   "`python tools/add_characters.py` で作れます。")
+        return
+
+    flash = st.session_state.pop("char_saved", None)
+    if flash:
+        ui.notice(flash, kind="ok", key="char-saved")
+
+    per_row = 5
+    for start in range(0, len(chars), per_row):
+        cols = st.columns(per_row)
+        for col, c in zip(cols, chars[start:start + per_row]):
+            with col:
+                with ui.card(f"ch-{c['id']}"):
+                    thumb = character_thumb(c["idle"])
+                    img = (f'<img src="{thumb["url"]}" style="height:170px;max-width:100%;'
+                           'object-fit:contain;display:block;margin:0 auto">'
+                           if thumb else
+                           '<div style="height:170px;display:flex;align-items:center;'
+                           'justify-content:center;color:#8A9A88">絵が見つかりません</div>')
+                    st.markdown(f'<div style="background:#E9F0EA;border-radius:10px;'
+                                f'padding:8px">{img}</div>', unsafe_allow_html=True)
+                    faces = len({c["idle"], c.get("listening") or c["idle"],
+                                 c.get("talking") or c["idle"]})
+                    st.markdown(f'<div class="ui-tcell" style="margin-top:8px"><b>'
+                                f'{escape(c["name"])}</b></div>'
+                                f'<div class="ui-tsub">表情 {faces} 枚</div>',
+                                unsafe_allow_html=True)
+                    if c["default"]:
+                        st.markdown(ui.badge("最初に立つ", "ok"), unsafe_allow_html=True)
+                    elif st.button("最初に立たせる", key=f"char_pick_{c['id']}",
+                                   use_container_width=True):
+                        try:
+                            save_book(lambda fresh, cid=c["id"]: fresh.set_default_character(cid),
+                                      f"既定のキャラクターを{c['name']}に変更（管理画面より）")
+                            st.session_state["char_saved"] = (
+                                f"「{c['name']}」が最初に立つようにしました。"
+                                "案内端末に届けるには「案内アプリへ反映する」を押してください。")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"保存できませんでした: {e}")
+
+    st.caption("表情が1枚のキャラクターは、聞き取り中・話している間も同じ絵で立ちます。"
+               "吹き出しの△の向きは「画面レイアウト」で合わせられます。")
+    with st.expander("表で細かく直す"):
+        sheet_editor("キャラクター", title="キャラクター（表）",
+                     note="画像は `assets/character/` に置きます。"
+                          "「聞き取り中」「話している」は空欄でよく、"
+                          "空なら「通常」の画像を使います。")
 
 
 # ---------------------------------------------------------------- 追加・修正
-with tab_add:
-    options = ["＋ 新しく追加する"] + [f"{i['id']}｜{i['answer'][:26]}…" for i in items]
-    picked = st.selectbox("編集するもの", options, key="pick")
-    is_new = picked == options[0]
-    target = blank() if is_new else items[options.index(picked) - 1]
+def get_photo_store():
+    """回答に付ける写真の置き場所（GitHub が設定されていれば GitHub）。"""
+    from photo_store import GitHubPhotoStore, LocalPhotoStore
+    token, repo = secret("github", "token"), secret("github", "repo")
+    if token and repo:
+        return GitHubPhotoStore(token, repo, secret("github", "branch", "main"), ROOT)
+    return LocalPhotoStore(ROOT)
 
-    item = edit_form(target, is_new, book.places())
 
-    st.divider()
-    c1, c2 = st.columns([1, 3])
-    with c1:
-        do_translate = st.checkbox("他の言語に翻訳する", value=True, disabled=not engine)
-    with c2:
-        langs = st.multiselect(
-            "翻訳する言語", list(T.LANGS), default=list(T.LANGS),
-            format_func=lambda k: T.LANGS[k], disabled=not engine,
-        )
+def page_add():
+    """質問を追加・修正する画面（中身は page_question.py）。"""
+    from types import SimpleNamespace
 
-    if st.button("確認する", type="primary", use_container_width=True):
-        errors = validate(item, is_new, {i["id"] for i in items})
-        if errors:
-            for e in errors:
-                st.error(e)
-        else:
-            for w in T.check_questions(item["questions"]):
-                st.warning(w)
-
-            # すでに入っている翻訳は消さずに引き継ぐ
-            translations = {} if is_new else {
-                lang: dict(tr, machine=X.MACHINE_MARK in tr["note"])
-                for lang, tr in book.translations_of(item["id"]).items()
-            }
-
-            if do_translate and engine and langs:
-                with st.spinner("翻訳しています…"):
-                    try:
-                        result = T.translate(
-                            {item["id"]: {"questions": item["questions"],
-                                          "answer": item["answer"]}},
-                            langs, engine,
-                        )
-                        per_lang = result.get(item["id"], {})
-                        for lang, v in per_lang.items():
-                            if lang in T.LANGS and v.get("answer"):
-                                translations[lang] = {
-                                    "questions": v.get("questions", []),
-                                    "answer": v["answer"],
-                                    "machine": True,
-                                }
-                        st.success(f"{len(per_lang)} 言語に翻訳しました。内容をご確認ください。")
-                    except Exception as e:
-                        st.error(f"翻訳できませんでした: {e}")
-                        st.info("日本語のみで保存することもできます。")
-
-            st.session_state["pending"] = {"item": item, "translations": translations,
-                                           "is_new": is_new}
-
-    # ---- 確認して保存
-    pending = st.session_state.get("pending")
-    if pending and pending["item"]["id"] == item["id"]:
-        st.divider()
-        st.markdown("### この内容で保存します")
-        st.markdown("**日本語**")
-        st.info(pending["item"]["answer"])
-
-        if pending["translations"]:
-            st.markdown("**翻訳（必要なら直接直せます）**")
-            for lang in T.LANGS:
-                tr = pending["translations"].get(lang)
-                if not tr:
-                    continue
-                st.markdown(
-                    f"<div class='lang-name'>{T.LANGS[lang]}"
-                    + ("　※自動翻訳" if tr.get("machine") else "")
-                    + "</div>",
-                    unsafe_allow_html=True,
-                )
-                tr["answer"] = st.text_area(
-                    f"回答（{T.LANGS[lang]}）", value=tr["answer"],
-                    key=f"a_{lang}", height=90, label_visibility="collapsed",
-                )
-                tr["questions"] = [
-                    q.strip() for q in st.text_area(
-                        f"聞き方（{T.LANGS[lang]}）",
-                        value="\n".join(tr["questions"]),
-                        key=f"q_{lang}", height=90,
-                    ).splitlines() if q.strip()
-                ]
-
-        if st.button("保存する", type="primary", use_container_width=True):
-            saved = pending
-
-            def apply_changes(fresh):
-                fresh.upsert_faq(saved["item"])
-                for lang, tr in saved["translations"].items():
-                    if not tr["answer"]:
-                        continue
-                    fresh.upsert_translation(
-                        saved["item"]["id"], lang, tr["questions"], tr["answer"],
-                        machine=tr.get("machine", False),
-                        source_answer=saved["item"]["answer"],
-                    )
-
-            who = "追加" if saved["is_new"] else "修正"
-            try:
-                save_book(apply_changes, f"{who}: {saved['item']['id']}（管理画面より）")
-                st.session_state.pop("pending", None)
-                st.success(
-                    "質問回答集に保存しました。"
-                    "案内アプリに反映するには「案内アプリへ反映する」から書き出してください。"
-                )
-                st.balloons()
-                st.rerun()
-            except X.ExcelError as e:
-                st.error(str(e))
-            except Exception as e:
-                st.error(f"保存できませんでした: {e}")
+    import page_question
+    page_question.render(SimpleNamespace(
+        book=book, items=items, engine=engine, save_book=save_book,
+        unpublished=unpublished, character_thumb=character_thumb,
+        photos=get_photo_store(), translation_warning=translation_warning,
+        list_page=PAGE_LIST,
+    ))
 
 
 # ---------------------------------------------------------------- 一覧
-with tab_list:
-    if not items:
-        st.info("まだ登録がありません。")
-    else:
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            places = st.multiselect("設置場所でしぼる", book.places())
-        with c2:
-            cats = sorted({i["category"] for i in items})
-            chosen = st.multiselect(
-                "分類でしぼる", cats,
-                format_func=lambda c: VALID_CATEGORIES.get(c, c),
-            )
-        with c3:
-            only_missing = st.checkbox("翻訳が足りないものだけ")
+def page_list():
+    """登録されている質問の一覧（中身は page_list.py）。"""
+    from types import SimpleNamespace
 
-        shown = [
-            i for i in items
-            if (not places or i["place"] in places)
-            and (not chosen or i["category"] in chosen)
-            and (not only_missing or len(done.get(i["id"], set())) < len(T.LANGS))
-        ]
-        st.caption(f"{len(shown)} 件")
-
-        for i in shown:
-            have = done.get(i["id"], set())
-            mark = "" if i["enabled"] else "（非表示）"
-            period = ""
-            if i["show_from"] or i["show_until"]:
-                period = f"　掲載: {i['show_from'] or '—'} 〜 {i['show_until'] or '—'}"
-            with st.expander(
-                f"{i['place'] or '—'}｜{VALID_CATEGORIES.get(i['category'], i['category'])}"
-                f"｜{i['id']}{mark}"
-            ):
-                st.write(i["answer"])
-                st.caption(f"聞き方: {'、'.join(i['questions'])}")
-                missing = [T.LANGS[l] for l in T.LANGS if l not in have]
-                st.caption(
-                    f"翻訳: {len(have)} / {len(T.LANGS)} 言語"
-                    + (f"（未: {'、'.join(missing)}）" if missing else "")
-                    + period
-                )
+    import page_list as L_page
+    L_page.render(SimpleNamespace(
+        book=book, items=items, done=done, save_book=save_book,
+        unpublished=unpublished, add_page=PAGE_ADD,
+    ))
 
 
 # ---------------------------------------------------------------- まとめて翻訳
-with tab_bulk:
-    st.markdown("### 未翻訳をまとめて翻訳する")
-    st.caption("日本語だけ入っている項目を探し、選んだ言語に翻訳して多言語シートに追加します。"
-               "すでに入っている翻訳には触りません。")
+def page_bulk():
+    """まとめて翻訳する画面（中身は page_bulk.py）。"""
+    from types import SimpleNamespace
 
-    bulk_langs = st.multiselect(
-        "翻訳する言語", list(T.LANGS), default=list(T.LANGS),
-        format_func=lambda k: T.LANGS[k], key="bulk_langs",
-    )
-    missing = book.missing(bulk_langs)
-
-    if not bulk_langs:
-        st.info("言語を選んでください。")
-    elif not missing:
-        st.success("未翻訳はありません。")
-    else:
-        by_lang = {}
-        for _, lang in missing:
-            by_lang[lang] = by_lang.get(lang, 0) + 1
-        st.warning(
-            "未翻訳: " + "、".join(f"{T.LANGS[l]} {n}件" for l, n in sorted(by_lang.items()))
-        )
-
-        ids = sorted({fid for fid, _ in missing})
-        limit = st.slider(
-            "一度に翻訳する項目数", min_value=1, max_value=max(1, len(ids)),
-            value=min(10, len(ids)),
-            help="多いほど時間と料金がかかります。まず少数で試すことをおすすめします。",
-        )
-        st.caption("対象: " + "、".join(ids[:limit]))
-
-        if not engine:
-            st.info("翻訳の設定（Secrets の [anthropic] または [open_model]）が"
-                    "されていないため実行できません。")
-        elif st.button("この内容で翻訳する", type="primary", use_container_width=True):
-            targets = ids[:limit]
-            by_id = {i["id"]: i for i in items}
-            need = {}
-            for fid in targets:
-                need[fid] = {
-                    "questions": by_id[fid]["questions"],
-                    "answer": by_id[fid]["answer"],
-                }
-
-            try:
-                with st.spinner(f"{len(targets)} 件を翻訳しています…（数分かかることがあります）"):
-                    result = T.translate(need, bulk_langs, engine)
-            except Exception as e:
-                st.error(f"翻訳できませんでした: {e}")
-                result = None
-
-            if result:
-                wrote, skipped = [], []
-
-                def apply_changes(fresh):
-                    already = fresh.translated_langs()
-                    for fid, per_lang in result.items():
-                        if fid not in by_id:
-                            skipped.append(f"{fid}: 質問回答集にありません")
-                            continue
-                        for lang, v in per_lang.items():
-                            lang = lang.lower()
-                            answer = (v.get("answer") or "").strip()
-                            questions = [q.strip() for q in (v.get("questions") or []) if q.strip()]
-                            if lang not in bulk_langs:
-                                continue
-                            if lang in already.get(fid, set()):
-                                skipped.append(f"{fid}/{lang}: すでに翻訳があるため残しました")
-                                continue
-                            if not answer or not questions:
-                                skipped.append(f"{fid}/{lang}: 回答か聞き方が空でした")
-                                continue
-                            fresh.upsert_translation(
-                                fid, lang, questions, answer, machine=True,
-                                source_answer=by_id[fid]["answer"],
-                            )
-                            wrote.append(f"{fid}/{lang}")
-
-                try:
-                    save_book(apply_changes, f"自動翻訳 {len(targets)} 件（管理画面より）")
-                    st.success(f"{len(wrote)} 件を多言語シートに追加しました。")
-                    for s in skipped:
-                        st.caption("・" + s)
-                    st.info("自動翻訳には備考欄に「自動翻訳（要確認）」と入ります。"
-                            "料金や条件を含む回答は、公開前に必ず人の目で確認してください。")
-                    st.rerun()
-                except X.ExcelError as e:
-                    st.error(str(e))
-                except Exception as e:
-                    st.error(f"保存できませんでした: {e}")
+    import page_bulk as B
+    B.render(SimpleNamespace(
+        book=book, items=items, engine=engine, save_book=save_book,
+        translation_warning=translation_warning,
+    ))
 
 
 # ---------------------------------------------------------------- 書き出し
-with tab_publish:
-    st.markdown("### 案内アプリへ反映する")
-    st.caption("質問回答集（Excel）から faq.json を書き出します。"
-               "案内アプリは次の起動でこの内容になります。")
+def page_publish():
+    """案内アプリへ反映する画面（中身は page_publish.py）。"""
+    from types import SimpleNamespace
 
-    try:
-        (faqs, errors, warnings, pending_tr, synonyms, places,
-         voice_sets, reference, char_list, voice_cfg,
-         readings) = build_faq.build_from_bytes(
-            st.session_state["raw"], ROOT / "assets"
-        )
-    except Exception as e:
-        st.error(f"読み取れませんでした: {e}")
-        faqs, errors, warnings, pending_tr = [], [str(e)], [], 0
-        synonyms, places, voice_sets, reference = {}, [], [], []
-        char_list, voice_cfg, readings = [], {}, []
-
-    c1, c2, c3 = st.columns(3)
-    c1.metric("案内に出す質問", f"{len(faqs)} 件")
-    c2.metric("翻訳済みの回答", sum(len(f["translations"]) for f in faqs))
-    c3.metric("エラー", f"{len(errors)} 件")
-
-    st.caption("　".join(
-        f"{T.LANGS[l]}: {sum(1 for f in faqs if l in f['translations'])}/{len(faqs)}"
-        for l in T.LANGS
+    import page_publish as P
+    P.render(SimpleNamespace(
+        items=items, root=ROOT, json_store=get_json_store(),
+        published=published_summary, add_page=PAGE_ADD,
     ))
-
-    if errors:
-        st.error("エラーを直すまで書き出せません。")
-        for e in errors:
-            st.write("× " + e)
-    if warnings:
-        with st.expander(f"確認したいこと（{len(warnings)} 件）"):
-            for w in warnings:
-                st.write("・" + w)
-
-    # いま書き出される内容のうち、現場で効き方が見えにくいものを先に見せる。
-    # 以前、管理画面でキャラクターを変えたのに書き出しを忘れ、
-    # 案内端末には古いキャラクターが立ち続けたことがあった。
-    default_char = next((c["name"] for c in char_list if c.get("default")), None)
-    if default_char:
-        st.caption(f"最初に立つキャラクター: **{default_char}**　"
-                   f"読み方の直し: {len(readings)} 語")
-        st.warning("キャラクターや設定を変えたときは、**この書き出しをするまで"
-                   "案内端末には届きません。**")
-
-    json_store = get_json_store()
-    st.caption(f"書き出し先: {json_store.label}")
-
-    def make_payload():
-        return {
-            "version": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "count": len(faqs),
-            "faqs": faqs,
-            "synonyms": synonyms,
-            "places": places,
-            "voice_sets": voice_sets,
-            "reference": reference,
-            "characters": char_list,
-            "voice": voice_cfg,
-            "readings": readings,
-        }
-
-    if st.button("書き出す", type="primary", disabled=bool(errors),
-                 use_container_width=True):
-        payload = make_payload()
-        try:
-            _, sha = json_store.load()
-            json_store.save(payload, "質問回答集を反映（管理画面より）", sha)
-            st.success(f"書き出しました（版: {payload['version']}）。"
-                       "案内端末は次の起動で新しい内容になります。")
-        except StoreError as e:
-            st.error(str(e))
-        except Exception as e:
-            st.error(f"書き出せませんでした: {e}")
-
-    st.download_button(
-        "faq.json をダウンロード",
-        data=json.dumps(make_payload(), ensure_ascii=False, indent=2),
-        file_name="faq.json",
-        mime="application/json",
-        use_container_width=True,
-    )
 
 
 # ---------------------------------------------------------------- 利用状況
-with tab_stats:
-    st.subheader("利用状況")
-    st.caption("案内端末で何が聞かれたかを、設置場所ごとに見られます。"
-               "案内端末の画面からは見られないようにしてあります。")
+def log_source():
+    """記録の読み出し先 (url, 合言葉)。
 
-    log_url = secret("logs", "url")
-    log_token = secret("logs", "token")
+    ふだんは Secrets の [logs] から読む。
+    CHAATBOT_LOGS_URL / CHAATBOT_LOGS_TOKEN を付けて起動したときだけ、そちらを使う
+    （仮の記録を置いた試しの中継サーバで、画面を確かめるため）。
+    """
+    import os
+    if os.environ.get("CHAATBOT_LOGS_URL"):
+        return os.environ["CHAATBOT_LOGS_URL"], os.environ.get("CHAATBOT_LOGS_TOKEN", "")
+    return secret("logs", "url"), secret("logs", "token")
 
-    if not log_url or not log_token:
-        st.info(
-            "記録の読み出し先が設定されていません。\n\n"
-            "中継サーバを置いた場所を Secrets に書いてください。\n\n"
-            "```toml\n[logs]\nurl   = \"https://例.com/api/logs.php\"\n"
-            "token = \"中継サーバの config.php に書いた log_token と同じ文字列\"\n```"
-        )
-    else:
-        period = st.radio(
-            "期間", ["直近7日", "直近30日", "すべて"],
-            horizontal=True, key="stats_period",
-        )
-        days = {"直近7日": 7, "直近30日": 30, "すべて": None}[period]
 
-        if st.button("記録を読み込む", key="stats_load"):
-            st.session_state.pop("log_rows", None)
+def page_stats():
+    """利用状況の画面（中身は page_stats.py）。"""
+    from types import SimpleNamespace
 
-        if "log_rows" not in st.session_state:
-            with st.spinner("記録を読み込んでいます…"):
-                try:
-                    st.session_state["log_rows"] = L.fetch(log_url, log_token)
-                except Exception as e:
-                    st.error(str(e))
-                    st.session_state["log_rows"] = []
-
-        rows = L.within(st.session_state.get("log_rows", []), days)
-
-        if not rows:
-            st.info("この期間の記録はまだありません。")
-        else:
-            overall = L.summarize(rows)
-            c1, c2, c3 = st.columns(3)
-            c1.metric("質問の総数", overall["total"])
-            # 職員に回さずに済んだ割合。設置の効果はこの数字で見る。
-            c2.metric("その場で答えられた", f"{overall['answered_rate']:.0%}")
-            c3.metric("職員へ回った", overall["by_source"].get("none", 0))
-
-            st.divider()
-            st.markdown("#### 設置場所ごと")
-
-            groups = L.by_client(rows)
-            columns = st.columns(max(len(groups), 1))
-            for column, (name, stat) in zip(columns, groups.items()):
-                with column:
-                    st.markdown(f"**{name}**")
-                    st.metric("質問数", stat["total"])
-                    st.caption(f"その場で答えられた {stat['answered_rate']:.0%}")
-                    for key, label in L.SOURCES.items():
-                        st.caption(f"{label}: {stat['by_source'].get(key, 0)} 件")
-                    langs = "　".join(
-                        f"{k}:{v}" for k, v in
-                        sorted(stat["by_lang"].items(), key=lambda x: -x[1])
-                    )
-                    st.caption(f"言語 {langs}")
-
-            st.divider()
-            st.markdown("#### 答えられなかった質問")
-            st.caption("ここに並ぶものを質問回答集に足すと、答えられる割合が上がります。")
-
-            for name, stat in groups.items():
-                if not stat["unmatched"]:
-                    continue
-                with st.expander(f"{name}（{len(stat['unmatched'])} 種類）"):
-                    for text, count in stat["unmatched"]:
-                        st.write(f"{count} 回　{text}")
-
-            st.divider()
-            st.markdown("#### その場所でだけ聞かれた質問")
-            st.caption("ほかの案内所では出ていない質問です。"
-                       "その案内所向けの回答（設置場所を指定した回答）を足す候補になります。")
-
-            for name in groups:
-                unique = L.only_here(rows, name)
-                if not unique:
-                    continue
-                with st.expander(f"{name}（{len(unique)} 種類）"):
-                    for text, count in unique:
-                        st.write(f"{count} 回　{text}")
-
-            st.divider()
-            st.markdown("#### よく聞かれた質問")
-            for name, stat in groups.items():
-                if not stat["top_faq"]:
-                    continue
-                with st.expander(name):
-                    for faq_id, count in stat["top_faq"]:
-                        label = next(
-                            (i["answer"][:40] for i in items if i["id"] == faq_id), ""
-                        )
-                        st.write(f"{count} 回　`{faq_id}`　{label}")
+    import page_stats as S
+    url, token = log_source()
+    S.render(SimpleNamespace(items=items, log_url=url, log_token=token, add_page=PAGE_ADD))
 
 
 # ---------------------------------------------------------------- 読み上げの声
-with tab_voice:
-    st.subheader("読み上げの声")
-    st.caption("どの案内端末でも同じになるようにします。"
-               "ここで決めた内容は「案内アプリへ反映する」で書き出すと効きます。")
+def _sample_audio(folder):
+    """用意した音声の中から、試しに鳴らす1つを選ぶ。(ファイルの中身, 回答の書き出し)"""
+    base = ROOT / "assets" / "audio" / folder if folder else ROOT / "assets" / "audio"
+    for it in items:
+        name = it.get("audio")
+        if name and (base / name).exists():
+            text = it["answer"].replace("\n", " ")
+            return (base / name).read_bytes(), text[:30] + ("…" if len(text) > 30 else "")
+    return None, ""
 
-    # ---- 用意した音声（VOICEVOXなどで作ったもの）
-    st.markdown("#### 用意した音声")
-    sets = book.voice_sets()
-    if not sets:
-        st.caption("「音声セット」シートがありません。"
-                   "`python tools/make_voice.py` で音声を作ると登録されます。")
-    else:
-        st.caption("回答ごとに用意した音声のうち、どれを鳴らすかを決めます。"
-                   "選んだ音声が無い回答は、端末の声で読み上げます。")
-        labels = [v["name"] for v in sets]
-        folders = [v["folder"] for v in sets]
-        now = next((i for i, v in enumerate(sets) if v["default"]), 0)
-        picked = st.selectbox(
-            "いつも鳴らす音声", range(len(sets)),
-            index=now, format_func=lambda i: labels[i], key="voice_set_default",
-        )
-        if picked != now:
-            try:
-                save_book(lambda fresh: fresh.set_default_voice_set(folders[picked]),
-                          f"既定の音声を{labels[picked]}に変更（管理画面より）")
-                st.success(f"{labels[picked]} にしました。")
-                st.rerun()
-            except X.ExcelError as e:
-                st.error(str(e))
-            except Exception as e:
-                st.error(f"保存できませんでした: {e}")
-        if sets[picked]["note"]:
-            st.caption(sets[picked]["note"])
 
-    st.divider()
+def page_voice():
+    import speech
 
-    # ---- 端末の声（言語ごと）
-    st.markdown("#### 端末の声")
-    st.info(
-        "**端末に入っている声は、端末ごとに違います。**　"
-        "ここで決められるのは「どれを優先するか」までです。"
-        "書いた声が入っていない端末では、その言語の声から自動で選びます。\n\n"
-        "入っている声の一覧と試し聞きは、案内端末の画面でしかできません"
-        "（URLに `?setup=1` を付けて開く）。"
-    )
+    ui.section("読み上げの声",
+               "どの案内端末でも同じになるようにします。変えた声は、その場で聞いて確かめられます。")
 
-    rows = book.voice_settings()
-    if not rows:
-        st.caption("「読み上げ」シートがありません。"
-                   "`python tools/add_voice_settings.py` で作れます。")
-    else:
+    flash = st.session_state.pop("voice_saved", None)
+    if flash:
+        ui.notice(flash, kind="ok", key="voice-saved")
+
+    with ui.card():
+        # ---- 用意した音声（VOICEVOXなどで作ったもの）
+        st.markdown("#### 用意した音声（日本語）")
+        sets = book.voice_sets()
+        if not sets:
+            st.caption("「音声セット」シートがありません。"
+                       "`python tools/make_voice.py` で音声を作ると登録されます。")
+        else:
+            st.caption("回答ごとに用意した音声のうち、どれを鳴らすかを決めます。"
+                       "用意した音声が無い回答は、下の「端末の声」で読み上げます。")
+            labels = [v["name"] for v in sets]
+            folders = [v["folder"] for v in sets]
+            now = next((i for i, v in enumerate(sets) if v["default"]), 0)
+            c1, c2 = st.columns([1, 1.3], vertical_alignment="bottom")
+            picked = c1.selectbox(
+                "いつも鳴らす音声", range(len(sets)),
+                index=now, format_func=lambda i: labels[i], key="voice_set_default",
+            )
+            data, label = _sample_audio(folders[picked])
+            with c2:
+                if data:
+                    st.caption(f"聞いてみる：「{label}」")
+                    st.audio(data, format="audio/mpeg")
+                else:
+                    st.caption("この音声のファイルが見つからないため、試しに鳴らせません。")
+            if sets[picked]["note"]:
+                st.caption(sets[picked]["note"])
+            if picked != now:
+                try:
+                    save_book(lambda fresh: fresh.set_default_voice_set(folders[picked]),
+                              f"既定の音声を{labels[picked]}に変更（管理画面より）")
+                    st.session_state["voice_saved"] = f"「{labels[picked]}」を鳴らすようにしました。"
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"保存できませんでした: {e}")
+
+    st.write("")
+
+    with ui.card():
+        # ---- 端末の声（言語ごと）
+        st.markdown("#### 端末の声")
+        st.caption("端末に入っている声は、端末ごとに違います。ここで決められるのは"
+                   "「どれを優先するか」まで。書いた声が入っていない端末では、"
+                   "その言語の声から自動で選びます。")
+
+        rows = book.voice_settings()
+        if not rows:
+            st.caption("「読み上げ」シートがありません。"
+                       "`python tools/add_voice_settings.py` で作れます。")
+            return
         by_lang = {r["lang"]: r for r in rows}
         names = {"ja": "日本語", **T.LANGS}
+        readings = [(a, b) for a, b, on in speech.clean_reading_rows(
+            book.sheet_rows("読み方")[1]) if on]
         for lang in ["ja"] + list(T.LANGS):
             row = by_lang.get(lang)
             if row is None:
                 continue
-            with st.expander(f"{names.get(lang, lang)}（{lang}）", expanded=(lang == "ja")):
-                with st.form(f"voice_{lang}"):
-                    voices = st.text_area(
-                        "優先する声（上から順に探します。カンマ区切り）",
-                        value=row["voices"], height=80, key=f"voices_{lang}",
-                        help="名前の一部が合えば採用します。"
-                             "例: 「Microsoft Aria」と書けば "
-                             "「Microsoft Aria - English (United States)」に当たります。",
-                    )
-                    c1, c2 = st.columns(2)
-                    rate = c1.slider("速さ", 0.5, 1.5, float(row["rate"]), 0.05,
-                                     key=f"rate_{lang}",
-                                     help="1.0が標準。小さいほどゆっくり話します。")
-                    pitch = c2.slider("高さ", 0.5, 1.5, float(row["pitch"]), 0.05,
-                                      key=f"pitch_{lang}",
-                                      help="1.0が標準。大きいほど高い声になります。")
-                    if st.form_submit_button("この言語の設定を保存", type="primary"):
-                        try:
-                            save_book(
-                                lambda fresh, lg=lang, v=voices, r=rate, pt=pitch:
-                                    fresh.update_voice_setting(lg, v, r, pt),
-                                f"{names.get(lang, lang)}の読み上げ設定を変更（管理画面より）",
-                            )
-                            st.success("保存しました。"
-                                       "「案内アプリへ反映する」で書き出すと効きます。")
-                            st.rerun()
-                        except X.ExcelError as e:
-                            st.error(str(e))
-                        except Exception as e:
-                            st.error(f"保存できませんでした: {e}")
+            with st.expander(f"{names.get(lang, lang)}", expanded=(lang == "ja")):
+                ui.field_label("優先する声",
+                               "上から順に探します。カンマで区切ります。名前の一部が合えば使います"
+                               "（「Microsoft Aria」と書けば「Microsoft Aria - English」に当たります）。")
+                voices = st.text_area("優先する声", value=row["voices"], height=70,
+                                      key=f"voices_{lang}", label_visibility="collapsed")
+                c1, c2 = st.columns(2)
+                with c1:
+                    ui.field_label("速さ", "1.0が標準。小さいほどゆっくり。")
+                    rate = st.slider("速さ", 0.5, 1.5, float(row["rate"]), 0.05,
+                                     key=f"rate_{lang}", label_visibility="collapsed")
+                with c2:
+                    ui.field_label("高さ", "1.0が標準。大きいほど高い声。")
+                    pitch = st.slider("高さ", 0.5, 1.5, float(row["pitch"]), 0.05,
+                                      key=f"pitch_{lang}", label_visibility="collapsed")
+
+                # 保存する前の値で聞ける（つまみを動かしてすぐ確かめるため）
+                sample = speech.SAMPLES.get(lang, "")
+                if lang == "ja":
+                    sample = speech.apply_readings(sample, readings)
+                want = [v.strip() for v in voices.split(",") if v.strip()]
+                c1, c2 = st.columns([1.3, 1], vertical_alignment="top")
+                with c1:
+                    speech.listen_button(sample, lang, want, rate, pitch,
+                                         label="🔈 この設定で聞いてみる")
+                changed = (voices.strip() != row["voices"].strip()
+                           or abs(rate - float(row["rate"])) > 1e-9
+                           or abs(pitch - float(row["pitch"])) > 1e-9)
+                if c2.button("この設定を保存", type="primary", key=f"voice_save_{lang}",
+                             disabled=not changed, use_container_width=True):
+                    try:
+                        save_book(
+                            lambda fresh, lg=lang, v=voices, r=rate, pt=pitch:
+                                fresh.update_voice_setting(lg, v, r, pt),
+                            f"{names.get(lang, lang)}の読み上げ設定を変更（管理画面より）",
+                        )
+                        st.session_state["voice_saved"] = (
+                            f"{names.get(lang, lang)}の声の設定を保存しました。"
+                            "案内端末に届けるには「案内アプリへ反映する」を押してください。")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"保存できませんでした: {e}")
 
 
 # ---------------------------------------------------------------- その他の設定
@@ -933,6 +676,14 @@ SETTING_SHEETS = {
                 "備考に「要確認」と書いてある行は、正しい読みを確かめてから使ってください。",
         "幅広": ["備考"],
     },
+    "画面レイアウト": {
+        "説明": "設置形態ごとの画面の並びと大きさです。"
+                "ふだんは上の編集画面で動かして決めます。",
+        "注意": "**値はすべて割合です**（高さ0.15なら画面の15%）。"
+                "px で持つと、別の大きさの画面に移したときに崩れるためです。"
+                "「設置場所」は案内アプリのURLに付ける名前と同じにしてください。",
+        "幅広": ["並び順", "備考"],
+    },
     "キャラクター": {
         "説明": "案内画面に立つキャラクターです。画像は `assets/character/` に置きます。"
                 "「聞き取り中」「話している」は空欄でよく、空なら「通常」の画像を使います。",
@@ -942,56 +693,160 @@ SETTING_SHEETS = {
     },
 }
 
-with tab_settings:
-    st.subheader("その他の設定")
-    st.caption("Excelを開かずに直せます。直したあとは"
-               "「案内アプリへ反映する」から書き出すと、案内端末に届きます。")
+def sheet_editor(sheet, title=None, note=None):
+    """表をそのまま直す部品。設定のシートはどれも同じ形なので1つで足りる。
 
-    sheet = st.radio("設定の種類", list(SETTING_SHEETS), horizontal=True,
-                     key="setting_sheet")
+    戻り値は、画面で直した（まだ保存していない）表。
+    読み方の「聞いて確かめる」のように、保存する前の値で試したいときに使う。
+    """
+    import pandas as pd
+
     meta = SETTING_SHEETS[sheet]
-    st.markdown(meta["説明"])
+    ui.section(title or sheet, meta["説明"] if note is None else note)
     st.info(meta["注意"])
+
+    flash = st.session_state.pop(f"sheet_saved_{sheet}", None)
+    if flash:
+        ui.notice(flash, kind="ok", key=f"sheet-saved-{sheet}")
 
     titles, rows = book.sheet_rows(sheet)
     if not titles:
         st.error(f"「{sheet}」シートがありません。")
-    else:
-        import pandas as pd
+        return None
 
-        frame = pd.DataFrame(rows, columns=titles) if rows else \
-            pd.DataFrame(columns=titles)
+    frame = pd.DataFrame(rows, columns=titles) if rows else pd.DataFrame(columns=titles)
+    config = {t: st.column_config.TextColumn(t, width="large" if t in meta["幅広"] else None)
+              for t in titles}
+    edited = st.data_editor(
+        frame, column_config=config, num_rows="dynamic",
+        use_container_width=True, hide_index=True, key=f"editor_{sheet}",
+    )
 
-        config = {}
-        for t in titles:
-            if t in meta["幅広"]:
-                config[t] = st.column_config.TextColumn(t, width="large")
-            else:
-                config[t] = st.column_config.TextColumn(t)
+    c1, c2 = st.columns([1, 3])
+    if c1.button("この内容で保存", type="primary", key=f"save_{sheet}"):
+        # すべて空の行は保存しない（表の下に出る入力用の空行を拾わないため）
+        new_rows = [
+            {t: ("" if pd.isna(v) else str(v)).strip() for t, v in record.items()}
+            for record in edited.to_dict("records")
+        ]
+        new_rows = [r for r in new_rows if any(r.values())]
+        try:
+            save_book(lambda fresh: fresh.write_sheet(sheet, new_rows),
+                      f"「{sheet}」を変更（管理画面より）")
+            st.session_state[f"sheet_saved_{sheet}"] = (
+                f"{len(new_rows)} 行を保存しました。"
+                "案内端末に届けるには「案内アプリへ反映する」を押してください。")
+            st.rerun()
+        except X.ExcelError as e:
+            st.error(str(e))
+        except Exception as e:
+            st.error(f"保存できませんでした: {e}")
+    c2.caption("行の追加は表の一番下、削除は行を選んで Delete キーです。")
+    return edited
 
-        edited = st.data_editor(
-            frame, column_config=config, num_rows="dynamic",
-            use_container_width=True, hide_index=True,
-            key=f"editor_{sheet}",
-        )
 
-        c1, c2 = st.columns([1, 3])
-        if c1.button("この内容で保存", type="primary", key=f"save_{sheet}"):
-            # すべて空の行は保存しない（表の下に出る入力用の空行を拾わないため）
-            new_rows = [
-                {t: ("" if pd.isna(v) else str(v)).strip()
-                 for t, v in record.items()}
-                for record in edited.to_dict("records")
-            ]
-            new_rows = [r for r in new_rows if any(r.values())]
-            try:
-                save_book(lambda fresh: fresh.write_sheet(sheet, new_rows),
-                          f"「{sheet}」を変更（管理画面より）")
-                st.success(f"{len(new_rows)} 行を保存しました。"
-                           "「案内アプリへ反映する」で書き出すと効きます。")
-                st.rerun()
-            except X.ExcelError as e:
-                st.error(str(e))
-            except Exception as e:
-                st.error(f"保存できませんでした: {e}")
-        c2.caption("行の追加は表の一番下、削除は行を選んで Delete キーです。")
+# ---------------------------------------------------------------- 読み方
+def page_readings():
+    """読み方：表で直し、1行ずつ「直す前／直したあと」を聞き比べる。"""
+    import speech
+
+    ui.section("読み方",
+               "合成音声が読み間違える言葉と、その正しい読みの表です。"
+               "1行ずつ「直す前」と「直したあと」を聞き比べて確かめられます。")
+    # 聞き比べの表を先に置き、その下に表の直し方を置く。
+    # 聞き比べは、下で直した（まだ保存していない）内容で読むので、
+    # 中身は下の表を作ってから入れる（先に場所だけ取っておく）。
+    slot = st.container()
+    st.write("")
+    with st.expander("読み方を足す・直す（表）", expanded=False):
+        edited = sheet_editor("読み方", title="読み方の表")
+    if edited is None:
+        return
+    voices, rate, pitch = speech.voice_of(
+        next((r for r in book.voice_settings() if r.get("lang") == "ja"), {}))
+    with slot:
+        with ui.card("yomi-listen"):
+            st.caption("「直す前」で読み間違いを確かめ、「直したあと」で直った読みを聞きます。"
+                       "取り消し線の行は「有効」が FALSE で、読み上げには当てません。"
+                       "下の表で直すと、保存する前でもここで聞けます。")
+            speech.readings_player(speech.clean_reading_rows(edited.to_dict("records")),
+                                   voices, rate, pitch)
+
+
+# ---------------------------------------------------------------- まとめたページ
+# 「案内画面」の4つと「現地の情報」の3つは、それぞれ1ページにまとめ、
+# 中を切り替えて使う（左の一覧が長くなりすぎて、探しにくかったため）。
+SCREEN_TABS = {"layout": "画面レイアウト", "character": "キャラクター",
+               "voice": "読み上げの声", "yomikata": "読み方"}
+LOCAL_TABS = {"sanko": "参考資料", "basho": "設置場所", "iikae": "言い換え"}
+
+
+def page_screen():
+    ui.page_header("画面・キャラクター・声",
+                   "案内端末の見た目と読み上げを決めます。"
+                   "変えた結果は、その場で見たり聞いたりして確かめられます。")
+    tab = ui.switch(SCREEN_TABS, key="screen_tab")
+    st.write("")
+    {"layout": page_layout, "character": page_character,
+     "voice": page_voice, "yomikata": page_readings}[tab]()
+
+
+def page_local():
+    ui.page_header("現地の情報",
+                   "AIが答えるときの下地や、案内所の場所、観光客の言い方を決めます。"
+                   "最初に決めたら、ふだんはあまり触りません。")
+    tab = ui.switch(LOCAL_TABS, key="local_tab")
+    st.write("")
+    sheet_editor({"sanko": "参考資料", "basho": "設置場所", "iikae": "言い換え"}[tab])
+
+
+# ---------------------------------------------------------------- 画面の並び
+# 役割ごとに4つへ分ける。
+#
+# 以前は横に7つのタブが並び、そのうち「その他の設定」の中にさらに5種類が
+# 入っていた。毎日使うもの（質問を足す）と、最初に決めたら滅多に触らないもの
+# （設置場所・言い換え）が同じ高さに並んでいたため、探すのに手間がかかった。
+#
+# いまは「毎日使うもの」を上、「決めたら触らないもの」を下にまとめてある。
+# 一覧から「修正」で開く・追加の画面から一覧へ戻る、のように
+# 画面どうしで行き来するため、行き先を名前で持っておく。
+PAGE_ADD = st.Page(page_add, title="質問を追加・修正する", icon=":material/add_circle:")
+PAGE_LIST = st.Page(page_list, title="登録されている質問", icon=":material/list:")
+
+PAGE_HOME = st.Page(page_home, title="ホーム", icon=":material/home:", default=True)
+PAGE_BULK = st.Page(page_bulk, title="まとめて翻訳する", icon=":material/translate:")
+PAGE_SCREEN = st.Page(page_screen, title="画面・キャラクター・声", icon=":material/palette:",
+                      url_path="screen")
+PAGE_LOCAL = st.Page(page_local, title="現地の情報", icon=":material/map:", url_path="local")
+PAGE_PUBLISH = st.Page(page_publish, title="案内アプリへ反映する", icon=":material/publish:")
+PAGE_STATS = st.Page(page_stats, title="利用状況", icon=":material/bar_chart:")
+
+PAGE_REFS = {"home": PAGE_HOME, "add": PAGE_ADD, "list": PAGE_LIST, "bulk": PAGE_BULK,
+             "screen": PAGE_SCREEN, "local": PAGE_LOCAL, "publish": PAGE_PUBLISH,
+             "stats": PAGE_STATS}
+
+PAGES = {
+    "": [PAGE_HOME],
+    "質問と回答": [PAGE_ADD, PAGE_LIST, PAGE_BULK],
+    "案内の設定": [PAGE_SCREEN, PAGE_LOCAL],
+    "運用": [PAGE_PUBLISH, PAGE_STATS],
+}
+
+# expanded=True にしないと、画面の数が多いとき後ろが
+# 「View 3 more」に畳まれて、「案内アプリへ反映する」が見えなくなる。
+nav = st.navigation(PAGES, expanded=True)
+
+# 「案内アプリへ反映する」の横に、まだ反映していない件数を出す。
+# 保存しただけで終わったと思い、書き出しを忘れることが実際にあったため。
+_pending = unpublished()
+if _pending:
+    ui.nav_badges({"page_publish": f"未反映 {len(_pending)}"})
+
+with st.sidebar:
+    st.divider()
+    if st.button("最新の内容を読み直す", use_container_width=True,
+                 help="Excel をほかの人が直したときや、別の画面で直したあとに押します。"):
+        reload_book()
+        st.rerun()
+
+nav.run()

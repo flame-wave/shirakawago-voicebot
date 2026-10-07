@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-06 15:38",
+  "version": "2026-10-06 19:05",
   "count": 73,
   "faqs": [
     {
@@ -6414,6 +6414,81 @@
     {
       "text": "紙巻",
       "reading": "カミマキ"
+    }
+  ],
+  "layouts": [
+    {
+      "place": "バスターミナル",
+      "order": [
+        "stage",
+        "faq",
+        "talk",
+        "languages"
+      ],
+      "heights": {
+        "faq": 0.09,
+        "typed": 0.0,
+        "talk": 0.15,
+        "languages": 0.1
+      },
+      "character": {
+        "scale": 1.0,
+        "rise": 0.0,
+        "side": 0.0
+      },
+      "bubble": {
+        "width": 0.46,
+        "text": 1.1
+      }
+    },
+    {
+      "place": "であいの館",
+      "order": [
+        "stage",
+        "faq",
+        "talk",
+        "languages"
+      ],
+      "heights": {
+        "faq": 0.09,
+        "typed": 0.0,
+        "talk": 0.15,
+        "languages": 0.1
+      },
+      "character": {
+        "scale": 1.0,
+        "rise": 0.0,
+        "side": 0.0
+      },
+      "bubble": {
+        "width": 0.46,
+        "text": 1.1
+      }
+    },
+    {
+      "place": "観光客",
+      "order": [
+        "stage",
+        "faq",
+        "typed",
+        "talk",
+        "languages"
+      ],
+      "heights": {
+        "faq": 0.0,
+        "typed": 0.0,
+        "talk": 0.0,
+        "languages": 0.0
+      },
+      "character": {
+        "scale": 1.0,
+        "rise": 0.0,
+        "side": 0.0
+      },
+      "bubble": {
+        "width": 0.0,
+        "text": 1.0
+      }
     }
   ]
 }

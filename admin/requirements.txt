@@ -1,5 +1,6 @@
-streamlit>=1.30
+streamlit>=1.50   # 左の分類つき一覧・チップ（st.pills）・横並びの箱（horizontal）に必要
 requests>=2.31
 anthropic>=0.40
 openpyxl>=3.1
 pandas>=2.0
+pillow>=10   # 編集画面に出す立ち絵の小さな写しを作る

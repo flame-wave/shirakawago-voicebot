@@ -69,6 +69,7 @@ export class FaqService {
     this._characters = [];
     this._voiceSettings = {};
     this._readings = [];
+    this._layouts = [];
   }
 
   /// 用意した音声の種類（話者ごと）。職員用の画面で選ばせるために使う。
@@ -85,6 +86,11 @@ export class FaqService {
   /// 職員が管理画面で決め、どの端末でも同じになるようにする。
   get voiceSettings() {
     return this._voiceSettings;
+  }
+
+  /// 設置形態ごとの画面の形（据え置き・観光客で並びを変えるため）。
+  get layouts() {
+    return this._layouts;
   }
 
   /// 読み上げの読み間違いを直す表（漢字 → カタカナ）。
@@ -130,6 +136,7 @@ export class FaqService {
       this._characters = data.characters ?? [];
       this._voiceSettings = data.voice ?? {};
       this._readings = data.readings ?? [];
+      this._layouts = data.layouts ?? [];
       return true;
     } catch (_) {
       return false;

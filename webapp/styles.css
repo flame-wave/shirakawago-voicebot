@@ -248,9 +248,40 @@ body {
   /* 中身（流れる質問の列）が画面の幅を押し広げないようにする */
   overflow: hidden;
   min-width: 0;
+
+  /* ── 設置形態ごとに変えられるところ ──────────────
+     据え置きのタブレットと観光客のスマートフォンでは、押しやすい大きさも、
+     見せたいものも違う。どのブロックをどの高さでどの順に出すかを、
+     管理画面の「画面レイアウト」から決められるようにしてある。
+
+     高さは cqh（この領域の高さの1%）で入れる。画面の大きさが変わっても
+     割合が保たれるので、7インチでも13インチでも同じ見え方になる。
+     既定の auto は「中身なりの高さ」＝これまでと同じ。 */
+  container-type: size;
+  --h-faq: auto;
+  --h-typed: auto;
+  --h-talk: clamp(72px, 9vmin, 120px);
+  --h-languages: auto;
+  --order-stage: 1;
+  --order-faq: 2;
+  --order-typed: 3;
+  --order-talk: 4;
+  --order-languages: 5;
 }
 
 .screen > * { min-width: 0; max-width: 100%; }
+
+/* 並び順。管理画面で入れ替えられる。 */
+.stage       { order: var(--order-stage); }
+.faq-strip   { order: var(--order-faq); }
+.typed       { order: var(--order-typed); }
+.talk-button { order: var(--order-talk); }
+.languages   { order: var(--order-languages); }
+
+/* 管理画面で「出さない」にしたブロック。
+   hidden ではなく印で消すのは、言語の列のように
+   他の理由で hidden を使っている所と取り違えないため。 */
+.screen > [data-off="1"] { display: none; }
 
 /* ── 会話の領域 ───────────────────────────── */
 
@@ -279,8 +310,10 @@ body {
      狭い画面で二重に小さくなって豆粒になる。 */
   --char-fill: 100cqh;
   --char-scale: 1;
+  /* --place-char-scale は設置形態ごとの倍率（管理画面の「画面レイアウト」）。
+     絵ごとの大きさに掛けるので、絵の違いは残したまま一律で大小を変えられる。 */
   --char-h: min(
-    calc(var(--char-fill) * var(--char-scale)),
+    calc(var(--char-fill) * var(--char-scale) * var(--place-char-scale, 1)),
     calc(68cqw / var(--char-aspect))
   );
 
@@ -299,8 +332,10 @@ body {
   /* 会話領域の上端から口元まで。
      立ち絵の上端は (領域の高さ − 立ち絵の高さ) × (1 − 高さ位置) の所にある
      （.character の bottom と対になる式。片方だけ変えると尻尾がずれる）。 */
+  /* 立ち位置。場所ごとの指定（--place-char-rise）があればそれが勝つ。 */
+  --rise: var(--place-char-rise, var(--char-rise, 0));
   --mouth: calc(
-    (100cqh - var(--char-h)) * (1 - var(--char-rise, 0))
+    (100cqh - var(--char-h)) * (1 - var(--rise))
     + var(--char-h) * var(--mouth-ratio)
   );
 
@@ -310,7 +345,7 @@ body {
      腕や裾が画面の外に消えた。立ち絵は必ず全身が入るようにする。
      （変数は位置の式で使っているので残してある。0＝切らない） */
   --char-bleed: 0;
-  --char-right: calc(-20px * var(--char-bleed));
+  --char-right: var(--place-char-right, calc(-20px * var(--char-bleed)));
 
   /* 会話領域の右端から、顔の左端までの距離 */
   --face-line: calc(var(--char-right) + var(--face));
@@ -319,10 +354,10 @@ body {
   --s-max: calc(100cqw - var(--gutter) - var(--tail) - var(--face-line) - 4px);
 
   /* 吹き出しの最大の幅。広い画面では広げすぎない */
-  --s: min(46cqw, var(--s-max));
+  --s: min(calc(var(--place-bubble, 0.46) * 100cqw), var(--s-max));
 
   /* 回答の文字の大きさ。会話領域の大きさに比例させる */
-  --font: clamp(17px, min(5.1cqh, 3.7cqw), 46px);
+  --font: calc(clamp(17px, min(5.1cqh, 3.7cqw), 46px) * var(--place-text, 1));
 
   /* 吹き出しの上に置く「質問」の高さぶん */
   --q-space: clamp(32px, calc(var(--font) * 1.8), 64px);
@@ -363,7 +398,7 @@ body {
   right: var(--char-right);
   /* 0 は下端に立たせる。立ち絵は切らないので、下へはみ出させない
      （--mouth の式と対になっている）。 */
-  bottom: calc((100cqh - var(--char-h)) * var(--char-rise, 0));
+  bottom: calc((100cqh - var(--char-h)) * var(--rise));
   height: var(--char-h);
   display: flex;
   align-items: flex-end;
@@ -680,7 +715,7 @@ body {
 
 .talk-button {
   flex: none;
-  height: clamp(72px, 9vmin, 120px);
+  height: var(--h-talk);
   margin-top: 14px;
   border: none;
   border-radius: 999px;
@@ -706,6 +741,7 @@ body {
 
 .faq-strip {
   flex: none;
+  height: var(--h-faq);
   margin-top: 12px;
   overflow: hidden;
   /* 端を薄くして、流れが画面の外へ続いているように見せる */
@@ -762,7 +798,13 @@ body {
   display: flex;
   gap: 8px;
   margin-top: 12px;
+  flex: none;
+  min-height: var(--h-typed);
 }
+
+/* 高さを決めたときは、中の入力欄とボタンもそれに合わせて伸ばす */
+.typed .typed-input,
+.typed .typed-send { height: auto; min-height: clamp(44px, 5.5vmin, 72px); }
 
 .typed-input {
   flex: 1;
@@ -796,6 +838,8 @@ body {
   gap: 8px;
   margin-top: 12px;
   flex: none;
+  min-height: var(--h-languages);
+  align-content: stretch;
 }
 
 .lang-button {
@@ -823,7 +867,9 @@ body {
 @media (min-width: 721px) {
   /* 画面を左右に分け、右半分のちょうど真ん中に立たせる。
      （立ち絵の中心が会話領域の75%の位置に来るように右端からの距離を決める） */
-  .stage { --char-right: calc(25cqw - var(--char-w) / 2); }
+  .stage {
+    --char-right: var(--place-char-right, calc(25cqw - var(--char-w) / 2));
+  }
 }
 
 /* ── 画面が狭いとき（スマートフォンなど） ───────── */
@@ -836,8 +882,9 @@ body {
   .stage {
     --gutter: 12px;
     --char-fill: 90cqh;
-    --char-right: calc(-9cqw * var(--char-bleed)); /* 既定では0（切らない） */
-    --s: var(--s-max);     /* 幅が足りないので、顔の手前まで目一杯使う */
+    --char-right: var(--place-char-right, calc(-9cqw * var(--char-bleed)));
+    /* 幅が足りないので、顔の手前まで目一杯使う（場所の指定があればそちら） */
+    --s: min(calc(var(--place-bubble, 1) * 100cqw), var(--s-max));
   }
 
   /* 幅が狭くなるぶん、写真とQRも小さくする */

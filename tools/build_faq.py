@@ -109,7 +109,7 @@ def cell_date(cell):
 
 
 def build(source: str, assets_dir: Path | None):
-    """戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ, 読み方)"""
+    """戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ, 読み方, 画面レイアウト)"""
     return build_from_bytes(load_workbook_bytes(source), assets_dir)
 
 
@@ -281,6 +281,64 @@ def read_reference(book) -> list:
     return notes
 
 
+# 画面レイアウトのブロック。案内アプリ（js/layout.js）と同じ名前を使う。
+LAYOUT_BLOCKS = ["stage", "faq", "typed", "talk", "languages"]
+
+
+def read_layouts(book) -> list:
+    """「画面レイアウト」シートを読む。無ければ空。
+
+    据え置きのタブレットと観光客のスマートフォンでは、押しやすい大きさも
+    見せたいものも違う。設置場所ごとに並びと大きさを持てるようにする。
+
+    値は割合（画面の高さに対する比）で持つ。px で持つと、別の大きさの
+    画面に移したとたんに重なるか画面の外へ出てしまう。
+    """
+    sheet = book.get("画面レイアウト")
+    if sheet is None:
+        return []
+
+    def ratio(row, column, default=0.0, low=0.0, high=1.0):
+        try:
+            value = float(row.get(column))
+        except (TypeError, ValueError):
+            return default
+        return value if low <= value <= high else default
+
+    out = []
+    for _, row in sheet.iterrows():
+        place = cell_str(row.get("設置場所"))
+        if not place or place.startswith("※"):
+            continue
+
+        order = [b.strip() for b in cell_str(row.get("並び順")).split(",")
+                 if b.strip() in LAYOUT_BLOCKS]
+        # 会話領域が無いと何も見えなくなる。書き忘れても消さない。
+        if "stage" not in order:
+            order = ["stage"] + order
+
+        out.append({
+            "place": place,
+            "order": order,
+            "heights": {
+                "faq": ratio(row, "よくある質問の高さ"),
+                "typed": ratio(row, "入力欄の高さ"),
+                "talk": ratio(row, "話すボタンの高さ"),
+                "languages": ratio(row, "言語の高さ"),
+            },
+            "character": {
+                "scale": ratio(row, "キャラクターの大きさ", 1.0, 0.1, 3.0),
+                "rise": ratio(row, "キャラクターの高さ位置"),
+                "side": ratio(row, "キャラクターの左右位置"),
+            },
+            "bubble": {
+                "width": ratio(row, "吹き出しの幅"),
+                "text": ratio(row, "文字の大きさ", 1.0, 0.5, 2.5),
+            },
+        })
+    return out
+
+
 def read_readings(book) -> list:
     """「読み方」シートを読む。無ければ空。
 
@@ -399,7 +457,7 @@ def read_synonyms(book) -> dict:
 def build_from_bytes(raw: bytes, assets_dir: Path | None):
     """xlsxのバイト列から変換する。管理画面もここを呼ぶ。
 
-    戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ, 読み方)
+    戻り値: (FAQ一覧, エラー, 確認事項, 未翻訳件数, 言い換え表, 設置場所, 音声セット, 参考資料, キャラクター, 読み上げ, 読み方, 画面レイアウト)
     """
     book = pd.read_excel(io.BytesIO(raw), sheet_name=None, dtype=object)
 
@@ -549,7 +607,7 @@ def build_from_bytes(raw: bytes, assets_dir: Path | None):
     return (faqs, errors, warnings, pending, read_synonyms(book), places,
             read_voice_sets(book), read_reference(book),
             read_characters(book, assets_dir), read_voice_settings(book),
-            read_readings(book))
+            read_readings(book), read_layouts(book))
 
 
 # ---------------------------------------------------------------- 実行
@@ -568,7 +626,8 @@ def main():
 
     print("読み込み中...")
     (faqs, errors, warnings, pending, synonyms, places, voice_sets,
-     reference, characters, voice, readings) = build(args.source, assets_dir)
+     reference, characters, voice, readings,
+     layouts) = build(args.source, assets_dir)
 
     print(f"\n読み込み結果: 有効な質問 {len(faqs)} 件 / 言い換え {sum(len(v) for v in synonyms.values())} 語"
           + (f" / 参考資料 {len(reference)} 件" if reference else ""))
@@ -606,6 +665,7 @@ def main():
         "characters": characters,    # 画面に立つキャラクター（利用者が選べる）
         "voice": voice,              # 言語ごとの読み上げの設定
         "readings": readings,        # 読み上げの読み間違いを直す表
+        "layouts": layouts,          # 設置形態ごとの画面の形
     }
     with out.open("w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
