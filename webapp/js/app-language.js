@@ -228,6 +228,17 @@ const TABLE = {
     fr: 'Envoyer',
   },
   /// キャラクターの切り替え
+  /// 左上のアプリ名。選んでいる言語で出す（読めない名前だと何のアプリか分からないため）
+  /// 「Shirakawa‑go」の「‑」は改行しないハイフン。スマートフォンで2行に折り返すとき、
+  /// 「Shirakawa-」と「go」に分かれないようにするため。
+  appTitle: {
+    ja: '白川郷AI観光ガイド',
+    en: 'Shirakawa‑go AI Guide',
+    zh: '白川乡AI旅游向导',
+    ko: '시라카와고 AI 관광 가이드',
+    es: 'Guía IA de Shirakawa‑go',
+    fr: 'Guide IA de Shirakawa‑go',
+  },
   characterTitle: {
     ja: 'キャラクターを選ぶ',
     en: 'Choose a character',

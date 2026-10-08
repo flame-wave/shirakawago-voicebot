@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2C5F2D">
-<title>白川郷 音声案内</title>
+<title>白川郷AI観光ガイド</title>
 <link rel="stylesheet" href="styles.css">
 <!-- QRコードの生成（同梱。外部への通信は行わない） -->
 <script src="vendor/qrcode.js"></script>
@@ -12,7 +12,7 @@
 <body>
 
 <header class="appbar">
-  <h1>白川郷 音声案内</h1>
+  <h1 id="appTitle">白川郷AI観光ガイド</h1>
   <!-- いまどの案内所の近くにいるか。
        ロッカーやATMのように、案内所ごとに答えが違う質問で使う。 -->
   <button class="place-pill" id="placeButton" type="button">📍 現在地を選ぶ</button>

@@ -52,6 +52,12 @@ const FALLBACK = {
   rise: 0,
 };
 
+/// その言語でのキャラクターの名前。その言語の名前が無ければ日本語の名前。
+/// （名前は質問回答集の「キャラクター」シートの「名前（英語）」などの欄から来る）
+export function nameIn(character, lang) {
+  return character?.names?.[lang] || character?.name || '';
+}
+
 const PLACEHOLDER_ICON = {
   idle: '🙂',
   listening: '👂',

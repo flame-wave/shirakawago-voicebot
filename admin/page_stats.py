@@ -18,6 +18,7 @@
 import csv
 import io
 from datetime import date, datetime, timedelta, timezone
+from html import escape
 
 import altair as alt
 import pandas as pd
@@ -35,8 +36,8 @@ JST = timezone(timedelta(hours=9))
 FRESH_SECONDS = 60   # 一度読んだ記録を使い回す長さ
 
 
-def load_rows(url, token, force=False):
-    """記録を読む。
+def load_rows(url, token, force=False, kind="question"):
+    """記録を読む。kind="ai" なら、AIが答えた分の記録（質問と答え）。
 
     画面を作り直すたびに読みに行くと遅いので、少しの間だけ持っておく。
     以前はずっと持ち続けていたため、「記録を読み直す」を押さないと
@@ -44,18 +45,20 @@ def load_rows(url, token, force=False):
     """
     import time
     ss = st.session_state
-    stale = time.time() - ss.get("log_rows_at", 0) > FRESH_SECONDS
+    key = "log_rows" if kind == "question" else f"log_rows_{kind}"
+    error = "log_error" if kind == "question" else f"log_error_{kind}"
+    stale = time.time() - ss.get(f"{key}_at", 0) > FRESH_SECONDS
     if force or stale:
-        ss.pop("log_rows", None)
-    if "log_rows" not in ss:
+        ss.pop(key, None)
+    if key not in ss:
         try:
-            ss.log_rows = L.fetch(url, token)
-            ss.log_error = ""
+            ss[key] = L.fetch(url, token, kind=kind)
+            ss[error] = ""
         except Exception as e:
-            ss.log_rows = []
-            ss.log_error = str(e)
-        ss.log_rows_at = time.time()
-    return ss.log_rows
+            ss[key] = []
+            ss[error] = str(e)
+        ss[f"{key}_at"] = time.time()
+    return ss[key]
 
 
 def _day(row):
@@ -100,6 +103,7 @@ def render(ctx):
                                       label_visibility="collapsed") or "30"
     if c2.button("記録を読み直す", use_container_width=True, key="stats_reload"):
         load_rows(ctx.log_url, ctx.log_token, force=True)
+        load_rows(ctx.log_url, ctx.log_token, force=True, kind="ai")
         st.rerun()
 
     all_rows = load_rows(ctx.log_url, ctx.log_token)
@@ -119,6 +123,7 @@ def render(ctx):
         _by_place_and_lang(rows)
         _top(ctx, rows, items_by_id)
         _unmatched(ctx, rows)
+        _ai_answers(ctx, days)
         _only_here(rows)
 
     st.write("")
@@ -296,12 +301,67 @@ def _unmatched_row(ctx, i, text, n, places):
         dots = "".join(f'<span title="{p}" style="display:inline-block;width:10px;height:10px;'
                        f'border-radius:50%;background:{_color(p)};margin-right:3px"></span>'
                        for p in L.clients_in([{"client": p} for p in places]))
-        a.markdown(f'<div class="ui-tcell"><b>{text}</b></div>'
+        a.markdown(f'<div class="ui-tcell"><b>{escape(text)}</b></div>'
                    f'<div class="ui-tsub">{dots}{"・".join(L.clients_in([{"client": p} for p in places]))}</div>',
                    unsafe_allow_html=True)
         b.markdown(f'<div class="ui-tcell">{n} 回</div>', unsafe_allow_html=True)
         if c.button("この質問を追加する", key=f"stats_add_{i}", use_container_width=True):
             st.switch_page(ctx.add_page, query_params={"q": text})
+
+
+def _ai_answers(ctx, days):
+    """AIが答えた質問と、その答え。
+
+    質問回答集に無かった質問に、AIが資料から答えたもの。中継サーバ（ask.php）が
+    質問と答えを記録している。よく聞かれるものは質問回答集に入れておくと、
+    AIに頼らず決まった答えを返せる（速く、答えもぶれない）。
+    AIの答えが資料と食い違っていないかを、職員が確かめる場所でもある。
+    """
+    ss = st.session_state
+    rows = L.within(load_rows(ctx.log_url, ctx.log_token, kind="ai"), days)
+    answered = [r for r in rows if r.get("result") == "answered" and r.get("question")]
+    answered.sort(key=lambda r: str(r.get("at") or ""), reverse=True)
+    with ui.card("stats-ai"):
+        st.markdown("#### AIが答えた質問")
+        if ss.get("log_error_ai"):
+            st.markdown(ui.box("AIの記録を読めませんでした", escape(ss.log_error_ai[:120]), "warn"),
+                        unsafe_allow_html=True)
+            return
+        if not answered:
+            st.markdown(ui.box("この期間に、AIが答えた質問はありません", "", "ok"),
+                        unsafe_allow_html=True)
+            return
+        st.caption("質問回答集に無かった質問に、AIが資料から答えたものです（新しい順）。"
+                   "答えが正しいかを確かめ、よく聞かれるものは「質問回答集に入れる」を押すと、"
+                   "質問とAIの答えが入った状態で、質問を追加する画面が開きます。")
+        for i, r in enumerate(answered[:10]):
+            _ai_row(ctx, i, r)
+        if len(answered) > 10:
+            with st.expander(f"ほかの {len(answered) - 10} 件"):
+                for i, r in enumerate(answered[10:], start=10):
+                    _ai_row(ctx, i, r)
+    st.write("")
+
+
+def _ai_row(ctx, i, r):
+    at = L._when(r)
+    when = f"{at.astimezone(JST):%m/%d %H:%M}" if at else ""
+    lang_code = str(r.get("lang") or "ja")
+    lang = LANG_NAMES.get(lang_code, lang_code)
+    place = str(r.get("place") or "") or "場所の指定なし"
+    question, answer = str(r.get("question") or ""), str(r.get("answer") or "")
+    with ui.keyed_box(f"ui-trow-ai{i}"):
+        a, b = st.columns([5, 1.8], vertical_alignment="center")
+        a.markdown(f'<div class="ui-tcell"><b>{escape(question)}</b></div>'
+                   f'<div class="ui-tsub" style="white-space:normal">{escape(answer)}</div>'
+                   f'<div class="ui-tsub">{escape(when)}　{escape(lang)}　{escape(place)}</div>',
+                   unsafe_allow_html=True)
+        if b.button("質問回答集に入れる", key=f"stats_ai_add_{i}", use_container_width=True):
+            # 日本語以外の質問は、AIの答えもその言語なので、下書きには入れない
+            params = {"q": question}
+            if lang_code == "ja":
+                params["a"] = answer
+            st.switch_page(ctx.add_page, query_params=params)
 
 
 def _only_here(rows):

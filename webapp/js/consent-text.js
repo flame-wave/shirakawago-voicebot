@@ -16,7 +16,7 @@ export const PROVIDER = '名古屋大学 情報学部／大学院情報学研究
 
 export const CONSENT = {
   ja: {
-    title: '白川郷 音声案内',
+    title: '白川郷AI観光ガイド',
     provider: PROVIDER + ' が提供しています。',
     purpose: 'このアプリは、観光案内をよりよくするための研究として運用しています。'
       + 'ご利用の記録は、案内の改善と研究にのみ使います。',
@@ -45,7 +45,7 @@ export const CONSENT = {
   },
 
   en: {
-    title: 'Shirakawa-go Voice Guide',
+    title: 'Shirakawa-go AI Guide',
     provider: 'Provided by the Endo and Urata Laboratory, School of Informatics and '
       + 'Graduate School of Informatics, Nagoya University.',
     purpose: 'This guide is operated as a research project to improve tourist '
@@ -78,7 +78,7 @@ export const CONSENT = {
   },
 
   zh: {
-    title: '白川乡 语音导览',
+    title: '白川乡AI旅游向导',
     provider: '由名古屋大学 信息学部／研究生院信息学研究科　远藤・浦田研究室提供。',
     purpose: '本导览作为改进旅游信息服务的研究项目运行。使用记录仅用于改进导览与研究。',
     recordTitle: '记录的内容',
@@ -106,7 +106,7 @@ export const CONSENT = {
   },
 
   ko: {
-    title: '시라카와고 음성 안내',
+    title: '시라카와고 AI 관광 가이드',
     provider: '나고야대학 정보학부／대학원 정보학연구과　엔도・우라타 연구실이 제공합니다.',
     purpose: '이 안내는 관광 안내를 개선하기 위한 연구로 운영되고 있습니다. '
       + '이용 기록은 안내 개선과 연구에만 사용합니다.',
@@ -135,7 +135,7 @@ export const CONSENT = {
   },
 
   es: {
-    title: 'Guía de voz de Shirakawa-go',
+    title: 'Guía IA de Shirakawa-go',
     provider: 'Ofrecido por el Laboratorio Endo y Urata, Facultad de Informática y '
       + 'Escuela de Posgrado en Informática, Universidad de Nagoya.',
     purpose: 'Esta guía funciona como un proyecto de investigación para mejorar la '
@@ -168,7 +168,7 @@ export const CONSENT = {
   },
 
   fr: {
-    title: 'Guide vocal de Shirakawa-go',
+    title: 'Guide IA de Shirakawa-go',
     provider: 'Proposé par le laboratoire Endo et Urata, Faculté d’informatique et '
       + 'École doctorale d’informatique, Université de Nagoya.',
     purpose: 'Ce guide est exploité dans le cadre d’un projet de recherche visant à '

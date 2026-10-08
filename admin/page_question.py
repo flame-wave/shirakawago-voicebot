@@ -460,15 +460,23 @@ def render(ctx):
 
     # 利用状況の「この質問を追加する」から来たとき（?q=聞かれた文）。
     # その文を聞き方に入れ、試しに聞いてみる欄にも入れておく。
+    # 「AIが答えた質問」から来たときは、AIの答えも下書きとして入れる（?a=AIの答え）。
     asked = st.query_params.get("q", "")
+    ai_answer = st.query_params.get("a", "")
     if is_new and asked and ss.get("q_seeded") != asked:
         _load("", None)
         ss.q_questions = [_clean(asked)]
         ss.q_try = asked
         ss.q_seeded = asked
-        ss.q_flash = ("info", f"利用状況で答えられなかった質問「{escape(asked)}」から開きました。"
-                              "聞き方に入れてあります。言葉を空白で分けた言い方も足すと、"
-                              "似た聞き方にも当たるようになります。")
+        if ai_answer:
+            ss.q_answer = ai_answer
+            ss.q_flash = ("info", f"AIが答えた質問「{escape(asked)}」から開きました。"
+                                  "AIの答えを回答の下書きに入れてあります。"
+                                  "<b>料金・時間・場所が正しいかを確かめて</b>から保存してください。")
+        else:
+            ss.q_flash = ("info", f"利用状況で答えられなかった質問「{escape(asked)}」から開きました。"
+                                  "聞き方に入れてあります。言葉を空白で分けた言い方も足すと、"
+                                  "似た聞き方にも当たるようになります。")
     if ss.q_place not in places:
         places.append(ss.q_place)
 

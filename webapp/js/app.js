@@ -14,7 +14,7 @@ import { SpeechService } from './speech-service.js';
 import { AiService } from './ai-service.js';
 import { PlaceService, NOWHERE } from './place-service.js';
 import { BackgroundView } from './background.js';
-import { CharacterView, CharacterState } from './character.js';
+import { CharacterView, CharacterState, nameIn } from './character.js';
 import { LayoutView } from './layout.js';
 import { AnswerView } from './answer-view.js';
 import { QuestionLog, logStats } from './question-log.js';
@@ -56,6 +56,7 @@ const el = {
   photoViewImg: document.getElementById('photoViewImg'),
   photoViewClose: document.getElementById('photoViewClose'),
   typedForm: document.getElementById('typedForm'),
+  appTitle: document.getElementById('appTitle'),
   typedInput: document.getElementById('typedInput'),
   typedSend: document.getElementById('typedSend'),
 };
@@ -89,6 +90,9 @@ const state = {
 
 function render() {
   renderPlacePill();
+  const title = uiString('appTitle', state.lang);
+  if (el.appTitle) el.appTitle.textContent = title;
+  document.title = title;
   el.dataSource.textContent = state.dataSource;
   el.dataVersion.textContent = state.dataVersion;
 
@@ -196,7 +200,7 @@ function openPlaceMenu() {
 
 function renderCharacterPill() {
   if (!el.characterButton) return;
-  el.characterButton.textContent = `🧑 ${character.current.name}`;
+  el.characterButton.textContent = `🧑 ${nameIn(character.current, state.lang)}`;
 }
 
 function openCharacterMenu() {
@@ -216,7 +220,7 @@ function openCharacterMenu() {
     img.alt = '';
     img.loading = 'lazy';
     const label = document.createElement('span');
-    label.textContent = item.name;
+    label.textContent = nameIn(item, state.lang);
     button.append(img, label);
 
     button.addEventListener('click', () => {

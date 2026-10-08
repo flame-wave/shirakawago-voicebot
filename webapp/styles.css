@@ -110,6 +110,29 @@ body {
   margin-left: auto;
 }
 
+/* スマートフォン。英語やフランス語ではアプリ名が長く、1行に入れると
+   「Shirakawa-go AI Gu…」のように切れてしまう。2行まで折り返して全部見せる。
+   キャラクターの名前も「…」だけにならないよう、縮めないで出す。 */
+@media (max-width: 480px) {
+  .appbar h1 {
+    flex: 1 1 auto;
+    font-size: 15px;
+    line-height: 1.2;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .char-pill {
+    flex: 0 0 auto;
+    padding: 0 10px;
+  }
+  .place-pill {
+    max-width: 34vw;
+    padding: 0 10px;
+  }
+}
+
 /* キャラクターの一覧。名前だけでは誰か分からないので、絵を並べて選ばせる。 */
 .char-menu-list {
   display: grid;

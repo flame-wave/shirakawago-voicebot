@@ -190,6 +190,16 @@ def png_size(path: Path):
     return width, height
 
 
+# 言語ごとの名前の欄（tools/add_character_names.py で足したもの）
+CHARACTER_NAME_COLUMNS = {
+    "en": "名前（英語）",
+    "zh": "名前（中国語）",
+    "ko": "名前（韓国語）",
+    "es": "名前（スペイン語）",
+    "fr": "名前（フランス語）",
+}
+
+
 def read_characters(book, assets_dir: Path | None) -> list:
     """「キャラクター」シートを読む。無ければ空。
 
@@ -241,6 +251,14 @@ def read_characters(book, assets_dir: Path | None) -> list:
             "rise": ratio("高さ位置", 0.0, upper=1.0, allow_zero=True),
             "default": cell_str(row.get("既定")).upper() in ("TRUE", "1", "○", "YES"),
         }
+
+        # 言語ごとの名前。空の言語は入れない（案内アプリは日本語の名前を出す）。
+        # 1つも無ければ欄ごと入れない（欄を足す前の質問回答集と、書き出しが変わらないように）
+        names = {lang: cell_str(row.get(column))
+                 for lang, column in CHARACTER_NAME_COLUMNS.items()
+                 if cell_str(row.get(column))}
+        if names:
+            character["names"] = names
 
         # 縦横比は画像から読む。書き間違いが起きない方に寄せる。
         if assets_dir:
