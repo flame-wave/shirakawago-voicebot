@@ -49,8 +49,27 @@ BADGE_STYLES = {
 CSS = f"""
 <style>
 /* ── 全体 ─────────────────────────────────── */
+/* 一番上の帯（Streamlit のヘッダー）。
+   画面が狭いと帯に背景色が付き、スクロールした文字が帯の下に潜って読めなくなる。
+   帯そのものは透明にして押せないようにし、中のボタン（サイドバーの開閉・Share など）
+   だけを小さな地の上に浮かせる。 */
+[data-testid="stHeader"] {{
+  background: transparent !important;
+  pointer-events: none;
+}}
+[data-testid="stHeader"] button,
+[data-testid="stHeader"] a,
+[data-testid="stToolbar"],
+[data-testid="stExpandSidebarButton"] {{
+  pointer-events: auto;
+}}
+[data-testid="stToolbar"],
+[data-testid="stExpandSidebarButton"] {{
+  background: rgba(244, 246, 241, 0.92);
+  border-radius: 10px;
+}}
 [data-testid="stMain"] .block-container {{
-  padding-top: 2.2rem;
+  padding-top: 3.2rem;
   padding-bottom: 2rem;
   max-width: 1400px;
 }}

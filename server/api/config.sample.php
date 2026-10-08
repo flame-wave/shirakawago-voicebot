@@ -49,6 +49,9 @@ return [
     // ---- 質問の記録を残す場所（案内端末から送られてくる）
     'question_log_path' => __DIR__ . '/data/question_log.jsonl',
 
+    // ---- アンケート（〇△×）の答えを残す場所（書かなければ data/survey_log.jsonl）
+    'survey_log_path' => __DIR__ . '/data/survey_log.jsonl',
+
     // ---- 記録を読み出すときの合言葉（管理者画面がこれを使う）
     // 決めないと誰も読めない。長い無作為の文字列にすること。
     //   例: php -r "echo bin2hex(random_bytes(24));"
@@ -56,4 +59,9 @@ return [
 
     // ---- 待ち時間（秒）。これを超えたら案内アプリは職員案内に切り替える
     'timeout' => 8,
+
+    // ---- 雑談への返事。資料に近いものが無いとき、「好きな食べ物は？」のような
+    // 話しかけに、キャラクターとして短く返す（案内の事実は答えない）。
+    // 書かなければ true。止めるときは false。
+    'small_talk' => true,
 ];

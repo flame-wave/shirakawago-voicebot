@@ -239,6 +239,29 @@ const TABLE = {
     es: 'Guía IA de Shirakawa‑go',
     fr: 'Guide IA de Shirakawa‑go',
   },
+  /// かんたんなアンケート（〇△×）
+  surveyQuestion: {
+    ja: 'AI観光ガイドの体験はどうでしたか？',
+    en: 'How was your experience with the AI guide?',
+    zh: 'AI旅游向导的体验如何？',
+    ko: 'AI 관광 가이드를 이용해 보시니 어떠셨나요?',
+    es: '¿Qué le ha parecido la guía con IA?',
+    fr: 'Comment avez-vous trouvé le guide IA ?',
+  },
+  surveyGood: { ja: 'よかった', en: 'Good', zh: '满意', ko: '좋았어요', es: 'Buena', fr: 'Bien' },
+  surveyOk: { ja: 'ふつう', en: 'Okay', zh: '一般', ko: '보통', es: 'Normal', fr: 'Moyen' },
+  surveyBad: { ja: 'いまいち', en: 'Not good', zh: '不满意', ko: '별로예요', es: 'Mala', fr: 'Pas bien' },
+  surveySkip: {
+    ja: '答えない', en: 'Skip', zh: '跳过', ko: '건너뛰기', es: 'Omitir', fr: 'Passer',
+  },
+  surveyThanks: {
+    ja: 'ありがとうございました！',
+    en: 'Thank you for your feedback!',
+    zh: '感谢您的反馈！',
+    ko: '의견 감사합니다!',
+    es: '¡Gracias por su opinión!',
+    fr: 'Merci pour votre avis !',
+  },
   characterTitle: {
     ja: 'キャラクターを選ぶ',
     en: 'Choose a character',

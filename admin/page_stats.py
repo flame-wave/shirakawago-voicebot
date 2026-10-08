@@ -67,7 +67,15 @@ def _day(row):
     return at.astimezone(JST).date() if at else None
 
 
+TALK_LABELS = {"greeting": "あいさつ", "thanks": "お礼", "name": "名前を聞かれた",
+               "howareyou": "元気？と聞かれた", "bye": "さようなら", "ai": "AIが返事"}
+
+
 def _label(items_by_id, fid, n=34):
+    # キャラクターの会話（あいさつなど）は「talk:種類」で記録している
+    if str(fid).startswith("talk:"):
+        kind = str(fid)[5:]
+        return f"（会話）{TALK_LABELS.get(kind, kind)}"
     it = items_by_id.get(fid)
     if not it:
         return "（いまは無い質問）"
@@ -104,6 +112,7 @@ def render(ctx):
     if c2.button("記録を読み直す", use_container_width=True, key="stats_reload"):
         load_rows(ctx.log_url, ctx.log_token, force=True)
         load_rows(ctx.log_url, ctx.log_token, force=True, kind="ai")
+        load_rows(ctx.log_url, ctx.log_token, force=True, kind="survey")
         st.rerun()
 
     all_rows = load_rows(ctx.log_url, ctx.log_token)
@@ -119,6 +128,8 @@ def render(ctx):
         ui.notice("この期間の記録はまだありません。", kind="info", key="stats-empty")
     else:
         _overview(rows)
+    _survey(ctx, days)
+    if rows:
         _daily(rows, days)
         _by_place_and_lang(rows)
         _top(ctx, rows, items_by_id)
@@ -140,6 +151,63 @@ def _overview(rows):
         ("AIが答えた", f"{by.get('ai', 0)} 件", "質問回答集に無かったもの"),
         ("職員へ回った", f"{by.get('none', 0)} 件", "答えを足す候補です"),
     ])
+    st.write("")
+
+
+# ---------------------------------------------------------------- アンケート
+VOTES = [("good", "〇 よかった"), ("ok", "△ ふつう"), ("bad", "× いまいち")]
+
+
+def _survey(ctx, days):
+    """アンケート（「AI観光ガイドの体験はどうでしたか？」への 〇△×）。
+
+    案内端末は、最初の案内を出し終えたあとに1回だけ聞く（据え置きは次の方ごと）。
+    「記録せずに使う」を選んだ方には聞かないので、数はその分少なくなる。
+    """
+    import pandas as pd
+    ss = st.session_state
+    rows = L.within(load_rows(ctx.log_url, ctx.log_token, kind="survey"), days)
+    with ui.card("stats-survey"):
+        st.markdown("#### アンケート（AI観光ガイドの体験はどうでしたか？）")
+        if ss.get("log_error_survey"):
+            st.markdown(ui.box("アンケートの記録を読めませんでした",
+                               escape(ss.log_error_survey[:120]), "warn"), unsafe_allow_html=True)
+            return
+        if not rows:
+            st.markdown(ui.box("この期間の回答はまだありません",
+                               "案内端末は、最初の案内を出し終えたあとに 〇△× で聞きます。", "info"),
+                        unsafe_allow_html=True)
+            return
+        total = len(rows)
+        count = {v: sum(1 for r in rows if r.get("vote") == v) for v, _ in VOTES}
+        cells = [("回答の数", f"{total} 件", "この期間")]
+        cells += [(label, f"{count[v]} 件", f"{count[v] / total:.0%}") for v, label in VOTES]
+        ui.tiles(cells)
+        st.caption("最初の案内を出し終えたあとに1回だけ聞いています（据え置きの端末は、次の方ごと）。"
+                   "「記録せずに使う」を選んだ方には聞いていません。")
+
+        def table(key, names=None):
+            groups = {}
+            for r in rows:
+                g = str(r.get(key) or "不明")
+                groups.setdefault(names.get(g, g) if names else g, []).append(r.get("vote"))
+            data = []
+            for g, votes in sorted(groups.items(), key=lambda x: -len(x[1])):
+                row = {"": g}
+                for v, label in VOTES:
+                    row[label] = votes.count(v)
+                row["計"] = len(votes)
+                row["〇の割合"] = f"{votes.count('good') / len(votes):.0%}"
+                data.append(row)
+            return pd.DataFrame(data)
+
+        a, b = st.columns(2)
+        with a:
+            ui.field_label("案内所ごと")
+            st.dataframe(table("client"), hide_index=True, use_container_width=True)
+        with b:
+            ui.field_label("言語ごと")
+            st.dataframe(table("lang", LANG_NAMES), hide_index=True, use_container_width=True)
     st.write("")
 
 

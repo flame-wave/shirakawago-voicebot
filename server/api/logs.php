@@ -5,6 +5,7 @@
  * 呼ばれ方:
  *   GET /api/logs.php?token=＜合言葉＞
  *   GET /api/logs.php?token=＜合言葉＞&kind=ai   … AIが答えた分の記録
+ *   GET /api/logs.php?token=＜合言葉＞&kind=survey … アンケート（〇△×）の答え
  *
  *   POST /api/logs.php   {"token": "…", "action": "clear"}
  *   POST /api/logs.php   {"token": "…", "action": "clear", "before": "2026-11-01"}
@@ -78,6 +79,7 @@ function clear_logs(array $config, array $body): void
     $paths = [
         $config['question_log_path'] ?? (__DIR__ . '/data/question_log.jsonl'),
         $config['log_path'] ?? (__DIR__ . '/data/ai_log.jsonl'),
+        $config['survey_log_path'] ?? (__DIR__ . '/data/survey_log.jsonl'),
     ];
     $deleted = 0;
     $kept = 0;
@@ -130,9 +132,11 @@ function clear_logs(array $config, array $body): void
 }
 
 $kind = (string) ($_GET['kind'] ?? 'question');
-$path = $kind === 'ai'
-    ? ($config['log_path'] ?? (__DIR__ . '/data/ai_log.jsonl'))
-    : ($config['question_log_path'] ?? (__DIR__ . '/data/question_log.jsonl'));
+$paths = [
+    'ai' => $config['log_path'] ?? (__DIR__ . '/data/ai_log.jsonl'),
+    'survey' => $config['survey_log_path'] ?? (__DIR__ . '/data/survey_log.jsonl'),
+];
+$path = $paths[$kind] ?? ($config['question_log_path'] ?? (__DIR__ . '/data/question_log.jsonl'));
 
 header('Content-Type: application/x-ndjson; charset=utf-8');
 header('Cache-Control: no-store');

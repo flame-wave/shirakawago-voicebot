@@ -15,6 +15,11 @@
        python tools/make_voice.py --speaker 3
        python tools/make_voice.py --speaker 3 --only toilet bus_next
 
+  「読み方」に言葉を足したあと、その言葉を含む音声だけを作り直す場合:
+       python tools/make_voice.py --fix-readings            （何を作り直すか見るだけ）
+       python tools/make_voice.py --fix-readings --go       （作り直して mp3 にする）
+       python tools/make_voice.py --fix-readings --words 朴葉味噌 --go
+
   別の声も用意して、案内アプリ側で選べるようにする場合:
        python tools/make_voice.py --speaker 8 --set zundamon --label "ずんだもん"
      → assets/audio/zundamon/ に作られ、「音声セット」シートに登録される
@@ -181,6 +186,124 @@ def register_set(wb, folder: str, label: str, speaker: int, speed: float) -> Non
         target.alignment = Alignment(vertical="top", wrap_text=(c == 5))
 
 
+def voice_sets(wb) -> list:
+    """「音声セット」シートの一覧 [(名前, フォルダ, 話者番号, 速さ)]。話者番号の無い行は飛ばす。"""
+    if VOICE_SHEET not in wb.sheetnames:
+        return []
+    ws = wb[VOICE_SHEET]
+    header = {cell(ws, 1, c): c for c in range(1, ws.max_column + 1)}
+    out = []
+    for r in range(2, ws.max_row + 1):
+        name = cell(ws, r, header.get("名前", 1))
+        if not name or name.startswith("※"):
+            continue
+        try:
+            speaker = int(float(cell(ws, r, header["話者番号"])))
+        except (KeyError, ValueError):
+            continue
+        try:
+            speed = float(cell(ws, r, header.get("速さ", 0)) or 1.0) if "速さ" in header else 1.0
+        except ValueError:
+            speed = 1.0
+        out.append((name, cell(ws, r, header["フォルダ"]) if "フォルダ" in header else "",
+                    speaker, speed))
+    return out
+
+
+def speaker_names(engine: str) -> dict:
+    names = {}
+    for speaker in requests.get(f"{engine}/speakers", timeout=10).json():
+        for style in speaker["styles"]:
+            names[style["id"]] = f"{speaker['name']}（{style['name']}）"
+    return names
+
+
+def fix_readings(args) -> None:
+    """読み方の表にある言葉を含む回答の音声だけを、すべての音声セットで作り直す。
+
+    「読み方」に言葉を足しても、すでに作った音声は変わらない（VOICEVOXで作り済みのため）。
+    全部を作り直すと時間がかかるので、その言葉を含む回答だけを作り直す。
+    --go を付けないときは、何を作り直すかを見せるだけで何も書き換えない。
+    """
+    check_engine(args.engine)
+    wb = load_workbook(Path(args.source))
+    all_readings = load_readings(wb)   # 合成に回すときは、表のすべてを当てる
+    readings = all_readings
+    if args.words:
+        readings = [(s, r) for s, r in readings if s in args.words]
+    if not readings:
+        print("当てる読み方がありません（「読み方」シートか --words を確かめてください）。")
+        return
+
+    ws = wb["FAQ"]
+    header = {cell(ws, 1, c): c for c in range(1, ws.max_column + 1)}
+    targets = []
+    for r in range(2, ws.max_row + 1):
+        fid = cell(ws, r, header[ID_COL])
+        audio = cell(ws, r, header[AUDIO_COL]) if AUDIO_COL in header else ""
+        if not fid or not audio:
+            continue
+        text = (cell(ws, r, header[SHORT_COL]) if SHORT_COL in header else "") \
+            or cell(ws, r, header[ANSWER_COL])
+        words = [s for s, _ in readings if s in text]
+        if words:
+            targets.append((fid, audio, text, words))
+    if not targets:
+        print("読み方の表にある言葉を含む、用意した音声はありません。")
+        return
+
+    names = speaker_names(args.engine)
+    sets = voice_sets(wb)
+    print(f"\n作り直す回答: {len(targets)} 件")
+    for fid, audio, _, words in targets:
+        print(f"  {fid}（{audio}）… {'・'.join(words)}")
+    print("\n声のセット:")
+    for name, folder, speaker, speed in sets:
+        print(f"  {name} … 話者番号 {speaker} = {names.get(speaker, '不明')}"
+              f"／速さ {speed}／assets/audio/{folder or ''}")
+    if not args.go:
+        print("\nまだ何も書き換えていません。話者番号が、いまの音声と同じ声か確かめてから、"
+              "--go を付けてもう一度実行してください。")
+        return
+
+    import tempfile
+    from convert_audio import convert, find_ffmpeg
+    ffmpeg = find_ffmpeg()
+    made, failed = [], []
+    for name, folder, speaker, speed in sets:
+        out_dir = Path(args.out) / folder if folder else Path(args.out)
+        for fid, audio, text, _ in targets:
+            target = out_dir / audio
+            if not target.exists():
+                continue   # このセットには、この回答の音声がもともと無い
+            try:
+                wav = synthesize(args.engine, apply_readings(text, all_readings), speaker, speed)
+            except requests.RequestException as e:
+                failed.append(f"{name}/{audio}: {e}")
+                continue
+            if target.suffix.lower() == ".mp3":
+                if not ffmpeg:
+                    failed.append(f"{name}/{audio}: ffmpeg が無いため mp3 にできません")
+                    continue
+                with tempfile.TemporaryDirectory() as tmp:
+                    src = Path(tmp) / "voice.wav"
+                    src.write_bytes(wav)
+                    if not convert(ffmpeg, src, target):
+                        failed.append(f"{name}/{audio}: mp3 にできませんでした")
+                        continue
+            else:
+                target.write_bytes(wav)
+            made.append(target.relative_to(ROOT))
+            print(f"  作り直しました: {target.relative_to(ROOT)}")
+    print(f"\n作り直した音声: {len(made)} 件")
+    for f in failed:
+        print("  × " + f)
+    if made:
+        print("\nこのあと:")
+        print("  1. 作り直したファイルを、ロリポップの同じ場所（assets/audio/…）へ FTP で上げる")
+        print("  2. git push する（GitHub の控えも新しくする）")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", default=str(ROOT / "tools" / "faq_master.xlsx"))
@@ -195,9 +318,19 @@ def main():
     ap.add_argument("--label", default="",
                     help="案内アプリに出すこの声の名前（省略すると話者名）")
     ap.add_argument("--list", action="store_true", help="話者の一覧を表示して終わる")
+    ap.add_argument("--fix-readings", action="store_true",
+                    help="「読み方」の表にある言葉を含む回答の音声だけを、すべての声のセットで作り直す")
+    ap.add_argument("--words", nargs="*",
+                    help="--fix-readings で対象にする言葉（省略すると「読み方」の表のすべて）")
+    ap.add_argument("--go", action="store_true",
+                    help="--fix-readings で実際に作り直す（付けないと、作り直すものを見せるだけ）")
     args = ap.parse_args()
 
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+    if args.fix_readings:
+        fix_readings(args)
+        return
 
     check_engine(args.engine)
     if args.list:

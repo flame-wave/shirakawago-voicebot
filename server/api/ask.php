@@ -63,6 +63,12 @@ if (mb_strlen($place) > 40) {
     $place = '';
 }
 
+// いま立っているキャラクターの名前（雑談の返事を、そのキャラクターとしてしてもらうため）
+$character = trim((string) ($request['character'] ?? ''));
+if (mb_strlen($character) > 20) {
+    $character = '';
+}
+
 // 極端に長い入力は、料金と悪用の両面で止める
 if ($question === '' || mb_strlen($question) > 200) {
     decline('bad_question', 400);
@@ -433,9 +439,11 @@ if ($faq === null) {
 $expanded = expand_question($faq, normalize_text($question), $lang);
 $picked = pick_relevant($faq['faqs'] ?? [], $lang, $expanded, $place);
 $candidates = array_column($picked, 'id');
-// 近いものが1件も無ければ、AIに聞く前に諦める。
-// 資料に無いことは答えさせない方針なので、聞いても答えは返らない。
+// 近いものが1件も無ければ、案内としては答えない（資料に無いことは答えさせない方針）。
+// ただ「好きな食べ物は？」「疲れた」のような雑談かもしれないので、
+// 雑談なら、キャラクターとして短く返してもらう（事実は答えさせない）。
 if (!$picked) {
+    small_talk($config, $question, $lang, $place, $character);
     write_log($config, ['at' => date('c'), 'lang' => $lang, 'place' => $place,
                         'question' => $question, 'result' => 'no_candidate']);
     decline('not_found');
@@ -515,12 +523,71 @@ $variable = "【資料】\n" . $context
 
 $prompt = $fixed . "\n\n" . $variable;   // 記録に残す長さの計算に使う
 
+// ---------------------------------------------------------------- 雑談
+/**
+ * 雑談への返事。案内として答えられなかったときだけ呼ぶ（短い文に限る）。
+ *
+ * 「好きな食べ物は？」「かわいいね」「疲れた」のような話しかけに、
+ * 立っているキャラクターとして1〜2文で返す。
+ * 案内（時刻・料金・場所・できる/できない など）は答えさせない。
+ * それらは資料に無いと分かった時点で、答えると誤案内になるため。
+ * 雑談でなければ何もせずに戻る（呼び出し側が「答えられない」を返す）。
+ */
+function small_talk(array $config, string $question, string $lang, string $place, string $character): void
+{
+    if (($config['small_talk'] ?? true) === false) {
+        return;
+    }
+    // 長い文は雑談ではなく相談や質問のことが多い。AIに2回聞く料金も抑えたいので、短い文だけにする
+    if (mb_strlen($question) > 40) {
+        return;
+    }
+    $name = $character !== '' ? $character : '案内係';
+    $fixed = <<<TEXT
+あなたは白川郷（世界遺産の合掌造り集落）の観光案内所に立つ案内キャラクター「{$name}」です。
+観光客が話しかけてきました。
+
+【返事をするもの】
+- あいさつ・雑談・気持ちの表現・キャラクターへの質問（例：「好きな食べ物は？」「かわいいね」「疲れた」「今日は寒いね」）。
+  キャラクターとして、明るく丁寧に、1〜2文の短い口語で返してください。
+
+【返事をしないもの（answer を null にする）】
+- 観光の案内（時刻・料金・場所・行き方・混雑・天気予報・営業・できる/できない・おすすめの店）。
+  これは資料に無かったので、答えると間違った案内になります。
+- けが・急病・危険・困りごとの相談、政治・宗教、不適切な話題。
+
+【守ること】
+- 実在の店・商品・人物について、事実を言い切らないでください。
+- 読み上げられるので、記号・絵文字・箇条書きは使わないでください。
+- 「答える言語」の言語で返してください。
+
+出力はJSONのみ: {"answer": "返事またはnull"}
+TEXT;
+    $variable = "【答える言語】\n" . $lang . "\n\n【観光客の言葉】\n" . $question;
+    $result = ask_ai($config, $fixed, $variable, 0.7, 200);
+    if (isset($result['error'])) {
+        return;
+    }
+    $parsed = parse_answer($result['text'] ?? '');
+    $answer = $parsed['answer'] ?? null;
+    if (!is_string($answer) || trim($answer) === '' || strtolower(trim($answer)) === 'null') {
+        return;
+    }
+    write_log($config, [
+        'at' => date('c'), 'lang' => $lang, 'place' => $place, 'question' => $question,
+        'model' => $config['model'], 'result' => 'talk', 'answer' => $answer,
+        'character' => $name, 'usage' => $result['usage'] ?? null,
+    ]);
+    respond(['answer' => trim($answer), 'sources' => [], 'talk' => true]);
+}
+
 // ---------------------------------------------------------------- AIに聞く
 /**
  * OpenAI互換の窓口に投げる。
  * Gemini・Groq・OpenRouter などは、設定の base_url と model を変えるだけで使える。
  */
-function ask_ai(array $config, string $fixed, string $variable): array
+function ask_ai(array $config, string $fixed, string $variable,
+                float $temperature = 0.2, int $maxTokens = 600): array
 {
     // 毎回同じ部分を system に、質問ごとに変わる部分を messages に分ける。
     // この順でしか使い回しが効かない（前から一致した分までが対象になる）。
@@ -531,9 +598,9 @@ function ask_ai(array $config, string $fixed, string $variable): array
 
     $payload = [
         'model' => $config['model'],
-        'max_tokens' => 600,
-        // 案内なので、毎回ぶれないよう低めにする
-        'temperature' => 0.2,
+        'max_tokens' => $maxTokens,
+        // 案内なので、毎回ぶれないよう低めにする（雑談のときだけ少し上げる）
+        'temperature' => $temperature,
         'system' => $system,
         'messages' => [['role' => 'user', 'content' => $variable]],
     ];
@@ -646,6 +713,9 @@ if (isset($result['error'])) {
 $parsed = parse_answer($result['text'] ?? '');
 $answer = $parsed['answer'] ?? null;
 if (!is_string($answer) || trim($answer) === '' || strtolower(trim($answer)) === 'null') {
+    // 案内としては答えられなかった。雑談かもしれないので、雑談としてだけ聞き直す
+    // （近い資料はたいてい何かしら見つかるので、ここで聞き直さないと雑談に返事ができない）
+    small_talk($config, $question, $lang, $place, $character);
     write_log($config, $base + ['result' => 'not_found']);
     decline('not_found');
 }

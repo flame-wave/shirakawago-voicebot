@@ -113,9 +113,38 @@ function clean(array $entry, string $client): ?array
 $sincePath = $config['log_since_path'] ?? (__DIR__ . '/data/log_since.txt');
 $since = is_file($sincePath) ? strtotime(trim((string) file_get_contents($sincePath))) : false;
 
+/// アンケート（〇△×）の答え。質問の記録とは別のファイルに書く。
+function clean_survey(array $entry, string $client): ?array
+{
+    $vote = (string) ($entry['vote'] ?? '');
+    if (!in_array($vote, ['good', 'ok', 'bad'], true)) {
+        return null;
+    }
+    $at = (string) ($entry['at'] ?? '');
+    if ($at === '' || strtotime($at) === false) {
+        $at = date('c');
+    }
+    return [
+        'at' => $at,
+        'client' => $client,
+        'place' => mb_substr(trim((string) ($entry['place'] ?? '')), 0, 40),
+        'lang' => mb_substr(preg_replace('/[^a-zA-Z]/', '', (string) ($entry['lang'] ?? '')), 0, 8),
+        'vote' => $vote,
+        'received' => date('c'),
+    ];
+}
+
 $lines = [];
+$surveys = [];
 foreach (array_slice($request['entries'], 0, MAX_ENTRIES) as $entry) {
     if (!is_array($entry)) {
+        continue;
+    }
+    if (($entry['kind'] ?? '') === 'survey') {
+        $row = clean_survey($entry, $client);
+        if ($row !== null && !($since !== false && strtotime($row['at']) < $since)) {
+            $surveys[] = json_encode($row, JSON_UNESCAPED_UNICODE);
+        }
         continue;
     }
     $row = clean($entry, $client);
@@ -128,8 +157,15 @@ foreach (array_slice($request['entries'], 0, MAX_ENTRIES) as $entry) {
     $lines[] = json_encode($row, JSON_UNESCAPED_UNICODE);
 }
 
+if ($surveys !== []) {
+    $surveyPath = $config['survey_log_path'] ?? (__DIR__ . '/data/survey_log.jsonl');
+    if (@file_put_contents($surveyPath, implode("\n", $surveys) . "\n", FILE_APPEND | LOCK_EX) === false) {
+        refuse('cannot_write', 500);
+    }
+}
+
 if ($lines === []) {
-    respond(['ok' => true, 'saved' => 0]);
+    respond(['ok' => true, 'saved' => count($surveys)]);
 }
 
 $path = $config['question_log_path'] ?? (__DIR__ . '/data/question_log.jsonl');
@@ -143,4 +179,4 @@ if ($written === false) {
     refuse('cannot_write', 500);
 }
 
-respond(['ok' => true, 'saved' => count($lines)]);
+respond(['ok' => true, 'saved' => count($lines) + count($surveys)]);

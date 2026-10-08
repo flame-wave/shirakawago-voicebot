@@ -464,7 +464,13 @@ def page_character():
         sheet_editor("キャラクター", title="キャラクター（表）",
                      note="画像は `assets/character/` に置きます。"
                           "「聞き取り中」「話している」は空欄でよく、"
-                          "空なら「通常」の画像を使います。")
+                          "空なら「通常」の画像を使います。"
+                          "「名前（英語）」などは、案内画面をその言語にしたときの名前です。")
+
+    # あいさつなどへの返事（キャラクターごと）
+    st.write("")
+    import page_talk
+    page_talk.render(book, engine, save_book)
 
 
 # ---------------------------------------------------------------- 追加・修正
@@ -803,6 +809,43 @@ def page_readings():
                        "下の表で直すと、保存する前でもここで聞けます。")
             speech.readings_player(speech.clean_reading_rows(edited.to_dict("records")),
                                    voices, rate, pitch)
+        prepared_audio_notice(speech.clean_reading_rows(edited.to_dict("records")))
+
+
+def prepared_audio_notice(rows):
+    """用意した音声（VOICEVOXなどで作ったmp3）は、読み方の表を直しても変わらない。
+
+    ブラウザの読み上げは、読み上げる直前に表を当てるのですぐ直る。
+    一方、用意した音声は作ったときの読みのまま録音されているので、作り直すしかない。
+    表にある言葉を含む回答を挙げ、パソコンで作り直す手順を見せる。
+    """
+    words = [src for src, yomi, on in rows if src and yomi and on]
+    hits = []
+    for it in items:
+        if not it.get("audio"):
+            continue
+        spoken = it.get("short") or it.get("answer") or ""
+        found = [w for w in words if w in spoken]
+        if found:
+            hits.append((it, found))
+    if not hits:
+        return
+    st.write("")
+    with ui.card("yomi-audio"):
+        st.markdown("#### 用意した音声の作り直し")
+        st.markdown(ui.box(
+            f"用意した音声（VOICEVOXなど）がある回答のうち {len(hits)} 件に、この表の言葉が入っています",
+            "用意した音声は、作ったときの読みのまま録音されているため、この表を直しても変わりません。"
+            "読みが違っていたら、VOICEVOX の入ったパソコンで作り直します。", "info"),
+            unsafe_allow_html=True)
+        for it, found in hits:
+            st.markdown(f'<div class="ui-tsub">・{escape(it["id"])}（{escape(it["audio"])}）… '
+                        f'{escape("・".join(found))}</div>', unsafe_allow_html=True)
+        st.caption("作り直し方（VOICEVOX を起動したパソコンで、この管理画面と同じ版の質問回答集を使う）")
+        st.code("python tools/make_voice.py --fix-readings          # 作り直すものを見るだけ\n"
+                "python tools/make_voice.py --fix-readings --go     # 作り直して mp3 にする",
+                language="bash")
+        st.caption("作り直したファイルは、ロリポップの assets/audio/ の同じ場所へ上げ、GitHub にも送ります。")
 
 
 # ---------------------------------------------------------------- まとめたページ

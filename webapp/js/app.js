@@ -15,12 +15,14 @@ import { AiService } from './ai-service.js';
 import { PlaceService, NOWHERE } from './place-service.js';
 import { BackgroundView } from './background.js';
 import { CharacterView, CharacterState, nameIn } from './character.js';
+import { talkKind, talkReply } from './talk.js';
 import { LayoutView } from './layout.js';
 import { AnswerView } from './answer-view.js';
 import { QuestionLog, logStats } from './question-log.js';
 import { SetupScreen } from './setup-screen.js';
 import { TunePanel } from './tune-panel.js';
-import { ConsentScreen } from './consent.js';
+import { ConsentScreen, mayRecord } from './consent.js';
+import { SurveyView } from './survey.js';
 import { fixedPlace, isKiosk, showSetup, showTune } from './deployment.js';
 
 // --- 部品（差し替え可能な単位） ---
@@ -31,6 +33,9 @@ const voice = new VoiceService(); // 読み上げ（音声ファイル／ブラ�
 const ai = new AiService(); // 質問回答集で答えられないときの補助
 const places = new PlaceService(); // いまどの案内所の近くにいるか
 const log = new QuestionLog(); // 質問の記録
+// かんたんなアンケート（〇△×）。答えは質問の記録とは別に送る
+const survey = new SurveyView(document.getElementById('survey'));
+survey.onVote = (vote) => log.addSurvey(vote, state.lang, state.place);
 
 const el = {
   dataSource: document.getElementById('dataSource'),
@@ -390,6 +395,7 @@ async function changeLanguage(lang) {
   character.setState(CharacterState.idle);
   renderPlacePill(); // 表示をその言語にする
   renderCharacterPill();
+  survey.setLanguage(lang);
   buildChips(); // その言語の言い方に入れ替える
   render();
   console.info('言語を切り替え:', LABEL[lang]);
@@ -429,6 +435,12 @@ async function handleQuestion(question) {
   }
 
   state.recognized = question;
+
+  // あいさつなどの会話は、質問回答集より先に見る。
+  // 「好きな食べ物は？」が食事の案内に当たってしまわないように。
+  // 会話とみなすのは、言い方とほぼ同じ短い文のときだけなので、質問は奪わない。
+  if (await answerTalk(question)) return;
+
   const faq = faqService.search(question, state.lang, state.place);
 
   // 次の質問に備えて、現在地が古ければ裏で取り直す（この回答は待たせない）
@@ -464,6 +476,46 @@ async function handleQuestion(question) {
     place: state.place,
     source: 'faq',
   });
+  askSurvey();
+}
+
+/// 案内を1つ終えたあとに、アンケートを出す（その方にまだ聞いていなければ）。
+/// 「記録せずに使う」を選んだ方には出さない（答えを記録できないため）。
+/// あいさつなどの会話のあとには出さない（まだ案内を受けていないため）。
+function askSurvey() {
+  if (mayRecord()) survey.ask(state.lang);
+}
+
+/// 「こんにちは」「ありがとう」などへの返事。答えたら true。
+///
+/// 返事は立っているキャラクターのもの（管理画面の「キャラクター」で書く）。
+/// 記録には faq_id「talk:種類」で残す（利用状況で、案内とは分けて数えられるように）。
+async function answerTalk(question) {
+  const kind = talkKind(question, character.current);
+  if (!kind) return false;
+  const reply = talkReply(character.current, kind, state.lang);
+  if (!reply) return false;
+
+  state.answer = reply;
+  state.photo = '';
+  state.link = '';
+  state.isFallback = false;
+  state.isAi = false;
+  character.setState(CharacterState.talking);
+  render();
+  const mode = await voice.speakText(reply);
+  log.add({
+    at: new Date(),
+    lang: state.lang,
+    recognized: question,
+    faqId: `talk:${kind}`,
+    category: 'talk',
+    translationFallback: false,
+    voiceMode: mode,
+    place: state.place,
+    source: 'faq',
+  });
+  return true;
 }
 
 /// 質問回答集で答えられなかったときの流れ。
@@ -483,28 +535,34 @@ async function answerWithoutFaq(question) {
     character.setState(CharacterState.listening);
     render();
 
-    result = await ai.ask(question, state.lang, state.place);
+    // キャラクターの名前も送る（雑談なら、そのキャラクターとして返事をしてもらうため）
+    result = await ai.ask(question, state.lang, state.place,
+      nameIn(character.current, state.lang));
   }
 
   if (result) {
     state.answer = result.answer;
-    state.isAi = true; // 画面に「AIが作成した回答」と断りを出す
+    // 案内には「資料をもとにAIが作成した回答」と断りを出す。
+    // 雑談の返事（result.talk）は案内ではないので出さない。
+    state.isAi = !result.talk;
     character.setState(CharacterState.talking);
     render();
 
     const mode = await voice.speakText(result.answer);
-    console.info('AIが回答（根拠）:', result.sources.join(', ') || 'なし');
+    console.info('AIが回答（根拠）:', result.sources.join(', ') || (result.talk ? '雑談' : 'なし'));
     log.add({
       at: new Date(),
       lang: state.lang,
       recognized: question,
-      faqId: null,
-      category: '',
+      // 雑談は案内の数に入れず、会話として数える（利用状況で「（会話）AIが返事」）
+      faqId: result.talk ? 'talk:ai' : null,
+      category: result.talk ? 'talk' : '',
       translationFallback: false,
       voiceMode: mode,
       place: state.place,
-      source: 'ai',
+      source: result.talk ? 'faq' : 'ai',
     });
+    if (!result.talk) askSurvey();
     return;
   }
 
@@ -532,6 +590,7 @@ async function answerWithoutFaq(question) {
     place: state.place,
     source: 'none',
   });
+  askSurvey();
 }
 
 function wireSpeech() {
@@ -827,6 +886,7 @@ function writeStore(key, value) {
 /// 次の方のために、画面を最初の状態へ戻す。
 /// 前の方の質問と回答が残っていると、その方の質問が他人に見えてしまう。
 function resetForNextVisitor() {
+  survey.reset();   // 次の方にも、アンケートを聞けるようにする
   state.recognized = '';
   state.answer = '';
   state.photo = '';

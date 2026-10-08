@@ -200,6 +200,80 @@ CHARACTER_NAME_COLUMNS = {
 }
 
 
+# 「会話」シート（tools/add_talk.py）。あいさつなどへの返事。
+# 種類の名前 → 案内アプリでの呼び名。どんな言い方をどの種類とみなすかは
+# 案内アプリ（webapp/js/talk.js）が決めている。
+TALK_KINDS = {"あいさつ": "greeting", "お礼": "thanks", "名前": "name",
+              "元気": "howareyou", "さようなら": "bye"}
+TALK_COLUMNS = {"ja": "返事", "en": "返事（英語）", "zh": "返事（中国語）",
+                "ko": "返事（韓国語）", "es": "返事（スペイン語）", "fr": "返事（フランス語）"}
+TALK_COMMON = "共通"
+
+
+def talk_key(kind_name: str) -> str:
+    """種類の名前 → 案内アプリでの呼び名。あいさつなど5つは決まった呼び名、自分で足した種類はそのまま。"""
+    return TALK_KINDS.get(kind_name, kind_name)
+
+
+def split_phrases(text: str) -> list:
+    """聞き方の欄（1行に1つ）を言い方の一覧にする。"""
+    if text is None or str(text) == "nan":
+        return []
+    return [w.strip() for w in str(text).splitlines() if w.strip()]
+
+
+def read_talk(book) -> dict:
+    """「会話」シートを {キャラクター: {種類: {"phrases": [...], "replies": [{言語: 返事}, ...]}}} で読む。
+
+    同じ種類・同じキャラクターの行が何行かあれば、返事の候補が増える（案内アプリが選ぶ）。
+    キャラクターの欄は ID でも名前でもよい（read_characters で ID にそろえる）。
+    無ければ空。
+    """
+    sheet = book.get("会話")
+    if sheet is None:
+        return {}
+    out = {}
+    for _, row in sheet.iterrows():
+        name = cell_str(row.get("種類"))
+        who = cell_str(row.get("キャラクター")) or TALK_COMMON
+        if not name or name.startswith("※") or who.startswith("※"):
+            continue
+        entry = out.setdefault(who, {}).setdefault(talk_key(name), {"phrases": [], "replies": []})
+        for w in split_phrases(row.get("聞き方")):
+            if w not in entry["phrases"]:
+                entry["phrases"].append(w)
+        reply = {lang: cell_str(row.get(col)) for lang, col in TALK_COLUMNS.items()
+                 if cell_str(row.get(col))}
+        if reply.get("ja"):
+            entry["replies"].append(reply)
+    return out
+
+
+def merge_talk(talk: dict, character: dict) -> dict:
+    """そのキャラクターの会話。
+
+    種類ごとに、本人の返事があればそれを、無ければ「共通」の返事を使う。
+    本人の返事がまだ訳されていない言語のために、「共通」の返事も控え（fallback）として持たせる。
+    言い方（phrases）は、本人と「共通」の両方を合わせる。
+    """
+    own = talk.get(character["id"]) or talk.get(character["name"]) or {}
+    common = talk.get(TALK_COMMON, {})
+    merged = {}
+    for kind in list(common) + [k for k in own if k not in common]:
+        mine, base = own.get(kind, {}), common.get(kind, {})
+        replies = mine.get("replies") or base.get("replies") or []
+        if not replies:
+            continue
+        entry = {"replies": replies}
+        phrases = list(dict.fromkeys((base.get("phrases") or []) + (mine.get("phrases") or [])))
+        if phrases:
+            entry["phrases"] = phrases
+        if mine.get("replies") and base.get("replies"):
+            entry["fallback"] = base["replies"]
+        merged[kind] = entry
+    return merged
+
+
 def read_characters(book, assets_dir: Path | None) -> list:
     """「キャラクター」シートを読む。無ければ空。
 
@@ -270,6 +344,14 @@ def read_characters(book, assets_dir: Path | None) -> list:
     # 「既定」がどれにも付いていなければ、先頭を既定にする
     if characters and not any(c["default"] for c in characters):
         characters[0]["default"] = True
+
+    # あいさつなどへの返事（「会話」シート）。シートが無ければ入れない
+    talk = read_talk(book)
+    if talk:
+        for character in characters:
+            merged = merge_talk(talk, character)
+            if merged:
+                character["talk"] = merged
     return characters
 
 

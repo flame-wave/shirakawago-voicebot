@@ -112,7 +112,11 @@ export class VoiceService {
   get currentSet() {
     try {
       const saved = localStorage.getItem(SET_KEY);
-      if (saved !== null) return saved;
+      // 覚えているセットが一覧から外されていたら、覚えていないものとして既定に戻す
+      // （外したセットの古い音声を、その端末だけが鳴らし続けないように）
+      const known = saved === TTS_ONLY || this._sets.length === 0
+        || this._sets.some((v) => v.id === saved);
+      if (saved !== null && known) return saved;
     } catch (_) {
       // 読めないときは既定に従う
     }

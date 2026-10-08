@@ -16,10 +16,11 @@ export class AiService {
     return AI_ENDPOINT !== '';
   }
 
-  /// 回答が得られれば { answer, sources }、駄目なら null を返す。
+  /// 回答が得られれば { answer, sources, talk }、駄目なら null を返す。
+  /// talk は、案内ではなく雑談への返事だったか（中継サーバが決める）。
   /// 例外は投げない（案内を止めないため）。
   /// place はいまいる案内所。中継サーバ側で渡す資料を絞るのに使う。
-  async ask(question, lang, place = '') {
+  async ask(question, lang, place = '', character = '') {
     if (!this.available) return null;
 
     const controller = new AbortController();
@@ -29,7 +30,7 @@ export class AiService {
       const res = await fetch(AI_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, lang, place: place ?? '' }),
+        body: JSON.stringify({ question, lang, place: place ?? '', character: character ?? '' }),
         signal: controller.signal,
       });
       if (!res.ok) {
@@ -45,6 +46,7 @@ export class AiService {
       return {
         answer: data.answer.trim(),
         sources: Array.isArray(data.sources) ? data.sources : [],
+        talk: data.talk === true,
       };
     } catch (e) {
       // 時間切れ・通信断。どちらも職員案内に回せばよい。

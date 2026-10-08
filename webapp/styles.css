@@ -300,6 +300,10 @@ body {
 .typed       { order: var(--order-typed); }
 .talk-button { order: var(--order-talk); }
 .languages   { order: var(--order-languages); }
+/* アンケートは言語の列と同じ場所に出す（出ている間、言語の列は隠す）。
+   言語の列を「出さない」にした画面では、いちばん下に出る。 */
+.survey      { order: var(--order-languages, 99); }
+.screen.survey-open > .languages { display: none; }
 
 /* 管理画面で「出さない」にしたブロック。
    hidden ではなく印で消すのは、言語の列のように
@@ -581,6 +585,69 @@ body {
 }
 
 /* AIが作った回答であることの断り書き */
+/* かんたんなアンケート（〇△×）。言語の列と入れ替えて、画面の下に出す */
+.survey {
+  flex: none;
+  margin-top: 12px;
+  min-height: var(--h-languages);
+  padding: 8px 12px 10px;
+  border: 1.5px solid var(--green);
+  border-radius: 12px;
+  background: #fff;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 6px 10px;
+}
+.survey[hidden] { display: none; }
+.survey-q,
+.survey-thanks {
+  margin: 0;
+  font-size: clamp(14px, 2vmin, 24px);
+  font-weight: 700;
+  color: var(--ink);
+}
+.survey-thanks { grid-column: 1 / -1; text-align: center; color: var(--green); }
+.survey-row {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+}
+.survey-vote {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: clamp(44px, 5.2vmin, 68px);
+  padding: 6px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text, #222);
+  font: inherit;
+  font-size: clamp(14px, 2.1vmin, 26px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.survey-mark { font-size: 1.3em; font-weight: 700; line-height: 1; }
+.survey-good .survey-mark { color: #2C7A3F; }
+.survey-ok .survey-mark { color: #B7791F; }
+.survey-bad .survey-mark { color: #B83A3A; }
+.survey-vote:active { background: var(--pale, #EEF4EA); }
+.survey-skip {
+  grid-row: 1;
+  grid-column: 2;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--sub);
+  font: inherit;
+  font-size: clamp(12px, 1.7vmin, 20px);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .answer-ai {
   margin: 10px 0 0;
   padding-top: 8px;

@@ -60,6 +60,22 @@ export class QuestionLog {
     }
   }
 
+  /// アンケート（〇△×）の答えを送る。質問の記録とは別に数えるので kind: 'survey' を付ける。
+  /// （古い中継サーバは recognized が空の記録を捨てるので、受け口を上げ替える前に送っても害は無い）
+  /// この端末の記録（よくある質問の並び順に使う）には入れない。
+  addSurvey(vote, lang, place) {
+    if (!LOG_ENDPOINT || !mayRecord()) return;
+    this._append(OUTBOX_KEY, JSON.stringify({
+      at: new Date().toISOString(),
+      kind: 'survey',
+      vote,
+      lang,
+      place: place ?? null,
+      recognized: '',
+    }), MAX_OUTBOX);
+    this._sendSoon();
+  }
+
   /// 質問から少し置いて送る。
   /// 以前は5分ごとと閉じるときにしか送らず、観光客がすぐ閉じると届かないことがあった。
   /// 続けて聞かれたときは、まとめて1回で送る。

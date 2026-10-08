@@ -284,6 +284,18 @@ class FaqBook:
             rows.append(values)
         return titles, rows
 
+    @staticmethod
+    def _shift_merged(ws, from_row: int, n: int) -> None:
+        """from_row 以降にある結合セル（下の説明書きなど）を n 行ずらす。
+
+        openpyxl は行を足したり消したりしても、結合の範囲を動かさない。
+        そのままだと、足した行が説明書きの結合範囲に重なり、書いた値が消えてしまう
+        （「会話」で返事を2通り書いたのに1通りしか残らなかった）。
+        """
+        for merged in list(ws.merged_cells.ranges):
+            if merged.min_row >= from_row:
+                merged.shift(0, n)
+
     def write_sheet(self, name: str, rows: list) -> None:
         """シートの中身を入れ替える。見出しと、下の説明書きは残す。
 
@@ -313,10 +325,12 @@ class FaqBook:
         if need > have:
             at = (body[-1] + 1) if body else 2
             ws.insert_rows(at, need - have)
+            self._shift_merged(ws, at, need - have)
         elif have > need:
             # 後ろから消す（前から消すと行番号がずれる）
             for r in reversed(body[need:]):
                 ws.delete_rows(r)
+                self._shift_merged(ws, r + 1, -1)
 
         for i, values in enumerate(rows):
             r = start + i
