@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-08 18:26",
+  "version": "2026-10-08 18:48",
   "count": 73,
   "faqs": [
     {
@@ -6340,7 +6340,7 @@
       "listening": "main.png",
       "talking": "main.png",
       "mouth": 0.16,
-      "face": 0.3,
+      "face": 0.253,
       "scale": 1.0,
       "rise": 0.0,
       "default": true,
@@ -7566,12 +7566,12 @@
         "languages": 0.1
       },
       "character": {
-        "scale": 1.0,
+        "scale": 0.864,
         "rise": 0.0,
         "side": 0.0
       },
       "bubble": {
-        "width": 0.664,
+        "width": 0.864,
         "text": 1.1
       }
     },
