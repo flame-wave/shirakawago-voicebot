@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-08 03:59",
+  "version": "2026-10-08 15:49",
   "count": 73,
   "faqs": [
     {
@@ -6109,6 +6109,13 @@
       "scale": 1.0,
       "rise": 0.0,
       "default": false,
+      "names": {
+        "en": "Navi",
+        "zh": "小导",
+        "ko": "나비",
+        "es": "Navi",
+        "fr": "Navi"
+      },
       "aspect": 0.5385
     },
     {
@@ -6122,6 +6129,13 @@
       "scale": 1.0,
       "rise": 0.0,
       "default": true,
+      "names": {
+        "en": "Yui",
+        "zh": "结衣",
+        "ko": "유이",
+        "es": "Yui",
+        "fr": "Yui"
+      },
       "aspect": 0.3614
     },
     {
@@ -6135,6 +6149,13 @@
       "scale": 0.48,
       "rise": 0.75,
       "default": false,
+      "names": {
+        "en": "Gassho-kun",
+        "zh": "合掌君",
+        "ko": "갓쇼 군",
+        "es": "Gassho-kun",
+        "fr": "Gassho-kun"
+      },
       "aspect": 0.8743
     },
     {
@@ -6148,6 +6169,13 @@
       "scale": 0.3,
       "rise": 0.75,
       "default": false,
+      "names": {
+        "en": "Yane-kun",
+        "zh": "屋顶君",
+        "ko": "야네 군",
+        "es": "Yane-kun",
+        "fr": "Yane-kun"
+      },
       "aspect": 1.4655
     },
     {
@@ -6161,6 +6189,13 @@
       "scale": 0.42,
       "rise": 0.75,
       "default": false,
+      "names": {
+        "en": "Go-chan",
+        "zh": "小乡",
+        "ko": "고 짱",
+        "es": "Go-chan",
+        "fr": "Go-chan"
+      },
       "aspect": 1.035
     }
   ],
