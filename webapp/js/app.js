@@ -20,7 +20,7 @@ import { AnswerView } from './answer-view.js';
 import { QuestionLog, logStats } from './question-log.js';
 import { SetupScreen } from './setup-screen.js';
 import { TunePanel } from './tune-panel.js';
-import { ConsentScreen, consentState } from './consent.js';
+import { ConsentScreen } from './consent.js';
 import { fixedPlace, isKiosk, showSetup, showTune } from './deployment.js';
 
 // --- 部品（差し替え可能な単位） ---
@@ -738,8 +738,11 @@ function wireConsent() {
     } else {
       ask();        // 起動直後は、次に来た方のために出しておく
     }
-  } else if (consentState() === '') {
-    ask();          // 一度お答えいただいた端末では、もう出さない
+  } else {
+    // 観光客の端末でも、開くたびに出す。
+    // 以前は一度お答えいただいた端末では出さなかったが、同じ端末を家族や
+    // 連れの方が使うこともあり、使う方ごとに確かめた方がよいため。
+    ask();
   }
 }
 
