@@ -32,10 +32,20 @@ PERIODS = {"7": "直近7日", "30": "直近30日", "all": "すべて"}
 JST = timezone(timedelta(hours=9))
 
 
+FRESH_SECONDS = 60   # 一度読んだ記録を使い回す長さ
+
+
 def load_rows(url, token, force=False):
-    """記録を読む。画面を作り直すたびに読みに行かないよう、一度読んだら持っておく。"""
+    """記録を読む。
+
+    画面を作り直すたびに読みに行くと遅いので、少しの間だけ持っておく。
+    以前はずっと持ち続けていたため、「記録を読み直す」を押さないと
+    新しい質問が出てこず、記録が届いていないように見えた。
+    """
+    import time
     ss = st.session_state
-    if force:
+    stale = time.time() - ss.get("log_rows_at", 0) > FRESH_SECONDS
+    if force or stale:
         ss.pop("log_rows", None)
     if "log_rows" not in ss:
         try:
@@ -44,6 +54,7 @@ def load_rows(url, token, force=False):
         except Exception as e:
             ss.log_rows = []
             ss.log_error = str(e)
+        ss.log_rows_at = time.time()
     return ss.log_rows
 
 

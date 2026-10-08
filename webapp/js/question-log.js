@@ -54,7 +54,18 @@ export class QuestionLog {
     this._append(KEY, line, MAX_ENTRIES);
     // 同意をいただけていない間は送らない。
     // この端末の中の記録（よくある質問の並び順に使う）だけを残す。
-    if (LOG_ENDPOINT && mayRecord()) this._append(OUTBOX_KEY, line, MAX_OUTBOX);
+    if (LOG_ENDPOINT && mayRecord()) {
+      this._append(OUTBOX_KEY, line, MAX_OUTBOX);
+      this._sendSoon();
+    }
+  }
+
+  /// 質問から少し置いて送る。
+  /// 以前は5分ごとと閉じるときにしか送らず、観光客がすぐ閉じると届かないことがあった。
+  /// 続けて聞かれたときは、まとめて1回で送る。
+  _sendSoon() {
+    clearTimeout(this._soon);
+    this._soon = setTimeout(() => this.flush(), 3000);
   }
 
   _append(key, line, limit) {
@@ -72,6 +83,9 @@ export class QuestionLog {
   ///
   /// 案内の邪魔をしないよう、失敗しても黙って諦める（次の機会に送り直す）。
   /// 送れた分だけを消すので、送っている間に増えた分を取りこぼさない。
+  ///
+  /// keepalive を付けるのは、画面を閉じる瞬間に送ったときも途中で止められないようにするため
+  /// （観光客のスマートフォンは、見終わるとすぐ閉じられる）。
   async flush() {
     if (!LOG_ENDPOINT || !mayRecord()) return false;
     const lines = this._lines(OUTBOX_KEY);
@@ -88,10 +102,13 @@ export class QuestionLog {
     }
 
     try {
+      const body = JSON.stringify({ client: clientId, entries });
       const res = await fetch(LOG_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client: clientId, entries }),
+        body,
+        // keepalive で送れるのは 64KB まで。溜まっていて大きいときは普通に送る
+        keepalive: body.length < 60000,
       });
       if (!res.ok) {
         console.info('質問記録を送れませんでした（後でやり直します）:', res.status);
