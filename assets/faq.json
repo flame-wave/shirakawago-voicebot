@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-08 18:48",
+  "version": "2026-10-13 04:14",
   "count": 73,
   "faqs": [
     {
@@ -6336,9 +6336,9 @@
     {
       "id": "main",
       "name": "ゆい",
-      "idle": "main.png",
-      "listening": "main.png",
-      "talking": "main.png",
+      "idle": "main_idle_20261013041354.png",
+      "listening": "main_idle_20261013041354.png",
+      "talking": "main_idle_20261013041354.png",
       "mouth": 0.16,
       "face": 0.253,
       "scale": 1.0,
@@ -6351,7 +6351,7 @@
         "es": "Yui",
         "fr": "Yui"
       },
-      "aspect": 0.3614,
+      "aspect": 0.6025,
       "talk": {
         "greeting": {
           "replies": [
