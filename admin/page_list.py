@@ -158,6 +158,7 @@ def render(ctx):
     part = shown[ss.l_page * PER_PAGE:(ss.l_page + 1) * PER_PAGE]
 
     st.caption(f"{len(items)} 件のうち {len(shown)} 件を表示しています。")
+    _downloads(ctx, [it for _, it, _ in shown], n_places, today)
     if not shown:
         ui.notice("当てはまる質問がありません。絞り込みを変えてください。", kind="info",
                   key="l-empty")
@@ -207,6 +208,38 @@ def render(ctx):
         if c3.button("次へ →", disabled=ss.l_page >= pages - 1, use_container_width=True):
             ss.l_page += 1
             st.rerun()
+
+
+def _downloads(ctx, shown, n_places, today):
+    """表示している質問を、Excel・CSVで保存する（会議の資料・確かめ用）。
+
+    絞り込みをしていればその分だけ、していなければすべてを書き出す。
+    質問回答集そのもの（faq_master.xlsx）も、そのまま保存できるようにしておく。
+    """
+    import exports
+    with st.expander(f"表示している {len(shown)} 件を書き出す（Excel・CSV）"):
+        st.caption("絞り込みをしていれば、その分だけを書き出します。"
+                   "聞き方・回答・各言語の訳・翻訳の状態・案内の期間などを1行に並べます。")
+        if not shown:
+            st.caption("書き出すものがありません。")
+            return
+        frame = exports.questions_frame(
+            ctx.book, shown, lambda it: _state(it, today)[0],
+            lambda p: _place_label(p, n_places), VALID_CATEGORIES)
+        stamp = date.today().strftime("%Y%m%d")
+        c1, c2, c3 = st.columns(3)
+        c1.download_button("Excel で保存", exports.to_excel({"質問の一覧": frame}),
+                           file_name=f"質問の一覧_{stamp}.xlsx", use_container_width=True,
+                           mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        c2.download_button("CSV で保存", exports.to_csv(frame),
+                           file_name=f"質問の一覧_{stamp}.csv", mime="text/csv",
+                           use_container_width=True)
+        raw = st.session_state.get("raw")
+        if raw:
+            c3.download_button("質問回答集をそのまま保存", raw, file_name="faq_master.xlsx",
+                               help="管理画面が編集している Excel（すべてのシート）をそのまま保存します",
+                               mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                               use_container_width=True)
 
 
 def _action(ctx, col, item, state_name):

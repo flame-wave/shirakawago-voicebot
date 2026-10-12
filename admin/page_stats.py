@@ -123,6 +123,7 @@ def render(ctx):
     days = None if period == "all" else int(period)
     rows = L.within(all_rows, days)
     items_by_id = {i["id"]: i for i in ctx.items}
+    _report_button(ctx, rows, days, period, items_by_id)
 
     if not rows:
         ui.notice("この期間の記録はまだありません。", kind="info", key="stats-empty")
@@ -139,6 +140,27 @@ def render(ctx):
 
     st.write("")
     _housekeeping(ctx, all_rows)
+
+
+def _report_button(ctx, rows, days, period, items_by_id):
+    """この期間のレポート（Excel）。会議の資料にそのまま使えるよう、集計と記録を1つにまとめる。
+
+    シート：概要・日ごと・案内所ごと・言語ごと・よく聞かれた質問・答えられなかった質問・
+            AIが答えた質問・アンケート（案内所ごと・言語ごと）・記録
+    """
+    import exports
+    ai_rows = L.within(load_rows(ctx.log_url, ctx.log_token, kind="ai"), days)
+    survey_rows = L.within(load_rows(ctx.log_url, ctx.log_token, kind="survey"), days)
+    report = exports.usage_report(rows, ai_rows, survey_rows,
+                                  lambda fid: _label(items_by_id, fid, 60), PERIODS[period])
+    c1, c2 = st.columns([4, 1.3], vertical_alignment="center")
+    c1.caption("選んでいる期間の集計と記録を、1つの Excel にまとめて保存できます"
+               "（概要・日ごと・案内所ごと・言語ごと・よく聞かれた質問・答えられなかった質問・"
+               "AIが答えた質問・アンケート・記録）。")
+    c2.download_button("レポートを保存", report, use_container_width=True,
+                       file_name=f"利用状況レポート_{PERIODS[period]}_{date.today():%Y%m%d}.xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                       key="stats_report")
 
 
 # ---------------------------------------------------------------- 全体

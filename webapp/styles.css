@@ -110,6 +110,27 @@ body {
   margin-left: auto;
 }
 
+/* 音を出す／消す（観光客のスマートフォンだけ）。丸いボタンにする */
+.mute-pill {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-left: 8px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mute-pill[hidden] { display: none; }
+.mute-pill.muted { background: rgba(255, 255, 255, 0.85); }
+.place-pill[hidden] + .mute-pill { margin-left: auto; }
+/* 据え置き（現在地も音のボタンも出さない）では、キャラクターのボタンを右に寄せる */
+.place-pill[hidden] + .mute-pill[hidden] + .char-pill { margin-left: auto; }
+
 /* スマートフォン。英語やフランス語ではアプリ名が長く、1行に入れると
    「Shirakawa-go AI Gu…」のように切れてしまう。2行まで折り返して全部見せる。
    キャラクターの名前も「…」だけにならないよう、縮めないで出す。 */

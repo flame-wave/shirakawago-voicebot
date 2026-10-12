@@ -63,6 +63,7 @@ const el = {
   typedForm: document.getElementById('typedForm'),
   appTitle: document.getElementById('appTitle'),
   typedInput: document.getElementById('typedInput'),
+  muteButton: document.getElementById('muteButton'),
   typedSend: document.getElementById('typedSend'),
 };
 
@@ -201,6 +202,32 @@ function openPlaceMenu() {
   el.placeMenuList.appendChild(hint);
 
   el.placeMenu.hidden = false;
+}
+
+/// 音を出す／消すボタン。観光客のスマートフォンだけに出す。
+/// 据え置きは次々と別の方が使うので、だれかが消したままにすると次の方に声が届かない。
+function renderMuteButton() {
+  if (!el.muteButton) return;
+  el.muteButton.hidden = isKiosk;
+  if (isKiosk) return;
+  const muted = voice.muted;
+  el.muteButton.textContent = muted ? '🔇' : '🔊';
+  el.muteButton.classList.toggle('muted', muted);
+  // 押すと何が起きるかを読み上げ・ツールチップで伝える
+  const label = uiString(muted ? 'muteOff' : 'muteOn', state.lang);
+  el.muteButton.setAttribute('aria-label', label);
+  el.muteButton.title = label;
+  el.muteButton.setAttribute('aria-pressed', muted ? 'true' : 'false');
+}
+
+function wireMute() {
+  if (!el.muteButton || isKiosk) return;
+  el.muteButton.addEventListener('click', async () => {
+    await voice.setMuted(!voice.muted);
+    if (voice.muted) character.setState(CharacterState.idle);
+    renderMuteButton();
+  });
+  renderMuteButton();
 }
 
 function renderCharacterPill() {
@@ -395,6 +422,7 @@ async function changeLanguage(lang) {
   character.setState(CharacterState.idle);
   renderPlacePill(); // 表示をその言語にする
   renderCharacterPill();
+  renderMuteButton();
   survey.setLanguage(lang);
   buildChips(); // その言語の言い方に入れ替える
   render();
@@ -716,6 +744,7 @@ async function init() {
 
   applySettings();
   wireCharacter();
+  wireMute();
 
   // 現在地の判定（案内所の一覧は質問回答集に入っている）
   // ここで失敗しても、案内そのものは続けられるようにする

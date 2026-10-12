@@ -239,6 +239,10 @@ const TABLE = {
     es: 'Guía IA de Shirakawa‑go',
     fr: 'Guide IA de Shirakawa‑go',
   },
+  /// 音を消すボタン（押すと何が起きるかを書く）
+  muteOn: { ja: '音を消す', en: 'Mute', zh: '静音', ko: '소리 끄기', es: 'Silenciar', fr: 'Couper le son' },
+  muteOff: { ja: '音を出す', en: 'Unmute', zh: '打开声音', ko: '소리 켜기', es: 'Activar sonido', fr: 'Activer le son' },
+
   /// かんたんなアンケート（〇△×）
   surveyQuestion: {
     ja: 'AI観光ガイドの体験はどうでしたか？',

@@ -112,7 +112,9 @@ export const AI_ENDPOINT = LOCAL ? '../server/api/ask.php' : '../api/ask.php';
 
 /// AIの返事をこの時間まで待つ。過ぎたら職員案内に切り替える。
 /// 観光客を待たせないことを、答えを得ることより優先する。
-export const AI_TIMEOUT_MS = 8000;
+/// 中継サーバは、案内で答えられなかった短い話しかけに、雑談としてもう一度AIに聞く
+/// （ask.php の small_talk）。2回分でも間に合うよう、少し長めにしてある。
+export const AI_TIMEOUT_MS = 12000;
 
 /// 無音がこの時間続いたら聞き取りを終える（実機の pauseFor 相当）
 export const SILENCE_TIMEOUT_MS = 10000;

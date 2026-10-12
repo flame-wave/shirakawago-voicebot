@@ -120,6 +120,11 @@ def _blank():
 # ---------------------------------------------------------------- 状態
 # 入力中の内容は session_state の「q_」で始まる名前に持つ。
 # 別の質問を開いたときだけ読み込み直し、それ以外は入力を保つ。
+LOAD_KEYS = ("q_place", "q_cat", "q_questions", "q_answer", "q_short", "q_photo", "q_link",
+             "q_chip", "q_from", "q_until", "q_audio", "q_id_manual", "q_open", "q_suggest",
+             "q_photo_new", "q_try")
+
+
 def _load(target, item):
     ss = st.session_state
     item = item or _blank()
@@ -455,7 +460,10 @@ def render(ctx):
         target = ""
     ctx.editing = target
     is_new = not target
-    if ss.get("q_loaded") != target:
+    # ほかの画面へ移ると、Streamlit はこの画面の入力欄の中身（q_place など）を消す。
+    # 「読み込み済み」の印だけが残っていると、戻ってきたときに読み込み直さず、
+    # 消えた値を読もうとして止まる。中身が欠けていたら読み込み直す。
+    if ss.get("q_loaded") != target or any(k not in ss for k in LOAD_KEYS):
         _load(target, by_id.get(target))
 
     # 利用状況の「この質問を追加する」から来たとき（?q=聞かれた文）。

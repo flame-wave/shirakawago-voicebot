@@ -21,7 +21,11 @@ export const VoiceMode = {
   recorded: 'recorded', // 用意された音声ファイル
   synthesized: 'synthesized', // ブラウザの音声合成
   failed: 'failed', // どちらも使えなかった
+  muted: 'muted', // 利用者が音を消している
 };
+
+/// 音を消しているかを覚えておく場所（観光客のスマートフォンで、その端末だけ）
+const MUTE_KEY = 'shirakawa_muted';
 
 export class VoiceService {
   constructor() {
@@ -249,9 +253,34 @@ export class VoiceService {
     return this._voiceFor(lang)?.name ?? '';
   }
 
+  /// 音を消しているか（観光客が画面右上のスピーカーで切り替える）。
+  /// 電車の中や静かな場所でも、文字だけで案内を使えるようにするため。
+  get muted() {
+    try {
+      return localStorage.getItem(MUTE_KEY) === '1';
+    } catch (_) {
+      return this._muted === true;
+    }
+  }
+
+  async setMuted(on) {
+    this._muted = on;
+    try {
+      if (on) localStorage.setItem(MUTE_KEY, '1');
+      else localStorage.removeItem(MUTE_KEY);
+    } catch (_) {
+      // 覚えられなくても、その場は切り替わる
+    }
+    if (on) await this.stop();   // 読み上げの途中なら、すぐ止める
+  }
+
   /// 回答を読み上げる。使った方法を返す。
   async speak(faq, lang, localized) {
     await this.stop();
+    if (this.muted) {
+      this._done();
+      return VoiceMode.muted;
+    }
 
     // 1. その言語の専用音声ファイルを試す
     if (localized.audio && this.currentSet !== TTS_ONLY) {
@@ -305,6 +334,10 @@ export class VoiceService {
 
   /// 文章をそのままブラウザ音声で読み上げる（FAQに紐づかない案内文など）
   speakText(text) {
+    if (this.muted) {
+      this._done();
+      return Promise.resolve(VoiceMode.muted);
+    }
     if (!text || !this.available) {
       this._done();
       return Promise.resolve(VoiceMode.failed);

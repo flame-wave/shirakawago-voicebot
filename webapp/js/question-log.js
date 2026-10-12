@@ -102,7 +102,24 @@ export class QuestionLog {
   ///
   /// keepalive を付けるのは、画面を閉じる瞬間に送ったときも途中で止められないようにするため
   /// （観光客のスマートフォンは、見終わるとすぐ閉じられる）。
+  ///
+  /// 送っている途中に、もう一度呼ばれることがある（質問のあと・5分ごと・閉じるとき）。
+  /// そのまま送ると、まだ消していない同じ記録をもう一度送ってしまい、利用状況の数が増える。
+  /// 送っている途中なら、それが終わるのを待つだけにする。
   async flush() {
+    if (this._sending) {
+      await this._sending.catch(() => false);
+      return this._lines(OUTBOX_KEY).length > 0;
+    }
+    this._sending = this._flushOnce();
+    try {
+      return await this._sending;
+    } finally {
+      this._sending = null;
+    }
+  }
+
+  async _flushOnce() {
     if (!LOG_ENDPOINT || !mayRecord()) return false;
     const lines = this._lines(OUTBOX_KEY);
     if (lines.length === 0) return false;
@@ -123,8 +140,9 @@ export class QuestionLog {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,
-        // keepalive で送れるのは 64KB まで。溜まっていて大きいときは普通に送る
-        keepalive: body.length < 60000,
+        // keepalive で送れるのは 64KB まで。溜まっていて大きいときは普通に送る。
+        // 日本語は1文字3バイトなので、文字数ではなくバイト数で比べる
+        keepalive: new TextEncoder().encode(body).length < 60000,
       });
       if (!res.ok) {
         console.info('質問記録を送れませんでした（後でやり直します）:', res.status);
