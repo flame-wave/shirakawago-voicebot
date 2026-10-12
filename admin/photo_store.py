@@ -1,11 +1,11 @@
-"""回答に付ける写真の置き場所。
+"""回答に付ける写真・キャラクターの絵の置き場所。
 
-写真は2か所に置く必要がある。
-  ・GitHub（または手元）の assets/photo … 質問回答集と一緒に残すため
-  ・ロリポップの assets/photo         … 案内アプリはここから写真を読む
+管理画面から上げた画像は、GitHub（または手元）の assets/photo・assets/character に置く。
+案内アプリは、ロリポップに同じ画像が無ければ GitHub から読む（webapp/js/assets.js）ので、
+FTP で上げ直さなくても案内端末に出る。
 
-管理画面からできるのは前者まで。後者（FTP）は管理者の作業として残る。
-そのため、新しく追加した写真には「案内端末に出すにはもう一手間」と知らせる。
+GitHub に保存したときは、管理画面の手元（Streamlit Cloud の写し）にも同じものを書く。
+保存した直後の見本の表示や、「案内アプリへ反映する」での縦横比の読み取りに使うため。
 """
 import base64
 import re
@@ -36,8 +36,8 @@ def safe_name(name: str) -> str:
 class LocalPhotoStore:
     label = "この端末"
 
-    def __init__(self, root):
-        self.dir = Path(root) / FOLDER
+    def __init__(self, root, folder=FOLDER):
+        self.dir = Path(root) / folder
 
     def list(self) -> list:
         if not self.dir.exists():
@@ -58,10 +58,11 @@ class LocalPhotoStore:
 class GitHubPhotoStore:
     label = "GitHub"
 
-    def __init__(self, token, repo, branch="main", root=None):
+    def __init__(self, token, repo, branch="main", root=None, folder=FOLDER):
         self.token, self.repo, self.branch = token, repo, branch
+        self.folder = folder
         # 管理画面を置いた時点の写し。GitHub に聞けないときの予備に使う。
-        self.local = LocalPhotoStore(root) if root else None
+        self.local = LocalPhotoStore(root, folder) if root else None
 
     @property
     def _headers(self):
@@ -70,7 +71,7 @@ class GitHubPhotoStore:
 
     def list(self) -> list:
         try:
-            res = requests.get(f"{API}/repos/{self.repo}/contents/{FOLDER}",
+            res = requests.get(f"{API}/repos/{self.repo}/contents/{self.folder}",
                                headers=self._headers, params={"ref": self.branch},
                                timeout=20)
             if res.status_code == 200:
@@ -87,7 +88,7 @@ class GitHubPhotoStore:
             if data:
                 return data
         try:
-            res = requests.get(f"{API}/repos/{self.repo}/contents/{FOLDER}/{name}",
+            res = requests.get(f"{API}/repos/{self.repo}/contents/{self.folder}/{name}",
                                headers=self._headers, params={"ref": self.branch},
                                timeout=20)
             if res.status_code == 200 and res.json().get("content"):
@@ -97,19 +98,25 @@ class GitHubPhotoStore:
         return None
 
     def save(self, name: str, data: bytes) -> str:
-        url = f"{API}/repos/{self.repo}/contents/{FOLDER}/{name}"
+        url = f"{API}/repos/{self.repo}/contents/{self.folder}/{name}"
         # 同じ名前があれば上書きする（目印 sha が要る）
         sha = None
         res = requests.get(url, headers=self._headers,
                            params={"ref": self.branch}, timeout=20)
         if res.status_code == 200:
             sha = res.json().get("sha")
-        body = {"message": f"写真を追加: {name}（管理画面より）",
+        what = "キャラクターの絵" if self.folder.endswith("character") else "写真"
+        body = {"message": f"{what}を追加: {name}（管理画面より）",
                 "content": base64.b64encode(data).decode("ascii"),
                 "branch": self.branch}
         if sha:
             body["sha"] = sha
         res = requests.put(url, headers=self._headers, json=body, timeout=60)
         if res.status_code not in (200, 201):
-            raise RuntimeError(f"写真を保存できませんでした（{res.status_code}）")
+            raise RuntimeError(f"画像を保存できませんでした（{res.status_code}）")
+        if self.local:
+            try:
+                self.local.save(name, data)   # 見本の表示と、反映のときの縦横比の読み取り用
+            except OSError:
+                pass
         return name

@@ -4,7 +4,7 @@
 // ブラウザ内で完結させる。各処理は差し替え可能な部品として分離してある。
 
 import {
-  LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, ASSET_BASE, KIOSK_REFRESH_MS, DAILY_RELOAD_HOUR,
+  LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, KIOSK_REFRESH_MS, DAILY_RELOAD_HOUR,
 } from './config.js';
 import { LANGUAGES, LABEL, uiString } from './app-language.js';
 import { FaqService } from './faq-service.js';
@@ -16,6 +16,7 @@ import { PlaceService, NOWHERE } from './place-service.js';
 import { BackgroundView } from './background.js';
 import { CharacterView, CharacterState, nameIn } from './character.js';
 import { talkKind, talkReply } from './talk.js';
+import { loadImage, retryRemote } from './assets.js';
 import { LayoutView } from './layout.js';
 import { AnswerView } from './answer-view.js';
 import { QuestionLog, logStats } from './question-log.js';
@@ -248,7 +249,8 @@ function openCharacterMenu() {
 
     // 絵を見せないと選べない（名前だけでは、どれが誰か分からない）
     const img = document.createElement('img');
-    img.src = `${ASSET_BASE}character/${item.idle}`;
+    img.addEventListener('error', () => retryRemote(img));   // ロリポップに無ければ GitHub から
+    loadImage(img, `character/${item.idle}`);
     img.alt = '';
     img.loading = 'lazy';
     const label = document.createElement('span');

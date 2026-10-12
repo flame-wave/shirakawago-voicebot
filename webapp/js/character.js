@@ -16,7 +16,7 @@
 // 同じ数字のままだと吹き出しの尻尾が口から外れるので、
 // キャラクターを変えるたびにCSSの変数を書き換えている。
 
-import { ASSET_BASE } from './config.js';
+import { loadImage, retryRemote } from './assets.js';
 import { fixedCharacter } from './deployment.js';
 
 /// キャラクターの状態。システムの状況に対応する。
@@ -73,7 +73,10 @@ export class CharacterView {
     this.placeholder = root.querySelector('.character-placeholder');
     /// 表情の画像が無い場合は通常の絵に落とす。
     /// 立ち絵が1枚しか無い段階でも表示できるようにするため。
-    this.img.addEventListener('error', () => this._onMissing());
+    // ロリポップに無ければ GitHub から読み直す。どちらにも無ければ欠けている扱いにする
+    this.img.addEventListener('error', () => {
+      if (!retryRemote(this.img)) this._onMissing();
+    });
     this._state = CharacterState.idle;
     this._missing = new Set();
     this._list = [FALLBACK];
@@ -221,14 +224,14 @@ export class CharacterView {
     }
     this.img.hidden = false;
     this.placeholder.hidden = true;
-    this.img.src = `${ASSET_BASE}character/${name}`;
+    loadImage(this.img, `character/${name}`);
   }
 
   _onMissing() {
     this._missing.add(this._state);
     if (this._state !== CharacterState.idle && !this._missing.has(CharacterState.idle)) {
       // 通常の絵に落として表示を続ける
-      this.img.src = `${ASSET_BASE}character/${this._current.idle}`;
+      loadImage(this.img, `character/${this._current.idle}`);
       return;
     }
     this._missing.add(CharacterState.idle);

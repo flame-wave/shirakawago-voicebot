@@ -78,6 +78,9 @@ LAYOUT_COL = {
 LAYOUT_BLOCKS = ["stage", "faq", "typed", "talk", "languages"]
 
 CHAR_SHEET = "キャラクター"
+# 言語ごとの名前の欄（tools/add_character_names.py）
+CHAR_NAME_COLS = {"en": "名前（英語）", "zh": "名前（中国語）", "ko": "名前（韓国語）",
+                  "es": "名前（スペイン語）", "fr": "名前（フランス語）"}
 CHAR_COL = {"name": "名前", "id": "ID", "idle": "通常",
             "listening": "聞き取り中", "talking": "話している",
             "mouth": "口の高さ", "face": "顔の広さ", "大きさ": "大きさ",
@@ -498,11 +501,13 @@ class FaqBook:
         self._put(ws, header, row, LAYOUT_COL["text"],
                   round(float(layout.get("bubble", {}).get("text") or 1), 3))
 
-    def characters(self) -> list:
+    def characters(self, include_hidden: bool = False) -> list:
         """「キャラクター」シートの一覧。無ければ空。
 
         案内画面に立つ絵。職員はここで既定を決め、
         利用者は案内画面で選び直せる。
+        include_hidden … 「有効」を FALSE にした（案内画面に出していない）ものも入れる。
+                         管理画面で、出し直したり直したりするため。
         """
         ws, header = self._sheet(CHAR_SHEET)
         if ws is None:
@@ -513,10 +518,17 @@ class FaqBook:
             idle = self._get(ws, header, r, CHAR_COL["idle"])
             if not name or not idle or self._is_note(name):
                 continue
-            enabled = self._get(ws, header, r, CHAR_COL["enabled"]).upper()
-            if enabled in ("FALSE", "0", "×", "NO"):
+            enabled = self._get(ws, header, r, CHAR_COL["enabled"]).upper()                 not in ("FALSE", "0", "×", "NO")
+            if not enabled and not include_hidden:
                 continue
             out.append({
+                "enabled": enabled,
+                # 言語ごとの名前（「名前（英語）」など。tools/add_character_names.py で足した欄）
+                "names": {lang: self._get(ws, header, r, title)
+                          for lang, title in CHAR_NAME_COLS.items()
+                          if self._get(ws, header, r, title)},
+                "scale": self._ratio(ws, header, r, "大きさ", 1.0),
+                "rise": self._ratio(ws, header, r, "高さ位置", 0.0),
                 "row": r,
                 "name": name,
                 "id": self._get(ws, header, r, CHAR_COL["id"])
@@ -558,6 +570,31 @@ class FaqBook:
             raise ExcelError(f"キャラクター「{character_id}」が見つかりません")
         self._put(ws, header, row, CHAR_COL["mouth"], round(float(mouth), 3))
         self._put(ws, header, row, CHAR_COL["face"], round(float(face), 3))
+
+    def update_character(self, character_id: str, values: dict) -> None:
+        """キャラクターの行を書き換える。values は {見出し: 値}。空文字はセルを空にする。
+
+        シートに無い見出しは書かない（古い形のシートでも止まらないように）。
+        """
+        ws, header = self._sheet(CHAR_SHEET)
+        if ws is None:
+            raise ExcelError(f"「{CHAR_SHEET}」シートがありません")
+        row = next((c["row"] for c in self.characters(include_hidden=True)
+                    if c["id"] == character_id), None)
+        if row is None:
+            raise ExcelError(f"キャラクター「{character_id}」が見つかりません")
+        for title, value in values.items():
+            if title in header:
+                self._put(ws, header, row, title, as_number(value) if value != "" else None)
+
+    def add_character(self, values: dict) -> None:
+        """キャラクターを1行足す。values は {見出し: 値}。下の説明書きは残す。"""
+        titles, rows = self.sheet_rows(CHAR_SHEET)
+        if not titles:
+            raise ExcelError(f"「{CHAR_SHEET}」シートがありません")
+        if any(r.get(CHAR_COL["id"]) == values.get(CHAR_COL["id"]) for r in rows):
+            raise ExcelError(f"同じID「{values.get(CHAR_COL['id'])}」のキャラクターがあります")
+        self.write_sheet(CHAR_SHEET, rows + [{t: values.get(t, "") for t in titles}])
 
     def set_default_character(self, character_id: str) -> None:
         """既定のキャラクターを決める。ほかの行の印は消す。

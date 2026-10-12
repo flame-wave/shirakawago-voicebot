@@ -4,7 +4,7 @@
 // 写真やQRを吹き出しに入れると、文章が押し出されて読みにくくなるため、
 // 「話した内容」と「見て確認するもの」を分けている。
 
-import { ASSET_BASE } from './config.js';
+import { loadImage, retryRemote } from './assets.js';
 import { showQr } from './deployment.js';
 import { uiString } from './app-language.js';
 
@@ -40,6 +40,7 @@ export class AnswerView {
 
     // 写真が無くても表示は崩さない
     this.photo.addEventListener('error', () => {
+      if (retryRemote(this.photo)) return;   // ロリポップに無ければ GitHub から
       this.photoBox.hidden = true;
       this._syncMedia();
     });
@@ -62,7 +63,7 @@ export class AnswerView {
 
     if (photo) {
       this.photoBox.hidden = false;
-      this.photo.src = `${ASSET_BASE}photo/${photo}`;
+      loadImage(this.photo, `photo/${photo}`);
       this.photoHint.textContent = uiString('tapToEnlarge', lang);
     } else {
       this.photoBox.hidden = true;

@@ -19,6 +19,12 @@ const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
 export const REMOTE_URL = LOCAL ? ''
   : 'https://raw.githubusercontent.com/flame-wave/shirakawago-voicebot/main/assets/faq.json';
 
+/// 画像（キャラクターの絵・写真）が ASSET_BASE に無いときに読みに行く先。
+/// 管理画面から足した絵や写真は GitHub にしか無いので、ここから読む（webapp/js/assets.js）。
+/// 空なら読みに行かない（手元で試すときは assets/ にそろっているため）。
+export const REMOTE_ASSET_BASE = LOCAL ? ''
+  : 'https://raw.githubusercontent.com/flame-wave/shirakawago-voicebot/main/assets/';
+
 /// 通信の待ち時間。現地の回線が遅い場合を考えて短めにする。
 export const FETCH_TIMEOUT_MS = 8000;
 

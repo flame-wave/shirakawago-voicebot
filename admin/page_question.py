@@ -726,9 +726,9 @@ def _photo_row(ctx):
         st.rerun()
     if ss.q_photo_new:
         st.markdown(ui.box(
-            "案内端末に出すには、もう一手間あります",
-            "追加した写真は、案内アプリの置き場所（ロリポップの assets/photo）にも"
-            "同じものを上げる必要があります。管理者にお願いしてください。", "warn"),
+            "写真を追加しました",
+            "保存して「案内アプリへ反映する」を押すと、案内端末に出ます"
+            "（FTP で上げ直す必要はありません）。", "ok"),
             unsafe_allow_html=True)
     if ss.q_open != "photo":
         return

@@ -281,14 +281,20 @@ def character_thumb(name: str):
     import io
 
     path = ROOT / "assets" / "character" / name
-    if not path.exists():
-        return None
+    if path.exists():
+        data = path.read_bytes()
+    else:
+        # 管理画面から足した絵は、置いたときの写しに無いことがある（GitHub から読む）
+        data = get_character_store().read(name)
+        if not data:
+            return None
     try:
         from PIL import Image
     except ImportError:
         return None
     try:
-        img = Image.open(path).convert("RGBA")
+        import io as _io
+        img = Image.open(_io.BytesIO(data)).convert("RGBA")
         ratio = img.width / img.height
         img.thumbnail((int(320 * ratio), 320))
         buf = io.BytesIO()
@@ -467,6 +473,11 @@ def page_character():
                           "空なら「通常」の画像を使います。"
                           "「名前（英語）」などは、案内画面をその言語にしたときの名前です。")
 
+    # キャラクターを足す・絵を差し替える・名前を直す・出す出さない
+    st.write("")
+    import page_character_edit
+    page_character_edit.render(book, save_book, get_character_store(), character_thumb)
+
     # あいさつなどへの返事（キャラクターごと）
     st.write("")
     import page_talk
@@ -481,6 +492,16 @@ def get_photo_store():
     if token and repo:
         return GitHubPhotoStore(token, repo, secret("github", "branch", "main"), ROOT)
     return LocalPhotoStore(ROOT)
+
+
+def get_character_store():
+    """キャラクターの絵の置き場所（assets/character。GitHub が設定されていれば GitHub）。"""
+    from photo_store import GitHubPhotoStore, LocalPhotoStore
+    token, repo = secret("github", "token"), secret("github", "repo")
+    folder = "assets/character"
+    if token and repo:
+        return GitHubPhotoStore(token, repo, secret("github", "branch", "main"), ROOT, folder)
+    return LocalPhotoStore(ROOT, folder)
 
 
 def page_add():
