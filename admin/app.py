@@ -348,7 +348,8 @@ def page_layout():
     edited = layout_editor(
         value=before,
         shape={"id": LAYOUT_SHAPES.get(place, "phone")},
-        character=thumb or {},
+        # 絵ごとの大きさ（キャラクターシート）も渡す。案内アプリはこれに端末ごとの倍率を掛ける
+        character=dict(thumb, scale=standing.get("scale") or 1) if thumb else {},
         key=f"layout_{place}_{rev}",
         rev=rev,
     )
@@ -407,6 +408,11 @@ def page_layout():
             st.error(f"保存できませんでした: {e}")
     c2.caption("動かしただけでは保存されません。"
                if changed else "まだ動かしていません。")
+    pending = len(unpublished() or [])
+    st.info("**保存は端末ごとに何度でもどうぞ。案内端末へ届ける「案内アプリへ反映する」は、"
+            "全部直し終わったあとに1回押せば足ります**（バスターミナル・であいの館・観光客の"
+            "保存した分が、まとめて届きます）。"
+            + (f"　いま反映を待っている変更：{pending} 件" if pending else ""), icon="💡")
 
     with st.expander("数値で直す"):
         sheet_editor("画面レイアウト", title="画面レイアウト（表）",

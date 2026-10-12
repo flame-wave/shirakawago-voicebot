@@ -13,6 +13,8 @@ GitHub から読むので（webapp/js/assets.js）、FTP で上げ直さなく�
 
 【大きさ】
 大きすぎる絵（数MB）は、案内端末の読み込みが遅くなる。高さ1600pxまでに縮めて保存する。
+絵のまわりの透明な余白は切り落とす。余白が残ると、案内画面では余白ごと枠に収めるため
+キャラクターが小さく立ち、吹き出しも顔から離れてしまう。
 背景が透けていない絵は、四角い背景のまま立つので、知らせる。
 """
 import io
@@ -26,6 +28,7 @@ import faq_excel as X
 import ui
 
 MAX_HEIGHT = 1600
+MARGIN = 0.01   # 余白を切ったあとに残す、ふちのすき間（高さに対する割合）
 LANGS = [("en", "英語"), ("zh", "中国語"), ("ko", "韓国語"), ("es", "スペイン語"), ("fr", "フランス語")]
 FACES = [("idle", "通常", "通常"), ("listening", "聞き取り中", "聞き取り中"), ("talking", "話している", "話している")]
 # 絵の形ごとの、最初の値（あとで「画面レイアウト」の編集画面や表で合わせられる）
@@ -45,11 +48,24 @@ def prepare(data: bytes):
     img = img.convert("RGBA")
     if has_alpha:
         has_alpha = img.getchannel("A").getextrema()[0] < 255   # 本当に透けている所があるか
+    if has_alpha:
+        img = _trim(img)
     if img.height > MAX_HEIGHT:
         img = img.resize((round(img.width * MAX_HEIGHT / img.height), MAX_HEIGHT), Image.LANCZOS)
     out = io.BytesIO()
     img.save(out, format="PNG", optimize=True)
     return out.getvalue(), has_alpha, round(img.width / img.height, 4)
+
+
+def _trim(img):
+    """まわりの透明な余白を切り落とす（ふちに少しだけすき間を残す）。"""
+    # ほとんど透明な薄いもや（影のぼかしの端など）は、余白として扱う
+    box = img.getchannel("A").point(lambda a: 255 if a > 8 else 0).getbbox()
+    if not box:
+        return img
+    pad = round(img.height * MARGIN)
+    l, t, r, b = box
+    return img.crop((max(0, l - pad), max(0, t - pad), min(img.width, r + pad), min(img.height, b + pad)))
 
 
 def file_name(cid: str, face: str) -> str:
@@ -166,6 +182,9 @@ def _edit(book, save_book, store, thumb, c, ver):
         except Exception as e:
             st.error(f"保存できませんでした: {escape(str(e))}")
             return
+        if "通常" in values:
+            notes.append("通常の絵を差し替えたので、「画面レイアウト」で吹き出しの△（口の高さ・顔の広さ）と"
+                         "大きさを、新しい絵に合わせ直してください。")
         ss["chedit_flash"] = (f"「{escape(name.strip())}」を保存しました。" + "".join(notes)
                               + "案内端末に届けるには「案内アプリへ反映する」を押してください。")
         ss["chedit_ver"] = ver + 1
