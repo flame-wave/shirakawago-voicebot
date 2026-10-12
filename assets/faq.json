@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-13 04:24",
+  "version": "2026-10-13 04:25",
   "count": 73,
   "faqs": [
     {
@@ -6339,8 +6339,8 @@
       "idle": "main_idle_20261013041354.png",
       "listening": "main_idle_20261013041354.png",
       "talking": "main_idle_20261013041354.png",
-      "mouth": 0.175,
-      "face": 0.344,
+      "mouth": 0.235,
+      "face": 0.607,
       "scale": 1.0,
       "rise": 0.0,
       "default": true,
@@ -7590,9 +7590,9 @@
         "languages": 0.1
       },
       "character": {
-        "scale": 1.0,
+        "scale": 0.75,
         "rise": 0.0,
-        "side": 0.145
+        "side": 0.0
       },
       "bubble": {
         "width": 0.753,
@@ -7615,7 +7615,7 @@
         "languages": 0.0
       },
       "character": {
-        "scale": 0.728,
+        "scale": 0.681,
         "rise": 0.0,
         "side": 0.0
       },
