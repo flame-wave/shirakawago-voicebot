@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-13 04:23",
+  "version": "2026-10-13 04:24",
   "count": 73,
   "faqs": [
     {
@@ -6340,7 +6340,7 @@
       "listening": "main_idle_20261013041354.png",
       "talking": "main_idle_20261013041354.png",
       "mouth": 0.175,
-      "face": 0.569,
+      "face": 0.344,
       "scale": 1.0,
       "rise": 0.0,
       "default": true,
