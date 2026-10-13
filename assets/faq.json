@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-13 15:55",
+  "version": "2026-10-13 17:23",
   "count": 73,
   "faqs": [
     {
@@ -313,7 +313,7 @@
         "キャッシング",
         "お金 引き出"
       ],
-      "answer": "海外で発行されたカードは、郵便局のATMのみご利用いただけます。この建物を出て右へ、歩いて20分ほどの場所にございます。日本で発行されたカードは、JAのATMをご利用いただけます。この建物を出て左へ、歩いて2分ほどの場所にございます。",
+      "answer": "海外で発行されたカードは、郵便局のATMのみご利用いただけます。白川郷バスターミナルを出て右へ、約2㎞歩いて20分ほどの場所にございます。日本で発行されたカードは、JAのATMをご利用いただけます。この建物を出て左へ、歩いて2分ほどの場所にございます。外貨の両替だけの場合は、白川郷バスターミナル内のお手洗い近くのエクスチェンジマシンをご利用ください。",
       "audio": "atm_bt.mp3",
       "photo": "",
       "link": "",
@@ -322,62 +322,57 @@
       "translations": {
         "en": {
           "questions": [
-            "ATM",
-            "withdraw cash",
+            "ATM cash machine",
             "withdraw money",
             "post office",
-            "cash machine",
-            "get cash"
+            "foreign card",
+            "currency exchange"
           ],
-          "answer": "Cards issued outside Japan can only be used at the post office ATM. It is about a 20-minute walk: leave this building and turn right. Cards issued in Japan can be used at the JA ATM. It is about a 2-minute walk: leave this building and turn left.",
+          "answer": "If you have a card issued overseas, you can only use the ATM at the post office. Exit Shirakawa-go Bus Terminal, turn right, and walk for about twenty minutes, which is approximately two kilometers away. If you have a card issued in Japan, you can use the ATM at JA. Exit this building, turn left, and it is about two minutes walk away. If you only need to exchange foreign currency, please use the exchange machine near the restrooms inside Shirakawa-go Bus Terminal.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "cajero",
-            "atm",
-            "sacar dinero",
-            "sacar efectivo",
-            "retirar efectivo",
-            "oficina correos"
+            "cajero automático",
+            "retirar dinero",
+            "oficina de correos",
+            "tarjeta extranjera",
+            "cambio de divisas"
           ],
-          "answer": "Las tarjetas emitidas en el extranjero solo pueden usarse en el cajero automático de la oficina de correos. Está a unos 20 minutos a pie: salga de este edificio y gire a la derecha. Las tarjetas emitidas en Japón pueden usarse en el cajero automático de JA. Está a unos 2 minutos a pie: salga de este edificio y gire a la izquierda.",
+          "answer": "Si tiene una tarjeta emitida en el extranjero, solo puede utilizar el cajero automático en la oficina de correos. Salga de la Terminal de Autobús de Shirakawa-go, gire a la derecha y camine aproximadamente dos kilómetros, lo que le llevará unos veinte minutos. Si tiene una tarjeta emitida en Japón, puede utilizar el cajero automático de JA. Salga de este edificio, gire a la izquierda y está a aproximadamente dos minutos a pie. Si solo necesita cambiar moneda extranjera, utilice la máquina de cambio cerca de los aseos dentro de la Terminal de Autobús de Shirakawa-go.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "atm",
-            "distributeur",
+            "distributeur automatique",
             "retirer argent",
-            "retrait espèces",
-            "bureau poste",
-            "billets banque retirer"
+            "bureau de poste",
+            "carte étrangère",
+            "change devises"
           ],
-          "answer": "Les cartes émises à l'étranger ne peuvent être utilisées qu'au distributeur du bureau de poste. Il se trouve à environ 20 minutes à pied : en sortant de ce bâtiment, tournez à droite. Les cartes émises au Japon peuvent être utilisées au distributeur de la JA. Il se trouve à environ 2 minutes à pied : en sortant de ce bâtiment, tournez à gauche.",
+          "answer": "Si vous avez une carte émise à l'étranger, vous ne pouvez utiliser que le distributeur automatique de la poste. En sortant de la gare routière de Shirakawa-go, tournez à droite et marchez environ deux kilomètres, ce qui prend environ vingt minutes. Si vous avez une carte émise au Japon, vous pouvez utiliser le distributeur automatique de la JA. En sortant de ce bâtiment, tournez à gauche et c'est à environ deux minutes à pied. Si vous avez besoin uniquement de changer des devises étrangères, veuillez utiliser le distributeur de change situé près des toilettes à l'intérieur de la gare routière de Shirakawa-go.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "atm",
-            "에이티엠",
-            "현금 인출",
-            "돈 인출",
-            "현금 뽑",
-            "우체국"
+            "ATM 현금인출기",
+            "돈 빼다 인출",
+            "우체국",
+            "외국카드",
+            "환전 환전하다"
           ],
-          "answer": "해외에서 발급된 카드는 우체국 ATM에서만 이용하실 수 있습니다. 이 건물을 나가서 오른쪽으로 걸어서 20분 정도 거리에 있습니다. 일본에서 발급된 카드는 JA ATM을 이용하실 수 있습니다. 이 건물을 나가서 왼쪽으로 걸어서 2분 정도 거리에 있습니다.",
+          "answer": "해외에서 발급한 카드는 우체국의 ATM만 이용할 수 있습니다. 시라카와고 버스터미널을 나와 오른쪽으로 약 2킬로미터, 걸어서 약 20분 정도 떨어진 곳에 있습니다. 일본에서 발급한 카드는 JA의 ATM을 이용할 수 있습니다. 이 건물을 나와 왼쪽으로 걸어서 약 2분 정도의 거리에 있습니다. 외화 환전만 필요하신 경우에는 시라카와고 버스터미널 내 화장실 근처의 환전기를 이용해주세요.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "ATM",
-            "取钱",
-            "取现",
-            "提款",
+            "自动提款机",
+            "取款 现金",
             "邮局",
-            "现金 不够"
+            "外币兑换",
+            "国外银行卡"
           ],
-          "answer": "海外发行的银行卡只能在邮局的ATM使用。出了这栋建筑向右，步行约20分钟即可到达。日本国内发行的银行卡可以使用JA（日本农业协同组合）的ATM。出了这栋建筑向左，步行约2分钟即可到达。",
+          "answer": "如果您持有海外发行的银行卡，只能使用邮局的自动提款机。从白川乡巴士总站出口向右走，约需二十分钟左右，距离约两公里。如果您持有在日本发行的银行卡，可以使用JA的自动提款机。从本建筑物出口向左走，约二分钟即可到达。如果您仅需要兑换外币，请使用白川乡巴士总站内洗手间附近的兑换机。",
           "audio": ""
         }
       }
@@ -393,7 +388,7 @@
         "キャッシング",
         "お金 引き出"
       ],
-      "answer": "海外で発行されたクレジットカードは、郵便局のATMのみご利用いただけます。一部ご利用になれないカードもあるようです。郵便局はここから車で5分ほどの「鳩谷郵便局」をご利用ください。日本で発行されたキャッシュカードやクレジットカードは、JAのATMをご利用いただけます。和田家前、展望台行きシャトルバス乗り場の向かいにございます。",
+      "answer": "海外で発行されたクレジットカードは、郵便局のATMのみご利用いただけます。一部ご利用になれないカードもあるようです。郵便局はであいの館から約2.2㎞車で5分ほどの「鳩谷郵便局」をご利用ください。日本で発行されたキャッシュカードやクレジットカードは、JAのATMをご利用いただけます。和田家前、展望台行きシャトルバス乗り場の向かいにございます。",
       "audio": "atm_deai.mp3",
       "photo": "",
       "link": "",
@@ -404,60 +399,55 @@
           "questions": [
             "ATM",
             "withdraw cash",
-            "withdraw money",
-            "post office",
             "cash machine",
-            "get cash"
+            "credit card ATM",
+            "where to get money"
           ],
-          "answer": "Credit cards issued outside Japan can only be used at the post office ATM. It seems that some cards cannot be used. Please use Hatogaya Post Office, about 5 minutes by car from here. Cash cards and credit cards issued in Japan can be used at the JA ATM. It is in front of Wada House, across from the stop for the shuttle bus to the observatory.",
+          "answer": "Foreign-issued credit cards can only be used at post office ATMs. Please note that some cards may not be accepted. The nearest post office is Hatoya Post Office, approximately two point two kilometers away, about five minutes by car from Deai no Mori. For Japanese-issued cash cards and credit cards, you can use JA ATMs. There is one located across from Wada House, near the shuttle bus stop to the observation deck.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "cajero",
-            "atm",
+            "cajero automático",
             "sacar dinero",
-            "sacar efectivo",
-            "retirar efectivo",
-            "oficina correos"
+            "retiro de efectivo",
+            "tarjeta de crédito",
+            "dónde obtener dinero"
           ],
-          "answer": "Las tarjetas de crédito emitidas en el extranjero solo pueden usarse en el cajero automático de la oficina de correos. Al parecer, algunas tarjetas no se pueden utilizar. Utilice la Oficina de Correos de Hatogaya, a unos 5 minutos en coche desde aquí. Las tarjetas bancarias y de crédito emitidas en Japón pueden usarse en el cajero automático de JA, que está delante de la Casa Wada, enfrente de la parada del autobús lanzadera al mirador.",
+          "answer": "Los cajeros automáticos de la oficina de correos solo aceptan tarjetas de crédito emitidas en el extranjero. Tenga en cuenta que algunas tarjetas pueden no ser aceptadas. La oficina de correos más cercana es la Oficina de Correos de Hatoya, aproximadamente a dos punto dos kilómetros de Deai no Mori, a unos cinco minutos en coche. Para tarjetas de débito y tarjetas de crédito emitidas en Japón, puede utilizar los cajeros automáticos de JA. Hay uno ubicado frente a la Casa Wada, cerca de la parada del autobús lanzadera hacia el mirador.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "atm",
-            "distributeur",
-            "retirer argent",
-            "retrait espèces",
-            "bureau poste",
-            "billets banque retirer"
+            "distributeur automatique",
+            "retrait d'argent",
+            "guichet automatique",
+            "carte de crédit",
+            "où retirer de l'argent"
           ],
-          "answer": "Les cartes de crédit émises à l'étranger ne peuvent être utilisées qu'au distributeur du bureau de poste. Il semble que certaines cartes ne soient pas acceptées. Veuillez vous rendre au bureau de poste de Hatogaya, à environ 5 minutes en voiture d'ici. Les cartes bancaires et cartes de crédit émises au Japon peuvent être utilisées au distributeur de la JA. Il se trouve devant la maison Wada, en face de l'arrêt de la navette pour l'observatoire.",
+          "answer": "Les cartes de crédit émises à l'étranger ne peuvent être utilisées que aux distributeurs automatiques de la poste. Veuillez noter que certaines cartes pourraient ne pas être acceptées. Le bureau de poste le plus proche est le Bureau de Poste de Hatoya, situé à environ deux point deux kilomètres de Deai no Mori, à environ cinq minutes en voiture. Pour les cartes de débit et les cartes de crédit émises au Japon, vous pouvez utiliser les distributeurs automatiques de JA. Il y en a un situé en face de la Maison Wada, près de l'arrêt de la navette vers le belvédère.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "atm",
-            "에이티엠",
+            "ATM",
             "현금 인출",
-            "돈 인출",
-            "현금 뽑",
-            "우체국"
+            "돈 찾",
+            "신용카드",
+            "현금 뽑"
           ],
-          "answer": "해외에서 발급된 신용카드는 우체국 ATM에서만 이용하실 수 있습니다. 일부 이용할 수 없는 카드도 있는 것 같습니다. 우체국은 여기서 차로 5분 정도 거리에 있는 하토가야 우체국을 이용해 주세요. 일본에서 발급된 현금카드나 신용카드는 JA ATM을 이용하실 수 있습니다. 와다 가옥 앞, 전망대행 셔틀버스 승차장 맞은편에 있습니다.",
+          "answer": "해외에서 발행된 신용카드는 우체국 ATM에서만 이용 가능합니다. 일부 카드는 이용하지 못할 수 있습니다. 가장 가까운 우체국은 데아이노모리에서 약 2.2킬로미터 거리의 하토야 우체국입니다. 자동차로 약 5분 소요됩니다. 일본에서 발행된 현금카드와 신용카드는 JA ATM에서 이용 가능합니다. 와다 가 맞은편, 전망대 셔틀버스 승차장 근처에 위치하고 있습니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "ATM",
+            "自动取款机",
             "取钱",
-            "取现",
-            "提款",
-            "邮局",
-            "现金 不够"
+            "提现",
+            "信用卡",
+            "取款"
           ],
-          "answer": "海外发行的信用卡只能在邮局的ATM使用，部分银行卡可能无法使用。邮局请前往距此开车约5分钟的鸠谷邮局。日本国内发行的现金卡和信用卡可以使用JA（日本农业协同组合）的ATM，位于和田家前、前往观景台的接驳巴士乘车处对面。",
+          "answer": "在邮局自动取款机可以使用外国发行的信用卡。但请注意，部分信用卡可能无法使用。最近的邮局是鸠谷邮局，距离相逢之馆约2.2公里，开车约需5分钟。对于日本发行的现金卡和信用卡，可以使用JA自动取款机。该自动取款机位于和田家对面，观景台班车乘车点附近。",
           "audio": ""
         }
       }
@@ -545,7 +535,7 @@
         "小銭",
         "両替 ロッカー"
       ],
-      "answer": "外貨の両替は、お手洗い近くのエクスチェンジマシンをご利用ください。コインロッカーでお使いになる小銭への両替は、窓口で承ります。",
+      "answer": "外貨の両替は、白川郷バスターミナル内のお手洗い近くのエクスチェンジマシンをご利用ください。コインロッカーでお使いになる小銭への両替は、窓口で承ります。",
       "audio": "currency_exchange_bt.mp3",
       "photo": "",
       "link": "",
@@ -556,59 +546,55 @@
           "questions": [
             "currency exchange",
             "exchange money",
-            "foreign currency",
-            "change money",
-            "small change",
-            "coin locker change"
+            "change foreign currency",
+            "coin exchange locker",
+            "where exchange"
           ],
-          "answer": "To exchange foreign currency, please use the exchange machine near the restrooms. If you need coins for the coin lockers, we can change money for you at the counter.",
+          "answer": "For currency exchange, please use the exchange machine located near the restrooms inside Shirakawa-go Bus Terminal. If you need small coins for coin lockers, our staff at the counter can help you exchange them.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "cambiar dinero",
-            "cambio moneda",
-            "divisa",
-            "moneda extranjera",
-            "monedas taquilla",
-            "monedas locker"
+            "cambio de dinero",
+            "cambio de moneda extranjera",
+            "cambio de monedas",
+            "monedas para taquilla",
+            "dónde cambiar dinero"
           ],
-          "answer": "Para cambiar moneda extranjera, utilice la máquina de cambio que está cerca de los baños. En el mostrador cambiamos billetes por monedas para usar en las taquillas.",
+          "answer": "Para cambiar moneda extranjera, utilice la máquina de cambio ubicada cerca de los aseos dentro de la Terminal de Autobuses de Shirakawa-go. Si necesita cambiar monedas para los casilleros, nuestro personal en la ventanilla le puede ayudar.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "change",
-            "changer argent",
-            "devise",
-            "monnaie",
-            "pièces",
-            "change casier"
+            "change de devises",
+            "changer de l'argent",
+            "échange monnaie étrangère",
+            "pièces monnaie consigne",
+            "où changer argent"
           ],
-          "answer": "Pour changer des devises étrangères, veuillez utiliser la machine de change située près des toilettes. Pour obtenir de la monnaie à utiliser dans les consignes automatiques, adressez-vous au guichet.",
+          "answer": "Pour échanger des devises étrangères, veuillez utiliser la machine d'échange située près des toilettes à l'intérieur de la Gare Routière de Shirakawa-go. Si vous avez besoin de petite monnaie pour les casiers, notre personnel au guichet peut vous aider.",
           "audio": ""
         },
         "ko": {
           "questions": [
             "환전",
-            "외화",
-            "잔돈",
-            "동전 교환",
-            "동전 바꾸",
-            "환전 로커"
+            "외화 환전",
+            "동전 환전",
+            "보관함 동전",
+            "어디서 환전하다"
           ],
-          "answer": "외화 환전은 화장실 근처에 있는 환전기를 이용해 주세요. 코인로커에서 사용하실 동전으로 바꾸는 것은 창구에서 해 드립니다.",
+          "answer": "외화 환전은 시라카와고 버스 터미널 내 화장실 근처의 환전 기계를 이용하시기 바랍니다. 동전 보관함용 잔돈 환전이 필요하신 경우, 창구에서 도와드립니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "兑换",
+            "兑换 外币",
             "换钱",
-            "外币",
-            "零钱",
-            "硬币 储物柜"
+            "兑换 硬币",
+            "投币柜 硬币",
+            "在哪里 兑换"
           ],
-          "answer": "外币兑换请使用洗手间附近的外币兑换机。如需兑换投币储物柜使用的零钱，请到窗口办理。",
+          "answer": "外币兑换请使用白川乡巴士总站内靠近卫生间的自动兑换机。如需为投币柜兑换零钱，请到窗口咨询工作人员。",
           "audio": ""
         }
       }
@@ -623,7 +609,7 @@
         "小銭",
         "両替 ロッカー"
       ],
-      "answer": "紙幣のみ対応ですが、外貨両替は観光協会バスターミナルにある両替機をご利用ください。（コインロッカーでお使いになる日本円紙幣から日本円通貨への両替は、窓口で承ります）",
+      "answer": "紙幣のみ対応ですが、外貨両替は白川郷バスターミナル内にある両替機をご利用ください。（コインロッカーでお使いになる日本円紙幣から日本円通貨への両替は、窓口で承ります）",
       "audio": "currency_exchange_deai.mp3",
       "photo": "",
       "link": "",
@@ -633,60 +619,56 @@
         "en": {
           "questions": [
             "currency exchange",
-            "exchange money",
-            "foreign currency",
-            "change money",
-            "small change",
-            "coin locker change"
+            "exchange foreign money",
+            "change coins",
+            "coin locker yen",
+            "where exchange"
           ],
-          "answer": "To exchange foreign currency, please use the exchange machine at the Tourist Association in Shirakawa-go Bus Terminal. It accepts banknotes only. If you need coins for the coin lockers, we can change Japanese yen banknotes into Japanese yen coins at the counter.",
+          "answer": "We can exchange banknotes only. For foreign currency exchange, please use the exchange machine located inside Shirakawa-go Bus Terminal. For exchanging Japanese banknotes to Japanese coins for use with coin lockers, we can assist you at our counter.",
           "audio": ""
         },
         "es": {
           "questions": [
+            "cambio de moneda extranjera",
             "cambiar dinero",
-            "cambio moneda",
-            "divisa",
-            "moneda extranjera",
-            "monedas taquilla",
-            "monedas locker"
+            "cambio de monedas",
+            "cambio de billetes",
+            "taquilla monedas"
           ],
-          "answer": "Para cambiar moneda extranjera, utilice la máquina de cambio de la Asociación de Turismo en la Terminal de Autobuses; solo admite billetes. En el mostrador cambiamos billetes de yenes japoneses por monedas de yenes para usar en las taquillas.",
+          "answer": "Solo podemos cambiar billetes. Para cambiar moneda extranjera, por favor use la máquina de cambio ubicada dentro de la Terminal de Autobuses Shirakawa-go. Si necesita cambiar billetes de yen japonés por monedas de yen japonés para usar en las taquillas de almacenamiento, nuestro personal en la ventanilla puede ayudarle.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "change",
+            "change devises étrangères",
             "changer argent",
-            "devise",
-            "monnaie",
-            "pièces",
-            "change casier"
+            "change pièces",
+            "change billets",
+            "casier pièces"
           ],
-          "answer": "Pour changer des devises étrangères, veuillez utiliser la machine de change du terminal de bus de Shirakawa-go, au bureau de l'Association touristique ; elle n'accepte que les billets. Pour changer des billets en yens contre des pièces en yens à utiliser dans les consignes automatiques, adressez-vous au guichet.",
+          "answer": "Nous ne pouvons changer que les billets. Pour l'échange de devises étrangères, veuillez utiliser le distributeur de change situé à l'intérieur de la gare routière de Shirakawa-go. Pour échanger des billets en yen japonais contre des pièces en yen japonais pour utiliser les casiers de rangement, notre personnel au guichet peut vous aider.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "환전",
-            "외화",
-            "잔돈",
-            "동전 교환",
-            "동전 바꾸",
-            "환전 로커"
+            "환전 외화",
+            "돈 바꾸기",
+            "동전 환전",
+            "지폐 환전",
+            "보관함 동전"
           ],
-          "answer": "외화 환전은 지폐만 가능하며, 시라카와고 버스터미널의 관광협회에 있는 환전기를 이용해 주세요. 코인로커에서 사용하실 일본 엔 지폐를 일본 엔 동전으로 바꾸는 것은 창구에서 해 드립니다.",
+          "answer": "지폐만 환전 가능합니다. 외화 환전이 필요하신 경우, 시라카와고 버스 터미널 내에 있는 환전기를 이용해주세요. 짐보관함 사용을 위해 일본 엔 지폐를 일본 엔 동전으로 바꾸고 싶으시다면, 창구에서 도와드립니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "兑换",
+            "兑换外币",
             "换钱",
-            "外币",
-            "零钱",
-            "硬币 储物柜"
+            "硬币兑换",
+            "纸币兑换",
+            "投币柜兑换"
           ],
-          "answer": "外币兑换请使用观光协会白川乡巴士总站内的兑换机，仅限纸币。如需将日元纸币兑换成储物柜使用的日元硬币，请到窗口办理。",
+          "answer": "我们只支持纸币兑换。如需兑换外币，请使用位于白川乡巴士站内的自动兑换机。如需将日元纸币兑换为日元硬币以供投币柜使用，我们可以在窗口为您提供帮助。",
           "audio": ""
         }
       }
@@ -702,7 +684,7 @@
         "手荷物",
         "荷物 置き"
       ],
-      "answer": "コインロッカーがございます。鍵が付いていないものは使用中です。満杯の場合は、近くのお宅でもお荷物をお預かりしております。どちらもいっぱいの場合は、窓口で臨時にお預かりしますのでお声がけください。",
+      "answer": "コインロッカーがございます。鍵が付いていないものは使用中です。満杯の場合は、近くのお宅でもお荷物をお預かりしております。どちらもいっぱいの場合は、白川郷バスターミナル内の観光協会窓口窓口で臨時にお預かりしますのでお声がけください。",
       "audio": "luggage_bt.mp3",
       "photo": "",
       "link": "",
@@ -711,62 +693,57 @@
       "translations": {
         "en": {
           "questions": [
-            "luggage",
-            "baggage",
+            "luggage storage",
             "coin locker",
-            "locker",
-            "suitcase",
-            "leave bag"
+            "suitcase storage",
+            "where can I leave my bag",
+            "baggage storage locker"
           ],
-          "answer": "There are coin lockers here. Lockers without a key are in use. If they are full, a nearby home also keeps luggage. If both are full, please ask at the counter and we will keep your luggage temporarily.",
+          "answer": "We have coin lockers available. If a locker doesn't have a key, it's currently in use. When the lockers are full, some nearby houses also offer luggage storage. If both are full, please ask at the Tourist Information Center window inside Shirakawa-go Bus Terminal, and we can store your luggage temporarily.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "taquilla",
-            "consigna",
-            "equipaje",
-            "maleta",
-            "dejar bolsa",
-            "locker"
+            "guardar equipaje",
+            "casillero de monedas",
+            "almacenamiento de maletas",
+            "dónde dejar mi bolsa",
+            "guardarropa"
           ],
-          "answer": "Hay taquillas que funcionan con monedas. Las que no tienen llave están en uso. Si están todas ocupadas, algunas casas particulares cercanas también guardan equipaje. Si ambas opciones están completas, consúltenos en el mostrador y le guardaremos el equipaje temporalmente.",
+          "answer": "Disponemos de casilleros de monedas. Si un casillero no tiene llave, significa que está en uso. Cuando los casilleros están llenos, algunas casas cercanas también pueden guardar su equipaje. Si ambos están llenos, diríjase a la ventanilla del Centro de Información Turística dentro de la Terminal de Autobuses de Shirakawa-go y podremos guardar su equipaje de forma temporal.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "consigne",
-            "casier",
-            "bagage",
-            "valise",
-            "déposer bagage",
-            "laisser valise"
+            "consigne à bagages",
+            "casier à pièces",
+            "rangement valises",
+            "où laisser mon sac",
+            "stockage de bagages"
           ],
-          "answer": "Des consignes automatiques sont à votre disposition. Celles qui n'ont pas de clé sont déjà utilisées. Si elles sont toutes pleines, des maisons voisines gardent également les bagages. Si tout est complet, nous pouvons garder vos bagages temporairement au guichet : n'hésitez pas à nous le demander.",
+          "answer": "Nous mettons à votre disposition des casiers à pièces. Si un casier n'a pas de clé, c'est qu'il est actuellement utilisé. Quand les casiers sont pleins, certaines maisons voisines proposent également un service de garde de bagages. Si les deux sont pleins, veuillez vous présenter au guichet du Centre d'Information Touristique à l'intérieur de la Gare Routière de Shirakawa-go, et nous pourrons garder vos bagages temporairement.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "짐 맡기",
-            "짐 맡길",
             "짐 보관",
-            "코인로커",
-            "사물함",
-            "캐리어"
+            "동전 락커",
+            "수하물 보관",
+            "짐을 두다",
+            "짐을 맡기다"
           ],
-          "answer": "코인로커가 있습니다. 열쇠가 꽂혀 있지 않은 로커는 사용 중입니다. 로커가 가득 찬 경우에는 근처 가정에서도 짐을 맡아 드리고 있습니다. 두 곳 모두 가득 찬 경우에는 창구에서 임시로 보관해 드리니 말씀해 주세요.",
+          "answer": "동전 락커를 이용할 수 있습니다. 락커에 열쇠가 없으면 사용 중입니다. 락커가 가득 찼을 때는 근처 주택에서도 짐을 보관해 드립니다. 둘 다 가득 차 있으면 시라카와고 버스 터미널 내 관광협회 안내소 창구에 말씀해 주시면 임시로 보관해 드리겠습니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "寄存 行李",
+            "行李寄存",
+            "投币柜",
             "储物柜",
-            "寄存柜",
-            "行李箱",
-            "行李 放哪",
-            "存包"
+            "放行李",
+            "箱子存放"
           ],
-          "answer": "这里有投币储物柜。没有插钥匙的柜子表示正在使用中。如果储物柜已满，附近的住户也提供行李寄存服务。如果都满了，窗口可以临时为您保管，请告诉工作人员。",
+          "answer": "我们提供投币式储物柜。如果储物柜上没有钥匙，表示正在使用中。当储物柜满了的时候，附近的民居也可以帮您保管行李。如果两处都满了，请到白川乡巴士终点站内的观光协会窗口告诉我们，我们会临时为您保管行李。",
           "audio": ""
         }
       }
@@ -782,7 +759,7 @@
         "手荷物",
         "荷物 置き"
       ],
-      "answer": "この駐車場や近隣にコインロッカーはございません。バスターミナルにはございます。",
+      "answer": "せせらぎ公園駐車場や近隣にコインロッカーはございません。バスターミナルにはございます。",
       "audio": "luggage_deai.mp3",
       "photo": "",
       "link": "",
@@ -791,62 +768,57 @@
       "translations": {
         "en": {
           "questions": [
-            "luggage",
-            "baggage",
-            "coin locker",
-            "locker",
-            "suitcase",
-            "leave bag"
+            "luggage storage locker",
+            "coin locker baggage",
+            "where suitcase storage",
+            "left luggage facility",
+            "store bag backpack"
           ],
-          "answer": "There are no coin lockers at this parking lot or nearby. There are coin lockers at the Bus Terminal.",
+          "answer": "There are no coin lockers at Seseragi Park Car Park or in the nearby area. However, coin lockers are available at the bus terminal.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "taquilla",
-            "consigna",
-            "equipaje",
-            "maleta",
-            "dejar bolsa",
-            "locker"
+            "almacenamiento equipaje",
+            "taquilla moneda",
+            "guardar maleta",
+            "consigna equipaje",
+            "dejar mochila"
           ],
-          "answer": "No hay taquillas de monedas en este estacionamiento ni en los alrededores. Sí las hay en la Terminal de Autobuses.",
+          "answer": "No hay taquillas de monedas en el aparcamiento de Seseragi Park ni en las áreas cercanas. Sin embargo, las taquillas de monedas están disponibles en la terminal de autobuses.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "consigne",
-            "casier",
-            "bagage",
-            "valise",
-            "déposer bagage",
-            "laisser valise"
+            "rangement bagages",
+            "casier à pièces",
+            "consigne valise",
+            "stockage bagage",
+            "laisser sac"
           ],
-          "answer": "Il n'y a pas de consignes automatiques sur ce parking ni aux alentours. Il y en a au terminal de bus.",
+          "answer": "Il n'y a pas de casiers à pièces au parking de Seseragi Park ni dans les zones environnantes. Cependant, des casiers à pièces sont disponibles à la gare routière.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "짐 맡기",
-            "짐 맡길",
             "짐 보관",
-            "코인로커",
-            "사물함",
-            "캐리어"
+            "동전 보관함",
+            "짐 맡기",
+            "수하물 보관",
+            "짐 두기"
           ],
-          "answer": "이 주차장과 주변에는 코인로커가 없습니다. 버스터미널에는 있습니다.",
+          "answer": "세세라기 공원 주차장 및 인근 지역에는 동전 보관함이 없습니다. 다만 버스 터미널에는 동전 보관함이 있습니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "寄存 行李",
+            "行李 存放",
+            "投币柜",
             "储物柜",
-            "寄存柜",
             "行李箱",
-            "行李 放哪",
-            "存包"
+            "放 包"
           ],
-          "answer": "这个停车场及附近没有投币储物柜。巴士总站有储物柜。",
+          "answer": "在瀬瀬らぎ公园停车场及周边地区没有投币柜。不过，巴士总站有投币柜可供使用。",
           "audio": ""
         }
       }
@@ -939,7 +911,7 @@
         "切手",
         "スタンプ ある"
       ],
-      "answer": "スタンプは机の上にご用意しております。切手は窓口で取り扱っております。御朱印は行っておりません。",
+      "answer": "スタンプは白川郷バスターミナル内の机の上にご用意しております。切手は窓口で取り扱っております。御朱印は行っておりません。",
       "audio": "stamp_bt.mp3",
       "photo": "",
       "link": "",
@@ -950,58 +922,55 @@
           "questions": [
             "stamp",
             "souvenir stamp",
-            "goshuin",
             "postage stamp",
-            "stamp book"
+            "stamp available",
+            "where stamp"
           ],
-          "answer": "Souvenir stamps are available on the table. Postage stamps are sold at the counter. We do not offer goshuin temple and shrine seals.",
+          "answer": "Stamps are available on the desk inside Shirakawa-go Bus Terminal. Postage stamps are sold at the information desk. We do not offer religious seal stamps.",
           "audio": ""
         },
         "es": {
           "questions": [
             "sello",
-            "sello recuerdo",
-            "goshuin",
+            "sello conmemorativo",
             "estampilla",
-            "sello postal",
-            "timbre"
+            "hay sellos",
+            "dónde obtener sello"
           ],
-          "answer": "Los sellos de recuerdo están sobre la mesa. Los sellos postales se venden en el mostrador. No ofrecemos goshuin.",
+          "answer": "Los sellos conmemorativos están disponibles en la mesa dentro de la Terminal de Autobuses de Shirakawa-go. Las estampillas postales se venden en la ventanilla de información. No ofrecemos sellos religiosos.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "tampon",
-            "tampon souvenir",
-            "goshuin",
             "timbre",
+            "timbre souvenir",
             "cachet",
-            "timbre poste"
+            "timbre disponible",
+            "où trouver timbre"
           ],
-          "answer": "Les tampons sont à votre disposition sur la table. Les timbres sont vendus au guichet. Nous ne proposons pas de goshuin.",
+          "answer": "Les timbres de commémoration sont disponibles sur le bureau à l'intérieur de la gare routière de Shirakawa-go. Les timbres-poste sont vendus au guichet d'information. Nous n'offrons pas de cachets religieux.",
           "audio": ""
         },
         "ko": {
           "questions": [
             "스탬프",
             "기념 스탬프",
-            "도장",
             "우표",
-            "고슈인",
-            "주인장"
+            "스탬프 있다",
+            "스탬프 구할 수 있다"
           ],
-          "answer": "스탬프는 책상 위에 준비되어 있습니다. 우표는 창구에서 취급하고 있습니다. 고슈인은 해 드리지 않습니다.",
+          "answer": "스탬프는 白川郷 버스 터미널 내부의 책상 위에 준비되어 있습니다. 우표는 창구에서 판매하고 있습니다. 종교적 인장 서비스는 제공하지 않습니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
+            "邮票",
+            "纪念邮票",
             "印章",
-            "纪念章",
-            "盖章",
-            "御朱印",
-            "邮票"
+            "有没有邮票",
+            "邮票在哪里"
           ],
-          "answer": "纪念印章放在桌子上。邮票可以在窗口购买。本处不提供御朱印。",
+          "answer": "纪念邮票放在白川乡巴士总站内的桌子上。邮票可以在窗口购买。我们不提供宗教印章服务。",
           "audio": ""
         }
       }
@@ -1016,7 +985,7 @@
         "切手",
         "スタンプ ある"
       ],
-      "answer": "記念スタンプは窓口机上にご用意しております。切手や御朱印の取扱いはございません。",
+      "answer": "記念スタンプはであいの館の窓口机上にご用意しております。切手や御朱印の取扱いはございません。",
       "audio": "stamp_deai.mp3",
       "photo": "",
       "link": "",
@@ -1027,58 +996,55 @@
           "questions": [
             "stamp",
             "souvenir stamp",
-            "goshuin",
-            "postage stamp",
-            "stamp book"
+            "memorial stamp",
+            "stamp available",
+            "where stamp"
           ],
-          "answer": "Souvenir stamps are available on the table at the counter. We do not sell postage stamps or offer goshuin temple and shrine seals.",
+          "answer": "Souvenir stamps are available at the counter of Deai no Yakata. We do not handle postage stamps or temple seals.",
           "audio": ""
         },
         "es": {
           "questions": [
             "sello",
-            "sello recuerdo",
-            "goshuin",
+            "sello conmemorativo",
             "estampilla",
-            "sello postal",
-            "timbre"
+            "sello disponible",
+            "dónde sello"
           ],
-          "answer": "Los sellos de recuerdo están sobre la mesa del mostrador. No vendemos sellos postales ni ofrecemos goshuin.",
+          "answer": "Los sellos conmemorativos están disponibles en el mostrador de Deai no Yakata. No vendemos sellos postales ni talismanes de templo.",
           "audio": ""
         },
         "fr": {
           "questions": [
             "tampon",
             "tampon souvenir",
-            "goshuin",
             "timbre",
-            "cachet",
-            "timbre poste"
+            "tampon disponible",
+            "où tampon"
           ],
-          "answer": "Le tampon souvenir est à votre disposition sur la table du guichet. Nous ne vendons pas de timbres et ne proposons pas de goshuin.",
+          "answer": "Les tampons commémoratifs sont disponibles au comptoir de Deai no Yakata. Nous ne vendons pas de timbres-poste ni de sceaux de temple.",
           "audio": ""
         },
         "ko": {
           "questions": [
             "스탬프",
             "기념 스탬프",
-            "도장",
             "우표",
-            "고슈인",
-            "주인장"
+            "스탬프 있습니다",
+            "스탐프 있나"
           ],
-          "answer": "기념 스탬프는 창구 책상 위에 준비되어 있습니다. 우표와 고슈인은 취급하지 않습니다.",
+          "answer": "기념 스탬프는 데아이노야카타의 창구 책상 위에 준비되어 있습니다. 우표와 어새(사찰 인장)는 취급하지 않습니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "印章",
             "纪念章",
-            "盖章",
-            "御朱印",
-            "邮票"
+            "邮票",
+            "印章",
+            "有纪念章吗",
+            "哪里纪念章"
           ],
-          "answer": "纪念印章放在窗口的桌子上。本处不出售邮票，也不提供御朱印。",
+          "answer": "纪念章在相逢馆的窗口柜台上提供。我们不出售邮票或寺庙印章。",
           "audio": ""
         }
       }
