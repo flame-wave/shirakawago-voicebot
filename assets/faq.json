@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-13 17:45",
-  "count": 73,
+  "version": "2026-10-13 17:47",
+  "count": 72,
   "faqs": [
     {
       "id": "shuttle_observatory",
@@ -1222,7 +1222,7 @@
       ],
       "answer": "展望台へは自家用車で行くことはできません。歩きとシャトルバスの2通りがあります。遊歩道を歩く場合は、この建物を出て左へ2分ほど進み、白水園という飲食店のところを左に曲がります。和田家を右手に進むと、突き当りに左へ上る約500mの坂道があり、およそ15分で着きます。山道を歩く場合は、この建物を出て右へ進み、国道360号線に入ってすぐの階段を登ると城跡展望台に着きます。シャトルバスの場合は、この建物を出て左へ2分ほどの、和田家のすいれん池前のバス停からご乗車ください。",
       "audio": "observatory_access_bt.mp3",
-      "photo": "",
+      "photo": "837395868_1392066166287577_8794264652917.jpg",
       "link": "",
       "chip": "展望台への行き方",
       "place": "バスターミナル",
@@ -1910,78 +1910,6 @@
             "有轮椅"
           ],
           "answer": "白川乡巴士总站和Seseragi公园停车场各备有2台轮椅。先到先得，请向各咨询处提出。Seseragi公园停车场的租借时间为上午9点30分至下午3点30分。11月至3月底的冬季期间，出于安全考虑不提供租借。另外，村内砂石路和台阶较多，并非经过整修的观光设施，移动时请多加小心。",
-          "audio": ""
-        }
-      }
-    },
-    {
-      "id": "bear",
-      "category": "manner",
-      "questions": [
-        "熊 出る",
-        "クマ 注意"
-      ],
-      "answer": "クマの出没にご注意ください。もしクマに出会ってしまったら、背中を見せずゆっくりと後退しましょう。\nもし襲われてしまった際には地面に伏せて頭を守りましょう。",
-      "audio": "bear.mp3",
-      "photo": "",
-      "link": "",
-      "chip": "",
-      "place": "共通",
-      "translations": {
-        "en": {
-          "questions": [
-            "bear",
-            "bear warning",
-            "bear attack",
-            "bear danger",
-            "bear safe"
-          ],
-          "answer": "Please be careful of bears. If you encounter a bear, do not turn your back on it, and back away slowly. If you are attacked, lie face down on the ground and protect your head.",
-          "audio": ""
-        },
-        "es": {
-          "questions": [
-            "osos",
-            "oso aparece",
-            "oso cuidado",
-            "oso ataque",
-            "oso encuentro"
-          ],
-          "answer": "Tenga cuidado, pueden aparecer osos. Si se encuentra con un oso, retroceda despacio sin darle la espalda. Si llega a ser atacado, póngase boca abajo en el suelo y protéjase la cabeza.",
-          "audio": ""
-        },
-        "fr": {
-          "questions": [
-            "ours",
-            "ours attention",
-            "ours danger",
-            "rencontrer ours",
-            "ours attaque"
-          ],
-          "answer": "Attention aux ours. Si vous rencontrez un ours, reculez lentement sans lui tourner le dos. Si vous êtes attaqué, couchez-vous face contre le sol et protégez votre tête.",
-          "audio": ""
-        },
-        "ko": {
-          "questions": [
-            "곰 나오",
-            "곰 나와",
-            "곰 조심",
-            "곰 주의",
-            "곰 출몰",
-            "곰 만나"
-          ],
-          "answer": "곰 출몰에 주의해 주세요. 만약 곰을 만나게 되면 등을 보이지 말고 천천히 뒤로 물러나세요. 만약 공격을 당했을 때는 땅에 엎드려 머리를 보호하세요.",
-          "audio": ""
-        },
-        "zh": {
-          "questions": [
-            "熊出没",
-            "有熊",
-            "遇到熊",
-            "黑熊",
-            "碰到熊"
-          ],
-          "answer": "请注意熊出没。万一遇到熊，请不要背对它，慢慢向后退。万一遭到袭击，请趴在地上保护好头部。",
           "audio": ""
         }
       }
@@ -4351,9 +4279,9 @@
       "questions": [
         "ハイキング",
         "登山",
-        "山 入れ",
         "散策 どこ",
-        "トレッキング"
+        "トレッキング",
+        "山に 入れ"
       ],
       "answer": "山の中や田畑には立ち入らないでください。道に迷ったり、けがをされる危険がございます。ご散策は集落内の道と、展望台までの遊歩道をご利用ください。",
       "audio": "hiking.mp3",
@@ -4364,62 +4292,57 @@
       "translations": {
         "en": {
           "questions": [
-            "hiking",
-            "hike",
-            "trekking",
-            "climb mountain",
-            "walk trail",
-            "mountain enter"
+            "hiking trails",
+            "mountain trekking",
+            "walking in mountains",
+            "can I go hiking",
+            "where to trek"
           ],
-          "answer": "Please do not enter the mountains or the fields. You could get lost or injured. For walking, please use the roads in the village and the walking path to the observatory.",
+          "answer": "Please do not enter the mountains or agricultural fields. There is a risk of getting lost or injured. Please use the paths within the village and the walking trail to the observation deck.",
           "audio": ""
         },
         "es": {
           "questions": [
             "senderismo",
-            "excursion",
-            "subir montaña",
-            "caminata",
-            "trekking",
-            "hiking"
+            "trekking montaña",
+            "caminar montaña",
+            "puedo hacer senderismo",
+            "rutas de montaña"
           ],
-          "answer": "No entre en las montañas ni en los campos de cultivo. Existe el riesgo de perderse o de sufrir lesiones. Para pasear, utilice los caminos de la aldea y el sendero que lleva al mirador.",
+          "answer": "Por favor, no entre en las montañas ni en los campos agrícolas. Hay riesgo de perderse o lesionarse. Utilice los senderos dentro del pueblo y el camino peatonal hacia el mirador.",
           "audio": ""
         },
         "fr": {
           "questions": [
             "randonnée",
-            "randonner",
-            "montagne",
-            "trekking",
-            "promenade où",
-            "balade"
+            "trekking montagne",
+            "marche montagne",
+            "puis-je faire randonnée",
+            "sentier montagne"
           ],
-          "answer": "Veuillez ne pas entrer dans la montagne ni dans les champs et rizières. Vous risqueriez de vous perdre ou de vous blesser. Pour vous promener, veuillez utiliser les chemins du village et le sentier menant à l'observatoire.",
+          "answer": "Veuillez ne pas entrer dans les montagnes ou les terres agricoles. Il y a un risque de vous perdre ou de vous blesser. Veuillez utiliser les chemins dans le village et le sentier pédestre menant au belvédère.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "하이킹",
             "등산",
             "트레킹",
-            "산에 들어",
-            "산책 코스",
-            "산책 어디"
+            "산 가기",
+            "산행 가능",
+            "하이킹 코스"
           ],
-          "answer": "산속이나 논밭에는 들어가지 마세요. 길을 잃거나 다칠 위험이 있습니다. 산책은 마을 안의 길과 전망대까지의 산책로를 이용해 주세요.",
+          "answer": "산이나 농경지에 들어가지 마세요. 길을 잃거나 다칠 위험이 있습니다. 마을 내의 도로와 전망대까지의 산책로를 이용해 주세요.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "徒步",
             "登山",
-            "爬山",
-            "进山",
-            "散步 哪里",
-            "远足"
+            "徒步旅行",
+            "山里散步",
+            "能去登山吗",
+            "爬山路线"
           ],
-          "answer": "请不要进入山林或田地。有迷路或受伤的危险。散步请走村落内的道路和通往观景台的游步道。",
+          "answer": "请不要进入山区或农田。有迷路或受伤的危险。请使用村落内的道路和通往观景台的步行道。",
           "audio": ""
         }
       }
