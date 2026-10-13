@@ -69,6 +69,9 @@ if (mb_strlen($character) > 20) {
     $character = '';
 }
 
+// プレビュー版（案内アプリの ?preview=1）からの問い合わせ。答え方は同じだが、記録には残さない。
+$preview = !empty($request['preview']);
+
 // 極端に長い入力は、料金と悪用の両面で止める
 if ($question === '' || mb_strlen($question) > 200) {
     decline('bad_question', 400);
@@ -683,7 +686,7 @@ $result = ask_ai($config, $fixed, $variable);
  */
 function write_log(array $config, array $row): void
 {
-    if (empty($config['log_path'])) {
+    if (empty($config['log_path']) || !empty($GLOBALS['preview'])) {
         return;
     }
     @file_put_contents(

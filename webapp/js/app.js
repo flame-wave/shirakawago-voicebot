@@ -24,7 +24,7 @@ import { SetupScreen } from './setup-screen.js';
 import { TunePanel } from './tune-panel.js';
 import { ConsentScreen, mayRecord } from './consent.js';
 import { SurveyView } from './survey.js';
-import { fixedPlace, isKiosk, showSetup, showTune } from './deployment.js';
+import { fixedPlace, isKiosk, isPreview, showSetup, showTune } from './deployment.js';
 
 // --- 部品（差し替え可能な単位） ---
 const speech = new SpeechService(); // 音声認識
@@ -95,11 +95,20 @@ const state = {
   dataSource: '',
 };
 
+// プレビュー版の印。本番と取り違えないよう、上のバーに出しておく。
+if (isPreview && el.appTitle) {
+  const badge = document.createElement('span');
+  badge.className = 'preview-badge';
+  badge.innerHTML = 'プレビュー<span class="preview-note">（記録されません）</span>';
+  badge.title = 'プレビュー版です。質問やアンケートは利用状況に記録されません。';
+  el.appTitle.after(badge);
+}
+
 function render() {
   renderPlacePill();
   const title = uiString('appTitle', state.lang);
   if (el.appTitle) el.appTitle.textContent = title;
-  document.title = title;
+  document.title = isPreview ? `【プレビュー】${title}` : title;
   el.dataSource.textContent = state.dataSource;
   el.dataVersion.textContent = state.dataVersion;
 

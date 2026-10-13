@@ -10,6 +10,7 @@
 // 呼び出し側は職員案内に切り替える。観光客を待たせないことを優先する。
 
 import { AI_ENDPOINT, AI_TIMEOUT_MS } from './config.js';
+import { isPreview } from './deployment.js';
 
 export class AiService {
   get available() {
@@ -30,7 +31,9 @@ export class AiService {
       const res = await fetch(AI_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, lang, place: place ?? '', character: character ?? '' }),
+        // preview: 中継サーバに「記録しないで」と伝える（プレビュー版）
+        body: JSON.stringify({ question, lang, place: place ?? '', character: character ?? '',
+                               preview: isPreview }),
         signal: controller.signal,
       });
       if (!res.ok) {

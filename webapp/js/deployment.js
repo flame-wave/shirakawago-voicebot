@@ -54,17 +54,23 @@ function forget() {
 const params = new URLSearchParams(window.location.search);
 const fromUrl = (params.get('place') || '').trim();
 
+/// プレビュー版（?preview=1）。見た目も答え方も本番と同じだが、何も記録しない。
+///   ・質問・アンケート・AIの回答を、利用状況に送らない（この端末の中にも残さない）
+///   ・?place=… で開いても、その役割をこのブラウザに覚えさせない
+/// 関係者に試してもらうときや、職員が確かめるときに使う（利用状況の数を汚さないため）。
+export const isPreview = ['1', 'true', 'yes', 'on'].includes((params.get('preview') || '').toLowerCase());
+
 // ?place=観光客 … 覚えている役割を忘れて、観光客の画面に戻す。
 // 一度 ?place=バスターミナル で開いたブラウザは、place を付けずに開いても
 // 据え置きのままになる（下の「前回の役割」）。パソコンで観光客の見え方を
 // 確かめるときに、そこから抜ける入口として使う。
 const asVisitor = fromUrl === VISITOR;
-if (asVisitor) forget();
+if (asVisitor && !isPreview) forget();
 
 // URLの指定が最優先。次に前回の役割、最後に config.js の既定。
-let place = asVisitor ? '' : fromUrl || saved();
+let place = asVisitor ? '' : fromUrl || (isPreview ? '' : saved());
 if (!place && !asVisitor && PLACE && PLACE !== 'auto') place = PLACE;
-if (fromUrl && !asVisitor) remember(fromUrl);
+if (fromUrl && !asVisitor && !isPreview) remember(fromUrl);
 
 /// 据え置き端末かどうか。場所が決まっていれば据え置きとみなす。
 export const isKiosk = place !== '';

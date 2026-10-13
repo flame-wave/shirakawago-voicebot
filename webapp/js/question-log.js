@@ -15,7 +15,7 @@
 // 送れなかった分は溜めておき、次に通信できたときにまとめて送る。
 
 import { LOG_ENDPOINT } from './config.js';
-import { clientId } from './deployment.js';
+import { clientId, isPreview } from './deployment.js';
 import { mayRecord } from './consent.js';
 
 const KEY = 'shirakawa_question_log';
@@ -40,6 +40,7 @@ const SPLIT = /\\n|\n/;
 export class QuestionLog {
   /// 1件記録する。失敗しても案内の動作は止めない。
   add(entry) {
+    if (isPreview) return;   // プレビュー版は何も残さない
     const line = JSON.stringify({
       at: entry.at.toISOString(),
       lang: entry.lang,
@@ -64,7 +65,7 @@ export class QuestionLog {
   /// （古い中継サーバは recognized が空の記録を捨てるので、受け口を上げ替える前に送っても害は無い）
   /// この端末の記録（よくある質問の並び順に使う）には入れない。
   addSurvey(vote, lang, place) {
-    if (!LOG_ENDPOINT || !mayRecord()) return;
+    if (!LOG_ENDPOINT || !mayRecord() || isPreview) return;
     this._append(OUTBOX_KEY, JSON.stringify({
       at: new Date().toISOString(),
       kind: 'survey',
@@ -120,7 +121,8 @@ export class QuestionLog {
   }
 
   async _flushOnce() {
-    if (!LOG_ENDPOINT || !mayRecord()) return false;
+    // プレビュー版では送らない（このブラウザに本番で溜まった分は、次に本番で開いたときに送る）
+    if (!LOG_ENDPOINT || !mayRecord() || isPreview) return false;
     const lines = this._lines(OUTBOX_KEY);
     if (lines.length === 0) return false;
 
