@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-13 17:23",
+  "version": "2026-10-13 17:43",
   "count": 73,
   "faqs": [
     {
@@ -1217,9 +1217,10 @@
         "展望台 どうやって",
         "展望台 歩い",
         "城山 展望台",
-        "展望台 行く"
+        "展望台 行く",
+        "展望台 車で"
       ],
-      "answer": "展望台へは、歩きとシャトルバスの2通りがあります。遊歩道を歩く場合は、この建物を出て左へ2分ほど進み、白水園という飲食店のところを左に曲がります。和田家を右手に進むと、突き当りに左へ上る道があり、およそ20分で着きます。山道を歩く場合は、この建物を出て右へ進み、国道360号線に入ってすぐの階段を登ると城跡展望台に着きます。シャトルバスの場合は、この建物を出て左へ2分ほどの、和田家のすいれん池前のバス停からご乗車ください。",
+      "answer": "展望台へは自家用車で行くことはできません。歩きとシャトルバスの2通りがあります。遊歩道を歩く場合は、この建物を出て左へ2分ほど進み、白水園という飲食店のところを左に曲がります。和田家を右手に進むと、突き当りに左へ上る約500mの坂道があり、およそ15分で着きます。山道を歩く場合は、この建物を出て右へ進み、国道360号線に入ってすぐの階段を登ると城跡展望台に着きます。シャトルバスの場合は、この建物を出て左へ2分ほどの、和田家のすいれん池前のバス停からご乗車ください。",
       "audio": "observatory_access_bt.mp3",
       "photo": "",
       "link": "",
@@ -1228,62 +1229,62 @@
       "translations": {
         "en": {
           "questions": [
-            "observatory get",
-            "observatory walk",
-            "observatory how",
-            "viewpoint walk",
-            "castle observatory",
-            "go observatory"
+            "How to get to the observation platform",
+            "How do I reach the observation platform",
+            "Walking to the observation platform",
+            "Shiroyama observation platform",
+            "Can I drive to the observation platform",
+            "Shuttle bus observation platform"
           ],
-          "answer": "There are 2 ways to get to the observatory: on foot or by shuttle bus. To take the walking path, leave this building and go left for about 2 minutes, then turn left at a restaurant called Shiramizuen. Walk on with Wada House on your right, and at the end of the road there is a path going up to the left. It takes about 20 minutes to get there. To take the mountain trail, leave this building and go right. Just after you enter Route 360, climb the stairs and you will reach the Castle Ruins Observatory. To take the shuttle bus, leave this building and go left for about 2 minutes, and get on at the bus stop in front of the water-lily pond at Wada House.",
+          "answer": "You cannot drive to the observation platform by private vehicle. There are two ways to reach it: walking or by shuttle bus. If you walk via the pedestrian path, exit this building and turn left. After about two minutes, you will see Hakusui-en restaurant. Turn left there. Continue with Wada-ke house on your right. At the end, there is a slope heading uphill to your left, approximately five hundred meters long. It will take about fifteen minutes to reach the top. If you prefer to walk via the mountain trail, exit this building and turn right. Enter National Route three hundred sixty. You will see stairs right away. Climb them and you will reach Shiroyama Castle observation platform. For the shuttle bus, exit this building and turn left. After about two minutes, you will find the bus stop in front of Wada-ke house Suiren Pond. Please board there.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "mirador llegar",
-            "mirador camin",
-            "mirador pie",
-            "mirador subir",
-            "castillo mirador",
-            "observatorio llegar"
+            "Cómo llegar al mirador",
+            "Cómo ir al mirador",
+            "Camino al mirador",
+            "Mirador Shiroyama",
+            "Puedo conducir al mirador",
+            "Autobús lanzadera mirador"
           ],
-          "answer": "Puede ir al mirador a pie o en el autobús lanzadera. Si va por el sendero, salga de este edificio, gire a la izquierda, camine unos 2 minutos y gire a la izquierda en el restaurante Shiramizuen. Siga adelante con la Casa Wada a su derecha; al final encontrará un camino que sube hacia la izquierda y llegará en unos 20 minutos. Si prefiere el camino de montaña, salga de este edificio, vaya hacia la derecha, entre en la Ruta 360 y suba las escaleras que encontrará enseguida; así llegará al Mirador de las Ruinas del Castillo. Si va en autobús lanzadera, salga de este edificio, gire a la izquierda y, a unos 2 minutos, suba en la parada frente al estanque de nenúfares de la Casa Wada.",
+          "answer": "No puede acceder al mirador en vehículo privado. Hay dos formas de llegar: caminando o en autobús lanzadera. Si elige la ruta peatonal, salga de este edificio y gire a la izquierda. Después de aproximadamente dos minutos, verá un restaurante llamado Hakusui-en. Gire a la izquierda allí. Continúe con la casa Wada-ke a su derecha. Al final, hay una pendiente hacia arriba a su izquierda, de aproximadamente quinientos metros de largo. Tardará unos quince minutos en llegar a la cima. Si prefiere la ruta de montaña, salga de este edificio y gire a la derecha. Ingrese a la Ruta Nacional trescientos sesenta. Verá escaleras inmediatamente. Suba y llegará al mirador del castillo Shiroyama. Para el autobús lanzadera, salga de este edificio y gire a la izquierda. Después de aproximadamente dos minutos, encontrará la parada de autobús frente al estanque Suiren de la casa Wada-ke. Por favor, suba allí.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "observatoire aller",
-            "observatoire chemin",
-            "observatoire pied",
-            "château observatoire",
-            "belvédère aller",
-            "point de vue aller"
+            "Comment aller au belvédère",
+            "Accès au belvédère",
+            "Chemin vers le belvédère",
+            "Belvédère Shiroyama",
+            "Voiture jusqu'au belvédère",
+            "Bus navette belvédère"
           ],
-          "answer": "Pour aller à l'observatoire, il y a deux possibilités : à pied ou en navette. Si vous prenez le sentier de promenade, sortez de ce bâtiment, tournez à gauche et marchez environ 2 minutes, puis tournez à gauche au restaurant Shiramizuen. Continuez en laissant la maison Wada sur votre droite ; au bout, un chemin monte sur la gauche, et vous arriverez en 20 minutes environ. Si vous prenez le sentier de montagne, sortez de ce bâtiment, tournez à droite, et juste après être entré sur la route 360, montez l'escalier : vous arriverez à l'observatoire des ruines du château. Pour la navette, sortez de ce bâtiment, tournez à gauche, et prenez-la à l'arrêt situé à environ 2 minutes, devant le bassin aux nénuphars de la maison Wada.",
+          "answer": "Vous ne pouvez pas accéder au belvédère en véhicule privé. Il y a deux façons de le rejoindre : à pied ou en bus navette. Si vous choisissez la route pédestre, sortez de ce bâtiment et tournez à gauche. Après environ deux minutes, vous verrez un restaurant appelé Hakusui-en. Tournez à gauche là-bas. Continuez avec la maison Wada-ke à votre droite. À la fin, il y a une pente ascendante à votre gauche, d'environ cinq cents mètres de long. Il faudra environ quinze minutes pour arriver au sommet. Si vous préférez l'itinéraire de montagne, sortez de ce bâtiment et tournez à droite. Entrez dans la Route nationale trois cent soixante. Vous verrez immédiatement des escaliers. Montez et vous arriverez au belvédère du château Shiroyama. Pour le bus navette, sortez de ce bâtiment et tournez à gauche. Après environ deux minutes, vous trouverez l'arrêt de bus devant l'étang Suiren de la maison Wada-ke. Veuillez monter à bord là-bas.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "전망대 가는",
-            "전망대 가려면",
-            "전망대 어떻게",
-            "전망대 걸어",
-            "전망대 길",
-            "성터 전망대"
+            "전망대 가는 길",
+            "전망대 어떻게 가",
+            "전망대 걸어서",
+            "성산 전망대",
+            "전망대 자동차",
+            "셔틀버스 전망대"
           ],
-          "answer": "전망대까지는 걸어가는 방법과 셔틀버스를 타는 방법, 2가지가 있습니다. 산책로로 걸어가실 경우, 이 건물을 나가서 왼쪽으로 2분 정도 가신 뒤, 시라미즈엔이라는 음식점에서 왼쪽으로 도세요. 와다 가옥을 오른쪽에 두고 나아가면 막다른 곳에 왼쪽으로 올라가는 길이 있으며, 약 20분이면 도착합니다. 산길로 걸어가실 경우, 이 건물을 나가서 오른쪽으로 가신 뒤 국도 360호선에 들어서자마자 나오는 계단을 오르면 성터 전망대에 도착합니다. 셔틀버스를 이용하실 경우, 이 건물을 나가서 왼쪽으로 2분 정도 거리에 있는 와다 가옥 수련 연못 앞 버스 정류장에서 타 주세요.",
+          "answer": "전망대는 승용차로 갈 수 없습니다. 도보 또는 셔틀버스 두 가지 방법이 있습니다. 산책로를 걸어가시는 경우, 이 건물을 나가셔서 왼쪽으로 약 2분 정도 진행하시면 하쿠스이엔이라는 음식점이 있습니다. 그곳에서 왼쪽으로 꺾으세요. 와다케 집을 오른쪽에 두고 계속 진행하면, 끝에서 왼쪽으로 올라가는 약 5백 미터의 경사로가 있습니다. 약 15분이 소요됩니다. 산길로 걸어가시는 경우, 이 건물을 나가셔서 오른쪽으로 진행하고 국도 360호선에 들어가세요. 바로 계단이 보입니다. 계단을 올라가시면 시로야마 성터 전망대에 도착합니다. 셔틀버스를 이용하시는 경우, 이 건물을 나가셔서 왼쪽으로 약 2분 진행하면 와다케 집 수이렌 연못 앞의 버스 정류장이 있습니다. 그곳에서 탑승하세요.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "观景台 怎么去",
-            "观景台 怎么走",
-            "观景台 步行",
-            "城山 观景台",
-            "去观景台",
-            "展望台"
+            "观景台怎么去",
+            "观景台怎么走",
+            "去观景台的路",
+            "城山观景台",
+            "观景台有车吗",
+            "观景台巴士"
           ],
-          "answer": "前往观景台有步行和乘坐接驳巴士两种方式。走游步道的话，出了这栋建筑向左走约2分钟，在一家叫白水园的餐厅处左转。经过右手边的和田家继续向前，尽头有一条向左上坡的路，大约20分钟可以到达。走山路的话，出了这栋建筑向右走，进入360号国道后立即登上台阶，即可到达城迹观景台。乘坐接驳巴士的话，请出了这栋建筑向左走约2分钟，在和田家睡莲池前的巴士站上车。",
+          "answer": "您不能开私家车前往观景台。有两种方式可以到达：步行或乘坐接驳巴士。如果您选择沿着步道行走，请从本建筑物出口向左走，约两分钟后，您会看到一家名叫白水园的餐厅。在那里向左转。继续前进，右手边会看到和田家。走到尽头后，您会看到一条向左上坡的小路，约五百米长。大约需要十五分钟才能到达观景台。如果您想通过山道行走，从本建筑物出口向右走，进入国道三百六十号线。您会立即看到楼梯。爬上去后，您会到达城山城跡观景台。乘坐接驳巴士的话，从本建筑物出口向左走，约两分钟后，您会在和田家睡莲池前的公交车站找到车站。请在那里上车。",
           "audio": ""
         }
       }
@@ -1298,7 +1299,7 @@
         "城山 展望台",
         "展望台 行く"
       ],
-      "answer": "展望台へは、有料シャトルバスが便利です。この建物の目の前の橋を渡り、大通りに出て左へ10分ほど進むと、和田家の前にバス停がございます。そちらからシャトルバスにご乗車ください。または山際沿いに歩いて登ることのできるルートもあり、ここから30～40分ほどで行くことができます。",
+      "answer": "展望台へは、有料シャトルバスが便利です。この建物の目の前の橋を渡り、大通りに出て左へ10分ほど進むと、和田家の前にバス停がございます。そちらからシャトルバスにご乗車ください。または山際沿いに歩いて登ることのできる約500mの歩道もあり、であいの館から30～40分ほどで行くことができます。",
       "audio": "observatory_access_deai.mp3",
       "photo": "",
       "link": "",
@@ -1307,62 +1308,57 @@
       "translations": {
         "en": {
           "questions": [
-            "observatory get",
-            "observatory walk",
-            "observatory how",
-            "viewpoint walk",
-            "castle observatory",
-            "go observatory"
+            "how to get to observation point",
+            "way to viewpoint",
+            "shuttle bus observatory",
+            "walking trail to observatory",
+            "Shiroyama observation deck"
           ],
-          "answer": "The paid shuttle bus is a convenient way to get to the observatory. Cross the bridge right in front of this building, go out to the main street, and walk left for about 10 minutes. There is a bus stop in front of Wada House. Please take the shuttle bus from there. There is also a route you can walk up along the foot of the mountain, which takes about 30 to 40 minutes from here.",
+          "answer": "To reach the observation point, we recommend taking our paid shuttle bus. Cross the bridge in front of this building, turn left onto the main street, and walk for about ten minutes. You will find the bus stop in front of Wada House. Board the shuttle bus from there. Alternatively, there is a walking trail of about five hundred meters along the base of the mountain. It takes approximately thirty to forty minutes to reach the observation point on foot from this building, the Deai Hall.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "mirador llegar",
-            "mirador camin",
-            "mirador pie",
-            "mirador subir",
-            "castillo mirador",
-            "observatorio llegar"
+            "cómo llegar al mirador",
+            "autobús lanzadera observatorio",
+            "sendero a la plataforma de observación",
+            "ruta hacia el punto de vista",
+            "camino hacia el Shiroyama"
           ],
-          "answer": "Para ir al mirador, lo más práctico es el autobús lanzadera de pago. Cruce el puente que está justo delante de este edificio, salga a la calle principal y gire a la izquierda; a unos 10 minutos encontrará la parada delante de la Casa Wada. Suba allí al autobús lanzadera. También hay una ruta a pie que sube por la falda de la montaña, y desde aquí se tarda unos 30 a 40 minutos.",
+          "answer": "Para llegar al mirador, le recomendamos tomar nuestro autobús lanzadera de pago. Cruce el puente frente a este edificio, gire a la izquierda en la calle principal y camine durante aproximadamente diez minutos. Encontrará la parada de autobús frente a la casa Wada. Aborde el autobús lanzadera desde allí. También hay un sendero a pie de aproximadamente quinientos metros a lo largo de la base de la montaña. Se tarda aproximadamente treinta a cuarenta minutos en llegar a pie desde este edificio, la Sala Deai.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "observatoire aller",
-            "observatoire chemin",
-            "observatoire pied",
-            "château observatoire",
-            "belvédère aller",
-            "point de vue aller"
+            "comment accéder au belvédère",
+            "itinéraire vers le point de vue",
+            "navette vers l'observatoire",
+            "sentier pédestre observatoire",
+            "accès plate-forme observation"
           ],
-          "answer": "Pour aller à l'observatoire, la navette payante est pratique. Traversez le pont juste en face de ce bâtiment, rejoignez la rue principale et marchez environ 10 minutes vers la gauche : l'arrêt se trouve devant la maison Wada. Prenez la navette à cet arrêt. Il existe aussi un itinéraire à pied qui monte le long du pied de la montagne ; il faut compter 30 à 40 minutes depuis ici.",
+          "answer": "Pour accéder au belvédère, nous vous recommandons de prendre notre navette payante. Traversez le pont devant ce bâtiment, tournez à gauche sur l'avenue principale et marchez pendant environ dix minutes. Vous trouverez l'arrêt de bus devant la maison Wada. Montez à bord de la navette à partir de là. Il y a aussi un sentier pédestre d'environ cinq cents mètres le long de la base de la montagne. Il faut environ trente à quarante minutes pour y arriver à pied en partant de ce bâtiment, le Deai Hall.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "전망대 가는",
-            "전망대 가려면",
-            "전망대 어떻게",
-            "전망대 걸어",
-            "전망대 길",
-            "성터 전망대"
+            "전망대 가는 방법",
+            "관측소 어떻게 가",
+            "셔틀버스 전망대",
+            "등산로 전망대",
+            "시로야마 전망대 가다"
           ],
-          "answer": "전망대까지는 유료 셔틀버스가 편리합니다. 이 건물 바로 앞의 다리를 건너 큰길로 나가서 왼쪽으로 10분 정도 가시면 와다 가옥 앞에 버스 정류장이 있습니다. 그곳에서 셔틀버스를 타 주세요. 또는 산자락을 따라 걸어서 올라가는 길도 있으며, 여기서 30분에서 40분 정도면 가실 수 있습니다.",
+          "answer": "전망대에 가시려면 유료 셔틀버스를 이용하시는 것이 편리합니다. 이 건물 앞의 다리를 건너서 큰 길로 나가 왼쪽으로 약십 분 정도 진행하시면 와다 가 앞에 버스 정류장이 있습니다. 그곳에서 셔틀버스에 타시기 바랍니다. 또는 산 기슭을 따라 걸을 수 있는 약오백 미터의 산책로가 있으며, 이 건물인 데아이 관에서 출발하면 약삼십 분에서 사십 분 정도면 도착할 수 있습니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
             "观景台 怎么去",
-            "观景台 怎么走",
-            "观景台 步行",
+            "观景台 走法",
             "城山 观景台",
-            "去观景台",
-            "展望台"
+            "登山道 观景台",
+            "穿梭巴士 观景台"
           ],
-          "answer": "前往观景台，乘坐收费的接驳巴士比较方便。过这栋建筑正前方的桥，走到大路后向左走约10分钟，和田家前面就是巴士站，请在那里乘坐接驳巴士。另外也有沿着山边步行上山的路线，从这里出发约30到40分钟可以到达。",
+          "answer": "前往观景台最方便的方式是乘坐付费穿梭巴士。请从本建筑前方的桥走过去，来到大街上向左走约十分钟，您会看到和田家前的公交车站。从那里乘坐穿梭巴士即可。另外，山脚边还有一条约五百米长的步行道，从本建筑出发步行前往观景台需要约三十至四十分钟。",
           "audio": ""
         }
       }
@@ -1454,12 +1450,13 @@
       "category": "sightseeing",
       "questions": [
         "白水湖",
-        "滝 行き",
         "白水",
-        "滝 どうやって",
-        "白水湖 行き方"
+        "白水湖 行き方",
+        "白水湖 アクセス",
+        "白水の滝 車で",
+        "滝へ どうやって"
       ],
-      "answer": "白水の滝と白水湖へは、自家用車でないと行くことができません。また、大雨により通行制限されている場合がありますのでご注意ください。詳しくはシラカワ・ゴーイングをご覧ください。",
+      "answer": "白水の滝と白水湖へは、自家用車で飲み行くことができますが、概ね11月から6月までは道路が冬期閉鎖となるため行くことができません。また、大雨により通行制限されている場合がありますのでご注意ください。詳しくはシラカワ・ゴーイングをご覧ください。",
       "audio": "waterfall_lake.mp3",
       "photo": "",
       "link": "https://shirakawa-going.jp/",
@@ -1468,61 +1465,62 @@
       "translations": {
         "en": {
           "questions": [
-            "Shiramizu",
-            "waterfall",
-            "falls",
-            "Shiramizu Lake",
-            "lake get",
-            "waterfall how"
+            "Hakuizu Lake",
+            "Hakuizu waterfall access",
+            "how to get to Hakuizu",
+            "Hakuizu Lake driving",
+            "Hakuizu waterfall car",
+            "can I drive to the waterfall"
           ],
-          "answer": "Shiramizu Falls and Shiramizu Lake can only be reached by private car. Please note that the road may be closed or restricted due to heavy rain. For details, please see SHIRAKAWA-Going.",
+          "answer": "You can drive to Hakuizu Waterfall and Hakuizu Lake by private vehicle. However, the road is closed during winter from approximately November to June, so access is not possible during this period. Please note that traffic restrictions may also occur due to heavy rain. For detailed information, please visit Shirakawa-Going.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "Shiramizu",
-            "cascada",
-            "catarata",
-            "lago Shiramizu",
-            "cascada llegar",
-            "lago llegar"
+            "Lago Hakuizu",
+            "Cascada Hakuizu",
+            "cómo llegar Hakuizu",
+            "Hakuizu en coche",
+            "acceso Hakuizu",
+            "carretera Hakuizu"
           ],
-          "answer": "A la cascada Shiramizu y al lago Shiramizu solo se puede llegar en vehículo propio. Tenga en cuenta también que puede haber restricciones de tráfico por lluvias intensas. Para más información, consulte SHIRAKAWA-Going.",
+          "answer": "Puede acceder a la Cascada Hakuizu y al Lago Hakuizu en automóvil privado. Sin embargo, la carretera está cerrada durante el invierno aproximadamente desde noviembre hasta junio, por lo que el acceso no es posible durante este período. Tenga en cuenta que también puede haber restricciones de tráfico debido a fuertes lluvias. Para información detallada, visite Shirakawa-Going.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "lac shiramizu",
-            "cascade",
-            "shiramizu",
-            "chute eau",
-            "aller lac",
-            "cascade aller"
+            "Lac Hakuizu",
+            "Cascade Hakuizu",
+            "comment aller Hakuizu",
+            "Hakuizu en voiture",
+            "accès Hakuizu",
+            "route Hakuizu"
           ],
-          "answer": "Les chutes de Shiramizu et le lac Shiramizu ne sont accessibles qu'en voiture particulière. Attention, la circulation peut être restreinte en cas de fortes pluies. Pour plus de détails, veuillez consulter SHIRAKAWA-Going.",
+          "answer": "Vous pouvez accéder à la Cascade Hakuizu et au Lac Hakuizu en voiture particulière. Cependant, la route est fermée pendant l'hiver, approximativement de novembre à juin, donc l'accès n'est pas possible pendant cette période. Veuillez noter que des restrictions de circulation peuvent également survenir en raison de fortes pluies. Pour plus d'informations, consultez le site Shirakawa-Going.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "시라미즈 호수",
-            "시라미즈 폭포",
-            "시라미즈",
-            "폭포 가는",
-            "폭포 어떻게",
-            "호수 가는"
+            "하쿠이즈 호수",
+            "하쿠이즈 폭포",
+            "하쿠이즈 가는 길",
+            "하쿠이즈 자동차",
+            "하쿠이즈 드라이브",
+            "폭포 접근"
           ],
-          "answer": "시라미즈 폭포와 시라미즈 호수는 자가용이 아니면 가실 수 없습니다. 또한 폭우로 통행이 제한되는 경우가 있으니 주의해 주세요. 자세한 내용은 시라카와 고잉을 확인해 주세요.",
+          "answer": "하쿠이즈 폭포와 하쿠이즈 호수는 개인 차량으로 방문할 수 있습니다. 다만, 11월부터 6월까지는 도로가 겨울철 폐쇄되어 통행이 불가능합니다. 또한 집중호우로 인해 통행이 제한될 수 있으니 주의하시기 바랍니다. 자세한 정보는 Shirakawa-Going을 참고하시기 바랍니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
             "白水湖",
             "白水瀑布",
-            "瀑布 怎么去",
-            "白水",
-            "白水湖 怎么走"
+            "白水湖怎么去",
+            "白水湖交通",
+            "白水瀑布自驾",
+            "开车去白水"
           ],
-          "answer": "白水瀑布和白水湖只能自驾前往。另外，因暴雨有时会实施通行限制，请注意。详情请查看SHIRAKAWA-Going。",
+          "answer": "您可以驾驶私家车前往白水瀑布和白水湖。但是，从大约十一月至六月期间，道路实行冬季封闭，无法通行。请注意，由于暴雨可能会实施交通管制。有关详细信息，请访问Shirakawa-Going网站。",
           "audio": ""
         }
       }
@@ -2935,7 +2933,7 @@
         "祭り 会場",
         "どぶろく どこ"
       ],
-      "answer": "会場の「白川八幡神社」は、荻町合掌造り集落の南端に位置しています。 白川郷バスターミナルからは、南（合掌造りが並ぶメイン通り）へ向かって徒歩約15分〜20分です。",
+      "answer": "会場の「白川八幡神社」は、荻町合掌造り集落の南端に位置しています。 白川郷バスターミナルからは約800m、南（合掌造りが並ぶメイン通り）へ向かって徒歩約15分〜20分です。",
       "audio": "festival_shrine_access_bt.mp3",
       "photo": "",
       "link": "",
@@ -2944,61 +2942,57 @@
       "translations": {
         "en": {
           "questions": [
-            "Shirakawa Hachiman",
-            "shrine where",
-            "shrine get",
+            "Shirakawa Hachiман Shrine location",
+            "how to get to shrine",
             "festival venue",
             "doburoku where",
-            "festival place"
+            "shrine access directions"
           ],
-          "answer": "The venue, Shirakawa Hachiman Shrine, is at the southern end of the Ogimachi gassho-style village. From Shirakawa-go Bus Terminal, it is about a 15 to 20 minute walk south, along the main street lined with gassho-style houses.",
+          "answer": "The festival venue, Shirakawa Hachiман Shrine, is located at the southern end of the Ogimachi Gassho-zukuri village. From the Shirakawa-go Bus Terminal, it is approximately eight hundred metres away. Head south along the main street lined with traditional Gassho-zukuri houses, and you will reach the shrine in approximately fifteen to twenty minutes on foot.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "Hachiman",
-            "santuario llegar",
-            "santuario Shirakawa",
-            "lugar festival",
-            "doburoku donde",
-            "templo festival"
+            "ubicación del Santuario Shirakawa Hachiман",
+            "cómo llegar al santuario",
+            "dónde está la plaza del festival",
+            "dónde está el doburoku",
+            "acceso al santuario"
           ],
-          "answer": "El lugar del festival, el Santuario Hachiman de Shirakawa, está en el extremo sur de la aldea de casas gassho-zukuri de Ogimachi. Desde la Terminal de Autobuses de Shirakawa-go, está a unos 15 a 20 minutos a pie en dirección sur, por la calle principal donde se alinean las casas gassho-zukuri.",
+          "answer": "El Santuario Shirakawa Hachiман, lugar de la celebración, se encuentra ubicado en el extremo sur de la aldea de casas Gassho-zukuri de Ogimachi. Desde la Terminal de Autobuses de Shirakawa-go se encuentra a aproximadamente ochocientos metros. Camine hacia el sur siguiendo la calle principal donde se alinean las tradicionales casas Gassho-zukuri, y llegará al santuario en aproximadamente quince a veinte minutos a pie.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "sanctuaire shirakawa",
-            "sanctuaire aller",
-            "sanctuaire où",
-            "lieu festival",
-            "doburoku où",
-            "hachiman"
+            "localisation du Sanctuaire Shirakawa Hachiман",
+            "comment aller au sanctuaire",
+            "où se trouve le festival",
+            "où est le doburoku",
+            "accès au sanctuaire"
           ],
-          "answer": "Le lieu du festival, le sanctuaire Shirakawa Hachiman, se trouve à l'extrémité sud du village aux maisons gassho d'Ogimachi. Depuis le terminal de bus de Shirakawa-go, comptez environ 15 à 20 minutes à pied vers le sud, par la rue principale bordée de maisons gassho.",
+          "answer": "Le Sanctuaire Shirakawa Hachiман, lieu du festival, est situé à l'extrémité sud du village de maisons Gassho-zukuri d'Ogimachi. Depuis la Gare routière de Shirakawa-go, il se trouve à environ huit cents mètres de distance. Dirigez-vous vers le sud en suivant la rue principale bordée de traditionnelles maisons Gassho-zukuri, et vous atteindrez le sanctuaire en environ quinze à vingt minutes à pied.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "시라카와 하치만 신사",
-            "하치만 신사",
-            "신사 가는",
-            "신사 어떻게",
-            "축제 장소",
-            "도부로쿠 어디"
+            "시라카와 하치만신사 어디",
+            "신사 가는 길",
+            "축제 회장 위치",
+            "도부로쿠 어디있어",
+            "신사 접근 방법"
           ],
-          "answer": "행사장인 시라카와 하치만 신사는 오기마치 갓쇼즈쿠리 마을의 남쪽 끝에 있습니다. 시라카와고 버스터미널에서는 남쪽, 갓쇼즈쿠리 가옥이 늘어선 메인 거리 방향으로 걸어서 약 15분에서 20분 걸립니다.",
+          "answer": "축제 회장인 시라카와 하치만신사는 오기마치 갓쇼즈쿠리 마을의 남쪽 끝에 위치하고 있습니다. 시라카와고 버스터미널에서 약 팔백 미터 거리에 있습니다. 전통 갓쇼즈쿠리 가옥들이 줄지어 있는 남쪽 메인 거리를 따라 도보로 약 십오 분에서 이십 분 정도 가면 신사에 도착합니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "白川八幡神社",
-            "神社 怎么走",
-            "节日 会场",
-            "浊酒 哪里",
-            "神社 在哪"
+            "白川八幡神社在哪里",
+            "神社怎么去",
+            "祭典会场位置",
+            "浊酒在哪儿",
+            "前往神社的路线"
           ],
-          "answer": "会场白川八幡神社位于荻町合掌造村落的南端。从白川乡巴士总站出发，向南沿着合掌造房屋林立的主街步行约15到20分钟。",
+          "answer": "祭典会场白川八幡神社位于荻町合掌造村落的南端。从白川乡巴士总站出发，距离约为八百米。沿着排满传统合掌造房屋的南向主街步行，约需十五分钟至二十分钟便可到达神社。",
           "audio": ""
         }
       }
@@ -3012,7 +3006,7 @@
         "祭り 会場",
         "どぶろく どこ"
       ],
-      "answer": "「白川八幡神社」は、荻町合掌造り集落の南端に位置しています。 であいの館方面からは、であい橋を渡って大通りに出て右（南側）へ進むと到着します。鳥居と大きな杉の木が目印です。",
+      "answer": "「白川八幡神社」は、荻町合掌造り集落の南端に位置しています。 であいの館方面からは約400m、であい橋を渡って大通りに出て右（南側）へ進むと到着します。鳥居と大きな杉の木が目印です。",
       "audio": "festival_shrine_access_deai.mp3",
       "photo": "",
       "link": "",
@@ -3021,61 +3015,57 @@
       "translations": {
         "en": {
           "questions": [
-            "Shirakawa Hachiman",
-            "shrine where",
-            "shrine get",
-            "festival venue",
-            "doburoku where",
-            "festival place"
+            "Shirakawa Hachimangu Shrine location",
+            "how to get to the shrine",
+            "where is the festival venue",
+            "Doburoku sake where",
+            "Hachimangu direction from Deai"
           ],
-          "answer": "Shirakawa Hachiman Shrine is at the southern end of the Ogimachi gassho-style village. From Deai-no-Yakata, cross Deai Bridge, go out to the main street, and head right, to the south, and you will arrive there. Look for the torii gate and the large cedar trees.",
+          "answer": "Shirakawa Hachimangu Shrine is located at the southern end of the Ogimachi gassho-zukuri village. From the Deai no Yakan building, it's about four hundred meters away. Cross the Deai Bridge, head out to the main street, and continue to the right, heading south. You'll recognize it by the torii gate and the large cedar trees.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "Hachiman",
-            "santuario llegar",
-            "santuario Shirakawa",
-            "lugar festival",
-            "doburoku donde",
-            "templo festival"
+            "Santuario Shirakawa Hachimangu dónde",
+            "cómo llegar al santuario",
+            "ubicación del festival",
+            "dónde está el Doburoku",
+            "dirección desde Deai no Yakan"
           ],
-          "answer": "El Santuario Hachiman de Shirakawa está en el extremo sur de la aldea de casas gassho-zukuri de Ogimachi. Desde Deai-no-Yakata, cruce el Puente Deai, salga a la calle principal y siga hacia la derecha, es decir, hacia el sur, hasta llegar. Lo reconocerá por el torii y el gran cedro.",
+          "answer": "El Santuario Shirakawa Hachimangu se encuentra ubicado en el extremo sur de la aldea de casas gassho-zukuri de Ogimachi. Desde el edificio Deai no Yakan, está a aproximadamente cuatrocientos metros. Cruza el puente Deai, sal a la calle principal y continúa hacia la derecha, en dirección sur. Podrás reconocerlo por la puerta torii y los grandes árboles de cedro.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "sanctuaire shirakawa",
-            "sanctuaire aller",
-            "sanctuaire où",
-            "lieu festival",
-            "doburoku où",
-            "hachiman"
+            "Sanctuaire Shirakawa Hachimangu localisation",
+            "comment aller au sanctuaire",
+            "où est le festival",
+            "où trouver le Doburoku",
+            "direction depuis Deai no Yakan"
           ],
-          "answer": "Le sanctuaire Shirakawa Hachiman se trouve à l'extrémité sud du village aux maisons gassho d'Ogimachi. Depuis le Deai-no-Yakata, traversez le pont Deai, rejoignez la rue principale et continuez vers la droite, c'est-à-dire vers le sud, pour y arriver. Le torii et le grand cèdre vous serviront de repères.",
+          "answer": "Le Sanctuaire Shirakawa Hachimangu est situé à l'extrémité sud du village de maisons gassho-zukuri d'Ogimachi. En partant du bâtiment Deai no Yakan, il se trouve à environ quatre cents mètres. Traversez le pont Deai, rejoignez la rue principale et continuez vers la droite en direction du sud. Vous le reconnaîtrez par le portique torii et les grands cèdres.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "시라카와 하치만 신사",
-            "하치만 신사",
-            "신사 가는",
-            "신사 어떻게",
-            "축제 장소",
-            "도부로쿠 어디"
+            "시라카와 하치만구 신사 위치",
+            "신사 가는 방법",
+            "제사 장소 어디",
+            "도부로쿠 어디 있어",
+            "데아이에서 하치만구 길"
           ],
-          "answer": "시라카와 하치만 신사는 오기마치 갓쇼즈쿠리 마을의 남쪽 끝에 있습니다. 데아이노야카타 쪽에서는 데아이 다리를 건너 큰길로 나가서 오른쪽, 즉 남쪽으로 가시면 도착합니다. 도리이와 큰 삼나무가 표지입니다.",
+          "answer": "시라카와 하치만구 신사는 오기마치 합장조 집락의 남쪽 끝에 위치하고 있습니다. 데아이노야칸 방면에서 약사백 미터 떨어져 있습니다. 데아이 다리를 건너 대로에 나온 후 오른쪽, 즉 남쪽으로 진행하면 도착합니다. 토리이 문과 큰 삼나무가 표시입니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "白川八幡神社",
-            "神社 怎么走",
-            "节日 会场",
-            "浊酒 哪里",
-            "神社 在哪"
+            "白川八幡神社 位置",
+            "怎么去神社",
+            "祭典会场在哪里",
+            "浊酒在哪里",
+            "从相逢馆去八幡神社"
           ],
-          "answer": "白川八幡神社位于荻町合掌造村落的南端。从Deai-no-Yakata（出会之馆）方向出发，过Deai桥走到大路后，向右（南边）前进即可到达。鸟居和高大的杉树是标志。",
+          "answer": "白川八幡神社位于荻町合掌造集落的南端。从相逢馆方向出发，约四百米的距离。穿过相逢桥，来到大街上，向右边，即南侧方向行进就能到达。以鸟居和大杉树为标志。",
           "audio": ""
         }
       }
@@ -3901,11 +3891,11 @@
       "questions": [
         "合掌造り 見学",
         "見学施設",
-        "中 入れる",
         "入館料",
-        "見学 料金"
+        "見学 料金",
+        "見学施設 入れる"
       ],
-      "answer": "合掌造りの見学施設は、各施設おひとり300円から400円、民家園のみおひとり800円となります。",
+      "answer": "合掌造りの見学施設は、各施設おひとり大人400円、民家園のみおひとり800円となります。",
       "audio": "gassho_facilities.mp3",
       "photo": "",
       "link": "https://shirakawa-go.gr.jp/active/",
@@ -3914,62 +3904,57 @@
       "translations": {
         "en": {
           "questions": [
-            "gassho house visit",
-            "gassho inside",
-            "visit house",
-            "go inside",
-            "entrance fee house",
-            "admission house"
+            "gassho tour admission fee",
+            "gassho village entrance price",
+            "how much cost gassho houses",
+            "gassho minkaen admission",
+            "visiting gassho buildings price"
           ],
-          "answer": "Admission to the gassho-style houses open to visitors is 300 yen to 400 yen per person at each facility, except for Gassho-zukuri Minkaen, which is 800 yen per person.",
+          "answer": "The admission fee for each gassho-style house viewing facility is four hundred yen per adult. The Minkaen folk village is eight hundred yen per adult.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "gassho visita",
-            "casa gassho",
-            "entrar casa",
-            "casa precio",
-            "museo entrada",
-            "Minkaen"
+            "gassho precio entrada",
+            "casas gassho cuánto cuesta",
+            "minkaen tarifa admisión",
+            "costo visita gassho",
+            "entrada gassho village"
           ],
-          "answer": "Las casas gassho-zukuri visitables cuestan de 300 a 400 yenes por persona cada una; solo el Gassho-zukuri Minkaen, un museo al aire libre, cuesta 800 yenes por persona.",
+          "answer": "El precio de entrada para cada instalación de visita de casas gassho es de cuatrocientos yenes por adulto. La aldea folclórica Minkaen es de ochocientos yenes por adulto.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "maison gassho visite",
-            "visiter gassho",
-            "visiter intérieur",
-            "entrer maison",
-            "tarif maison",
-            "gassho prix"
+            "gassho tarif entrée",
+            "maisons gassho prix visite",
+            "minkaen coût admission",
+            "village gassho tarif",
+            "gassho combien coûte"
           ],
-          "answer": "Les maisons gassho ouvertes à la visite coûtent de 300 à 400 yens par personne chacune, sauf le Gassho-zukuri Minkaen, un musée en plein air, qui coûte 800 yens par personne.",
+          "answer": "Le tarif d'entrée pour chaque installation de visite des maisons gassho est de quatre cents yens par adulte. Le village folklorique Minkaen est de huit cents yens par adulte.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "갓쇼즈쿠리 관람",
-            "관람 시설",
-            "안에 들어가",
-            "입관료",
-            "관람 요금",
-            "갓쇼 내부"
+            "갓쇼조쿠리 관광 입장료",
+            "갓쇼조쿠리 집 입장료",
+            "민카엔 가격",
+            "갓쇼조쿠리 보다 료금",
+            "갓쇼 민가 방문 비용"
           ],
-          "answer": "갓쇼즈쿠리 관람 시설은 각 시설 1인당 300엔에서 400엔이며, 갓쇼즈쿠리 민카엔만 1인당 800엔입니다.",
+          "answer": "갓쇼조쿠리 관광 시설 각각의 입장료는 성인 한 명당 사백 엔입니다. 민카엔은 성인 한 명당 팔백 엔입니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "合掌造 参观",
-            "参观 设施",
-            "进去 参观",
-            "合掌屋 门票",
-            "参观 费用",
-            "里面 参观"
+            "合掌造 参观 门票",
+            "合掌造房屋 入场费",
+            "民家园 多少钱",
+            "参观合掌村 价格",
+            "合掌建筑 参观费用"
           ],
-          "answer": "合掌造参观设施的门票为每处每人300日元至400日元，只有合掌造民家园（露天博物馆）为每人800日元。",
+          "answer": "合掌造房屋各个参观设施的成人门票价格为每人四百日元。民家园的门票价格为每人八百日元。",
           "audio": ""
         }
       }
@@ -4137,13 +4122,13 @@
       "id": "snowfall",
       "category": "season",
       "questions": [
-        "雪 いつ",
         "雪 積もる",
         "初雪",
         "雪 時期",
-        "積雪"
+        "積雪",
+        "雪は いつ"
       ],
-      "answer": "近年の傾向では、毎年12月初旬に初雪が観測されます。当村は豪雪地帯のため、12月下旬から2月下旬は雪の積もった状態が続きます。お出かけ前に天気予報をご確認ください。",
+      "answer": "近年の傾向では、毎年12月初旬に初雪が観測されます。当村は豪雪地帯のため、12月下旬から2月下旬は雪の積もった状態が続きます。お出かけ前に天気予報をご確認ください。白川村役場ホームページのライブカメラから集落の雪の状況を確認することができます。",
       "audio": "snowfall.mp3",
       "photo": "",
       "link": "https://weather.yahoo.co.jp/weather/jp/21/5220/21604.html",
@@ -4152,62 +4137,57 @@
       "translations": {
         "en": {
           "questions": [
-            "snow when",
-            "snow season",
-            "first snow",
-            "snowfall",
-            "snow cover",
-            "when snow"
+            "when does snow fall",
+            "snowfall season",
+            "first snow time",
+            "snow accumulation period",
+            "heavy snow months"
           ],
-          "answer": "Recent trends show that the first snow is observed in early December every year. This village gets very heavy snowfall, so the ground stays covered with snow from late December to late February. Please check the weather forecast before you go out.",
+          "answer": "Based on recent trends, the first snow is typically observed in early December each year. Shirakawa Village is in a heavy snowfall region, so snow accumulation continues from late December through late February. Please check the weather forecast before your visit. You can monitor snow conditions in the village through the live camera on the Shirakawa Village official website.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "nieve cuando",
-            "nevad",
-            "primera nieve",
-            "nieve epoca",
-            "nieve acumul",
-            "nieva"
+            "nieve cuando cae",
+            "primera nieve época",
+            "acumulación de nieve período",
+            "nevadas meses",
+            "Shirakawa nieve temporal"
           ],
-          "answer": "Según la tendencia de los últimos años, la primera nevada se registra a principios de diciembre. Este pueblo está en una zona de nevadas muy intensas, por lo que de finales de diciembre a finales de febrero la nieve permanece acumulada. Consulte el pronóstico del tiempo antes de salir.",
+          "answer": "Según las tendencias recientes, se observa la primera nieve a principios de diciembre cada año. La aldea de Shirakawa es una zona de fuertes nevadas, por lo que la acumulación de nieve continúa desde finales de diciembre hasta finales de febrero. Por favor, verifique el pronóstico del tiempo antes de su visita. Puede monitorear las condiciones de nieve en la aldea a través de la cámara en vivo en el sitio web oficial de la Aldea de Shirakawa.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "neige quand",
-            "neige tomber",
-            "première neige",
-            "neige saison",
-            "enneigement",
-            "neige période"
+            "neige quand tombe",
+            "premières neiges période",
+            "accumulation neige mois",
+            "chutes de neige saison",
+            "Shirakawa village neige temps"
           ],
-          "answer": "Ces dernières années, la première neige est observée début décembre. Notre village se trouve dans une région de fortes chutes de neige, et le sol reste enneigé de fin décembre à fin février. Veuillez consulter les prévisions météo avant de partir.",
+          "answer": "Selon les tendances récentes, les premières neiges sont généralement observées au début décembre chaque année. Le village de Shirakawa est une région de très fortes chutes de neige, donc l'accumulation de neige persiste de fin décembre à fin février. Veuillez vérifier les prévisions météorologiques avant votre visite. Vous pouvez surveiller l'état de la neige dans le village via la caméra en direct sur le site officiel du village de Shirakawa.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "눈 언제",
-            "눈 쌓이",
-            "눈 쌓인",
-            "첫눈",
-            "적설",
-            "눈 오는 시기"
+            "눈 내리는 시기",
+            "초설 언제",
+            "적설 기간",
+            "폭설 지역",
+            "흰천 마을 눈"
           ],
-          "answer": "최근 경향으로는 매년 12월 초순에 첫눈이 관측됩니다. 이 마을은 폭설 지대이기 때문에 12월 하순부터 2월 하순까지는 눈이 쌓인 상태가 계속됩니다. 외출하시기 전에 일기예보를 확인해 주세요.",
+          "answer": "최근 추세에 따르면 매년 12월 초순에 초설이 관측됩니다. 시라카와 마을은 호설 지대이므로 12월 하순부터 2월 하순까지 눈이 쌓인 상태가 계속됩니다. 방문 전에 날씨 예보를 확인해주시기 바랍니다. 시라카와 마을청 홈페이지의 라이브 카메라를 통해 마을의 적설 상황을 확인할 수 있습니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "下雪 什么时候",
-            "积雪",
-            "初雪",
-            "下雪 季节",
-            "下雪 月份",
-            "雪景"
+            "下雪 时间",
+            "初雪 什么时候",
+            "积雪 季节",
+            "降雪 月份",
+            "白川 雪 几月"
           ],
-          "answer": "从近年的情况来看，每年12月上旬会迎来初雪。本村是大雪地区，12月下旬到2月下旬会持续积雪。出行前请确认天气预报。",
+          "answer": "根据近年的趋势，每年十二月初会观测到初雪。白川村是豪雪地带，从十二月下旬到二月下旬会持续积雪。请在出行前确认天气预报。您可以通过白川村役场官方网站的实时摄像头确认集落的积雪状况。",
           "audio": ""
         }
       }
@@ -4298,9 +4278,10 @@
         "自転車",
         "サイクリング",
         "自転車 乗れ",
-        "自転車 走"
+        "自転車 走れる",
+        "自転車 停めれ"
       ],
-      "answer": "自転車で集落内へお越しいただくことは可能ですが、歩いている方が多いため、おすすめはしておりません。押して歩いていただくか、駐輪してからのご見学をお願いいたします。",
+      "answer": "自転車で集落内へお越しいただくことは可能ですが、駐輪場がないことおよび、歩いている方が多いため、おすすめはしておりません。押して歩いてご見学をお願いいたします。",
       "audio": "bicycle.mp3",
       "photo": "",
       "link": "",
@@ -4310,56 +4291,56 @@
         "en": {
           "questions": [
             "bicycle",
-            "bike",
             "cycling",
-            "ride bike",
-            "cycle"
+            "bike riding",
+            "can I ride a bike",
+            "bicycle parking"
           ],
-          "answer": "You may come into the village by bicycle, but we do not recommend it because there are many people walking. Please walk your bicycle, or park it before sightseeing.",
+          "answer": "You may bring a bicycle into the village, however there is no bicycle parking area. Since many visitors walk through the settlement, we recommend that you dismount and push your bicycle while sightseeing.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "bici",
-            "ciclismo",
-            "ciclista",
-            "bici montar",
-            "bici andar"
+            "bicicleta",
+            "ciclo",
+            "andar en bicicleta",
+            "puedo montar en bici",
+            "estacionamiento de bicicletas"
           ],
-          "answer": "Se puede entrar en la aldea en bicicleta, pero no lo recomendamos porque hay mucha gente caminando. Le pedimos que la lleve empujándola a pie o que la estacione antes de hacer la visita.",
+          "answer": "Puede traer su bicicleta al pueblo, pero no hay un área de estacionamiento para bicicletas. Como muchos visitantes caminan por el asentamiento, le recomendamos que baje de la bicicleta y la empuje mientras realiza el recorrido turístico.",
           "audio": ""
         },
         "fr": {
           "questions": [
             "vélo",
             "bicyclette",
-            "cyclisme",
-            "rouler vélo",
-            "vélo village"
+            "faire du vélo",
+            "puis-je faire du vélo",
+            "stationnement vélo"
           ],
-          "answer": "Il est possible de venir à vélo dans le village, mais nous ne le recommandons pas, car il y a beaucoup de piétons. Veuillez pousser votre vélo à la main, ou le garer avant de visiter.",
+          "answer": "Vous pouvez amener votre vélo au village, mais il n'y a pas de zone de stationnement pour les vélos. Comme de nombreux visiteurs se promènent dans le village à pied, nous vous recommandons de descendre de votre vélo et de le pousser pendant la visite.",
           "audio": ""
         },
         "ko": {
           "questions": [
             "자전거",
-            "사이클링",
-            "자전거 타",
-            "자전거 탈",
-            "자전거 들어"
+            "자전거 타기",
+            "자전거 탈 수 있나",
+            "자전거 주차",
+            "자전거 보관"
           ],
-          "answer": "자전거로 마을 안에 들어오실 수는 있지만, 걸어 다니는 분이 많아 권하지 않습니다. 자전거를 끌고 걸으시거나, 자전거를 세워 두신 후 관람해 주시기 바랍니다.",
+          "answer": "자전거를 가지고 마을로 들어올 수 있지만, 자전거 주차장이 없습니다. 많은 방문객들이 마을을 걸어서 둘러보기 때문에, 자전거에서 내려 끌고 다니며 관광하시기를 권장합니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
             "自行车",
-            "骑行",
-            "骑车",
-            "单车",
-            "自行车 可以"
+            "骑自行车",
+            "能骑自行车吗",
+            "自行车停放",
+            "自行车架"
           ],
-          "answer": "可以骑自行车进入村落，但因为步行游客很多，我们不太推荐。请推着自行车步行，或停好自行车后再参观。",
+          "answer": "您可以骑自行车进入村落，但村内没有自行车停放区。由于许多游客在此步行游览，我们建议您下车推行自行车游览景区。",
           "audio": ""
         }
       }
@@ -4525,12 +4506,13 @@
       "id": "river",
       "category": "manner",
       "questions": [
-        "川 入れ",
         "水遊び",
-        "川 遊ん",
-        "庄川"
+        "庄川",
+        "川に 入れ",
+        "川で 遊べ",
+        "川遊び 禁止"
       ],
-      "answer": "川は流れが速く水深もあるため大変危険です。川にはお入りにならないでください。",
+      "answer": "川は流れが速く水深もあるほか、ダムの放水もあるため大変危険です。川にはお入りにならないでください。",
       "audio": "river.mp3",
       "photo": "",
       "link": "",
@@ -4539,62 +4521,57 @@
       "translations": {
         "en": {
           "questions": [
-            "river",
-            "river swim",
-            "play water",
             "water play",
-            "Shogawa",
-            "river enter"
+            "swimming in river",
+            "can I enter the river",
+            "is it safe to swim",
+            "Shogawa River"
           ],
-          "answer": "The river is very dangerous because the current is fast and the water is deep. Please do not go into the river.",
+          "answer": "The river has a strong current and deep water. Additionally, water is released from the dam, making it extremely dangerous. Please do not enter the river.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "rio entrar",
-            "rio bañar",
-            "rio jugar",
-            "nadar",
-            "jugar agua",
-            "Shogawa"
+            "juegos de agua",
+            "río Shogawa",
+            "puedo entrar en el río",
+            "nadar en el río",
+            "peligro río"
           ],
-          "answer": "El río es muy peligroso porque la corriente es rápida y el agua es profunda. No entre en el río.",
+          "answer": "El río tiene una corriente fuerte y agua profunda. Además, hay liberación de agua de la presa, lo que lo hace extremadamente peligroso. Por favor, no entre en el río.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "rivière",
-            "baignade",
-            "jouer eau",
-            "rivière entrer",
-            "shogawa",
-            "nager"
+            "jeux d'eau",
+            "rivière Shogawa",
+            "je peux entrer dans la rivière",
+            "nager dans la rivière",
+            "rivière danger"
           ],
-          "answer": "Le courant de la rivière est rapide et l'eau est profonde : c'est très dangereux. Veuillez ne pas entrer dans la rivière.",
+          "answer": "La rivière a un courant rapide et une eau profonde. De plus, il y a des lâchages d'eau du barrage, ce qui la rend extrêmement dangereuse. Veuillez ne pas entrer dans la rivière.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "강에 들어",
-            "강 들어가",
-            "강에서 놀",
             "물놀이",
-            "쇼가와",
-            "강 수영"
+            "장가와",
+            "강에 들어가다",
+            "강에서 수영하",
+            "강 위험"
           ],
-          "answer": "강은 물살이 빠르고 수심도 깊어 매우 위험합니다. 강에는 들어가지 마세요.",
+          "answer": "강은 물살이 빠르고 수심이 깊으며, 댐의 방류수가 있어서 매우 위험합니다. 강에 들어가지 마십시오.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "下河",
-            "玩水",
-            "河边 玩耍",
+            "水上游乐",
             "庄川",
-            "游泳",
-            "河里"
+            "能 进河里",
+            "河里 游泳",
+            "河水 危险"
           ],
-          "answer": "河流水流湍急，水也很深，非常危险。请不要进入河中。",
+          "answer": "河流水流湍急，水深较深，同时还会进行放水，非常危险。请不要进入河里。",
           "audio": ""
         }
       }
@@ -4606,10 +4583,13 @@
         "何時まで",
         "見学 時間帯",
         "営業時間",
-        "夜 見られる",
-        "早朝"
+        "早朝",
+        "駐車場 営業時間",
+        "入庫 締切時間",
+        "見学 可能時間",
+        "夜に 見られる"
       ],
-      "answer": "世界遺産集落は住民の方が生活されています。そのため、集落内にご宿泊の方以外のご見学は、8時から17時の時間帯でお願いしております。村営駐車場の営業時間も8時から17時です。ライトアップなどのイベント開催日は除きます。",
+      "answer": "世界遺産集落は住民の方が生活されています。そのため、集落内にご宿泊の方以外のご見学は、8時から17時の時間帯でお願いしております。村営駐車場の営業時間も8時から17時（最終入庫は16時30分）です。ライトアップなどのイベント開催日は除きます。",
       "audio": "visit_hours.mp3",
       "photo": "",
       "link": "",
@@ -4618,62 +4598,62 @@
       "translations": {
         "en": {
           "questions": [
-            "opening hours",
             "visiting hours",
-            "open until",
-            "night visit",
-            "early morning",
-            "close time"
+            "opening hours times",
+            "when can I visit",
+            "car park parking lot hours",
+            "last entry time",
+            "night viewing evening"
           ],
-          "answer": "People live in the World Heritage village. For this reason, we ask visitors, except those staying overnight in the village, to visit between 8:00 a.m. and 5:00 p.m. The village parking lots are also open from 8:00 a.m. to 5:00 p.m. This does not apply on days with events such as the light-up.",
+          "answer": "The Shirakawa-go village is a living community where residents reside. For visitors not staying overnight in the village, sightseeing is permitted between 8 a.m. and 5 p.m. The village-operated parking lot is also open from 8 a.m. to 5 p.m., with the final entry at 4 p.m. and 30 minutes. Please note that these times do not apply on days when special events such as illumination displays are held.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "horario visita",
-            "hora cierr",
-            "abierto hasta",
-            "noche visita",
-            "temprano",
-            "madrugada"
+            "horario de visita",
+            "horarios de apertura",
+            "a qué hora puedo visitar",
+            "horario de estacionamiento aparcamiento",
+            "última entrada",
+            "iluminación nocturna"
           ],
-          "answer": "En la aldea declarada Patrimonio de la Humanidad viven sus residentes. Por eso, salvo quienes se alojan en la aldea, le pedimos que la visite entre las 8:00 y las 17:00. El estacionamiento municipal también funciona de 8:00 a 17:00. Se exceptúan los días con eventos como la iluminación nocturna.",
+          "answer": "El pueblo de Shirakawa-go, Patrimonio de la Humanidad, es una comunidad donde residen habitantes. Por lo tanto, para los visitantes que no se alojen en el pueblo, la visita se permite de 8 de la mañana a 5 de la tarde. El aparcamiento municipal también abre de 8 de la mañana a 5 de la tarde, con la última entrada a las 4 de la tarde y 30 minutos. Estos horarios no aplican en días de eventos especiales como iluminaciones.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "village fermeture",
-            "heure visite",
-            "horaire ouverture",
-            "visite nuit",
-            "tôt matin",
-            "heure fermeture"
+            "heures de visite",
+            "horaires d'ouverture",
+            "quand puis-je visiter",
+            "heures parking",
+            "dernière entrée",
+            "illumination nocturne"
           ],
-          "answer": "Des habitants vivent dans le village classé au patrimoine mondial. C'est pourquoi, sauf si vous séjournez dans le village, nous vous demandons de le visiter entre 8 h et 17 h. Les parkings municipaux sont également ouverts de 8 h à 17 h. Les jours d'événements comme les illuminations font exception.",
+          "answer": "Le village de Shirakawa-go, patrimoine mondial, est une communauté où vivent des habitants. Par conséquent, pour les visiteurs ne séjournant pas dans le village, les visites sont autorisées de 8 heures du matin à 17 heures. Le parking municipal est également ouvert de 8 heures du matin à 17 heures, avec une dernière entrée à 16 heures 30. Ces horaires ne s'appliquent pas les jours où des événements spéciaux tels que les illuminations ont lieu.",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "몇 시까지",
-            "관람 시간",
-            "영업시간",
-            "운영 시간",
-            "밤에 볼",
-            "이른 아침"
+            "방문 시간",
+            "개방 시간",
+            "관광 가능 시간",
+            "주차장 운영 시간",
+            "최종 입차 시간",
+            "야간 관광 야경"
           ],
-          "answer": "세계유산 마을에는 주민분들이 생활하고 계십니다. 그래서 마을 안에 숙박하시는 분 외에는 오전 8시부터 오후 5시 사이에 관람해 주시기를 부탁드리고 있습니다. 마을에서 운영하는 주차장의 운영 시간도 오전 8시부터 오후 5시까지입니다. 라이트업 등 행사가 열리는 날은 제외합니다.",
+          "answer": "시라카와고 세계유산 마을은 주민들이 생활하는 지역입니다. 따라서 마을에 숙박하지 않는 관광객의 관광은 오전 8시부터 오후 5시까지의 시간대에만 가능합니다. 마을 운영 주차장의 운영 시간도 오전 8시부터 오후 5시까지이며, 최종 입차 시간은 오후 4시 30분입니다. 라이트업 등 특별 행사 개최일은 제외됩니다.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "几点 结束",
-            "参观 到几点",
-            "开放 时间",
-            "晚上 参观",
-            "早上 参观",
-            "营业 时间"
+            "参观时间",
+            "开放时间",
+            "几点关闭",
+            "停车场营业时间",
+            "最后入场时间",
+            "夜间照亮"
           ],
-          "answer": "世界遗产村落里有居民生活。因此，除在村落内住宿的游客外，请在上午8点至下午5点之间参观。村营停车场的营业时间也是上午8点至下午5点。点灯等活动举办日除外。",
+          "answer": "白川乡世界遗产村庄是村民生活的地方。因此，除了在村庄内住宿的客人外，其他游客的参观时间为上午8时至下午5时。村营停车场的营业时间也是上午8时至下午5时（最后入庫时间为下午4时30分）。在举办灯光秀等特殊活动的日期除外。",
           "audio": ""
         }
       }
@@ -4910,7 +4890,7 @@
         "祭り 会場",
         "どぶろく どこ"
       ],
-      "answer": "白川八幡神社は、荻町合掌造り集落の南端にございます。鳥居と大きな杉の木が目印です。白川郷バスターミナルからは、メイン通りを南へ徒歩15分から20分ほどです。",
+      "answer": "白川八幡神社は、荻町合掌造り集落の南端にございます。鳥居と大きな杉の木が目印です。白川郷バスターミナルからは約800m、メイン通りを南へ徒歩15分から20分ほどです。",
       "audio": "festival_shrine_access_common.mp3",
       "photo": "",
       "link": "",
@@ -4919,52 +4899,52 @@
       "translations": {
         "en": {
           "questions": [
-            "where is Shirakawa Hachiman shrine",
+            "Shirakawa Hachiman Shrine location",
             "how to get to the shrine",
-            "festival venue location",
-            "where is doburoku stand"
+            "where is the festival",
+            "doburoku sake where"
           ],
-          "answer": "Shirakawa Hachiman Shrine is at the southern edge of the Ogimachi Gassho‑zukuri village. Look for the torii gate and a large cedar tree. It is about a fifteen‑ to twenty‑minute walk south along the main street from the Shirakawa-go Bus Terminal.",
+          "answer": "Shirakawa Hachiman Shrine is located at the southern end of the Ogimachi gassho-zukuri village. Look for the torii gate and a large cedar tree as landmarks. It is about 800 meters from Shirakawa-go Bus Terminal, or about 15 to 20 minutes on foot heading south along the main street.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "白川八幡神社 在 哪",
-            "神社 怎么 去",
-            "祭典 场地 在 哪",
-            "どぶろく 在 哪"
+            "白川八幡神社 位置",
+            "神社 怎么走",
+            "祭祀 地点",
+            "浊酒 在哪里"
           ],
-          "answer": "白川八幡神社位于荻町合掌造り集落的南端。以鸟居和一棵大杉树为标志。从白川乡巴士总站沿主街向南步行约十五到二十分钟即可到达。",
+          "answer": "白川八幡神社位于萩町合掌造村落的南端。以鸟居和一棵大杉树作为地标。从白川乡巴士总站约800米，沿着主干道向南步行约15到20分钟即可到达。",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "백화 고하치만 신사 어디",
-            "신사 가는 방법",
-            "축제 장소 위치",
-            "도부로쿠 어디"
+            "시라카와 하치만 신사 위치",
+            "신사 가는 길",
+            "제사 장소",
+            "탁주 어디 있어"
           ],
-          "answer": "백화 고하치만 신사는 오기마치 합장마을 남쪽 끝에 있습니다. 토리이와 큰 삼나무가 눈에 띕니다. 시라카와고 버스 터미널에서 메인 거리 남쪽으로 걸어 약 15~20분 거리입니다.",
+          "answer": "시라카와 하치만 신사는 오기마치 갓쇼즈쿠리 마을의 남쪽 끝에 위치하고 있습니다. 도리이 문과 큰 삼나무가 목표물입니다. 시라카와고 버스 터미널에서 약 800미터이며, 메인 거리를 남쪽으로 도보 약 15분에서 20분 거리입니다.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "dónde está el santuario Shirakawa Hachiman",
+            "Santuario Shirakawa Hachiman dónde",
             "cómo llegar al santuario",
-            "ubicación del recinto del festival",
-            "dónde está el puesto de doburoku"
+            "ubicación del festival",
+            "sake doburoku dónde está"
           ],
-          "answer": "El santuario Shirakawa Hachiman se encuentra en el extremo sur del pueblo de casas Gassho‑zukuri de Ogimachi. El torii y un gran cedro son los puntos de referencia. Está a unos quince‑veinte minutos a pie hacia el sur desde la Terminal de Autobuses de Shirakawa‑gō.",
+          "answer": "El Santuario Shirakawa Hachiman se encuentra en el extremo sur de la aldea de casas de estilo gassho-zukuri de Ogimachi. La puerta torii y un gran árbol de cedro son las señales de referencia. Se encuentra a aproximadamente 800 metros de la Terminal de Autobuses de Shirakawa-go, o a unos 15 a 20 minutos a pie hacia el sur por la calle principal.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "où est le sanctuaire Shirakawa Hachiman",
+            "Sanctuaire Shirakawa Hachiman localisation",
             "comment aller au sanctuaire",
             "lieu du festival",
-            "où se trouve le stand de doburoku"
+            "saké doburoku où"
           ],
-          "answer": "Le sanctuaire Shirakawa Hachiman se situe à l’extrémité sud du village d’Ogimachi aux maisons Gassho‑zukuri. Le torii et un grand cèdre servent de repères. Il se trouve à environ quinze à vingt minutes de marche vers le sud depuis le terminal de bus de Shirakawa‑gō.",
+          "answer": "Le Sanctuaire Shirakawa Hachiman est situé à l'extrémité sud du village de maisons gassho-zukuri d'Ogimachi. Le portail torii et un grand cèdre servent de points de repère. Il se trouve à environ 800 mètres de la gare routière de Shirakawa-go, soit environ 15 à 20 minutes à pied vers le sud en suivant la rue principale.",
           "audio": ""
         }
       }
@@ -5228,7 +5208,7 @@
         "城山 展望台",
         "展望台 行く"
       ],
-      "answer": "展望台へは、歩きと有料シャトルバスの2通りがあります。シャトルバスは和田家のすいれん池前の乗り場から出ています。歩く場合は、和田家の先から登る遊歩道でおよそ20分です。",
+      "answer": "展望台へは、自家用車で行くことはできません。歩きと有料シャトルバスの2通りがあります。シャトルバスは和田家のすいれん池前の乗り場から出ています。歩く場合は、和田家の先から登る遊歩道でおよそ20分です。",
       "audio": "observatory_access_common.mp3",
       "photo": "",
       "link": "",
@@ -5237,62 +5217,57 @@
       "translations": {
         "en": {
           "questions": [
-            "how to get to the observatory",
-            "observatory shuttle bus location",
-            "walk to the viewpoint time",
-            "where does the castle hill observatory start",
-            "directions for the observatory",
-            "how long is the hike to the view point"
+            "observatory access",
+            "how to get to viewpoint",
+            "hiking trail to observatory",
+            "shuttle bus observation deck",
+            "Shiroyama viewpoint direction"
           ],
-          "answer": "You can reach the observatory either on foot or by a paid shuttle bus. The shuttle departs from the stop in front of the Suiren Pond at the Wada family house. If you walk, follow the trail that starts beyond the Wada house; it takes about twenty minutes.",
+          "answer": "You cannot drive your own car to the observatory. There are two ways to reach it: hiking or taking a paid shuttle bus. The shuttle bus departs from the bus stop in front of Wada House's Suiren Pond. If you choose to hike, there is a walking trail that starts just beyond Wada House, and it takes approximately twenty minutes to reach the top.",
           "audio": ""
         },
         "zh": {
           "questions": [
-            "怎么去展望台",
-            "展望台的接驳巴士在哪里",
-            "步行到观景点要多久",
-            "城山展望台从哪儿开始",
-            "去观景台的路线",
-            "步行到观景点需要多长时间"
+            "观景台 怎么去",
+            "瞭望台 路线",
+            "徒步 登山道",
+            "和田家 观景台",
+            "城山展望台 交通"
           ],
-          "answer": "前往展望台有两种方式：步行或乘坐付费接驳巴士。巴士在和田家的水莲池前的站点发车。步行的话，从和田家后面的步道上去，大约需要二十分钟。",
+          "answer": "观景台禁止自驾车进入。到达观景台有两种方式：徒步或乘坐付费班车。班车从和田家的睡莲池前停靠站出发。如果选择徒步，可以从和田家后方的登山步道开始，大约需要二十分钟才能到达。",
           "audio": ""
         },
         "ko": {
           "questions": [
-            "전망대 가는 방법",
-            "전망대 셔틀버스 위치",
-            "걸어서 전망대까지 시간",
-            "성산 전망대는 어디서 시작하나요",
-            "전망대로 가는 길 안내",
-            "전망대까지 도보 소요 시간"
+            "전망대 가는 길",
+            "전망대 어떻게 가",
+            "셔틀버스 탈 수 있",
+            "와다가 전망대",
+            "성산 전망대 접근"
           ],
-          "answer": "전망대는 도보와 유료 셔틀버스 두 가지 방법으로 갈 수 있습니다. 셔틀버스는 와다 가문의 수이렌 연못 앞 정류장에서 출발합니다. 도보로 가실 경우 와다 가문 뒤쪽에서 시작하는 산책로를 따라 약 20분 정도 소요됩니다.",
+          "answer": "전망대로는 자가용 자동차로 갈 수 없습니다. 도보와 유료 셔틀버스 두 가지 방법이 있습니다. 셔틀버스는 와다가의 수련지 앞 승차장에서 출발합니다. 도보로 가시는 경우, 와다가 너머의 산책로에서 올라가면 약 이십 분이 걸립니다.",
           "audio": ""
         },
         "es": {
           "questions": [
-            "cómo llegar al mirador",
-            "ubicación del autobús lanzadera al observatorio",
-            "tiempo caminando al punto de vista",
-            "dónde empieza el mirador del castillo",
-            "direcciones para el observatorio",
-            "cuánto tarda la caminata al mirador"
+            "mirador acceso",
+            "cómo llegar observatorio",
+            "autobús lanzadera parada",
+            "senderismo sendero",
+            "Casa Wada punto vista"
           ],
-          "answer": "Puede llegar al mirador caminando o tomando un autobús lanzadera de pago. El lanzadera sale de la parada frente al estanque Suiren en la casa de la familia Wada. Si camina, siga el sendero que comienza más allá de la casa Wada; tarda unos veinte minutos.",
+          "answer": "No puede conducir su propio automóvil hasta el mirador. Hay dos formas de llegar: caminando o en autobús lanzadera de pago. El autobús lanzadera sale desde la parada frente al Estanque Suiren de la Casa Wada. Si elige caminar, hay una ruta de senderismo que comienza justo después de la Casa Wada, y tarda aproximadamente veinte minutos en llegar a la cima.",
           "audio": ""
         },
         "fr": {
           "questions": [
-            "comment accéder au belvédère",
-            "où se trouve le bus navette du point de vue",
-            "temps de marche jusqu’au point de vue",
-            "où commence le belvédère du château",
-            "itinéraire pour le belvédère",
-            "combien de temps marche jusqu’au point de vue"
+            "observatoire accès",
+            "comment aller belvédère",
+            "navette autobus gratuit",
+            "randonnée sentier montagne",
+            "Maison Wada point vue"
           ],
-          "answer": "Vous pouvez rejoindre le belvédère à pied ou en bus navette payant. La navette part de l’arrêt devant l’étang Suiren, à la maison de la famille Wada. Si vous choisissez de marcher, suivez le sentier qui débute au-delà de la maison Wada ; cela prend environ vingt minutes.",
+          "answer": "Vous ne pouvez pas vous rendre à l'observatoire en voiture personnelle. Il y a deux façons d'y accéder : à pied ou en navette payante. La navette part de l'arrêt situé devant l'Étang Suiren de la Maison Wada. Si vous choisissez de marcher, il y a un sentier de randonnée qui commence juste après la Maison Wada, et il faut environ vingt minutes pour atteindre le sommet.",
           "audio": ""
         }
       }
@@ -5460,7 +5435,7 @@
         "結の庄 送迎",
         "結の庄 どこ"
       ],
-      "answer": "結の庄は道の駅白川郷の裏手、3.1キロメートル先にあり、歩くとおよそ30分から40分かかります。国道は交通量が多いため、川沿いの道をおすすめしております。送迎は午後2時30分から始まります。",
+      "answer": "結の庄は道の駅白川郷の裏手、3.1km先にあり、歩くとおよそ30分から40分かかります。国道は交通量が多いため、川沿いの道をおすすめしております。送迎は午後2時30分から始まります。",
       "audio": "yuinosho_common.mp3",
       "photo": "",
       "link": "",
@@ -5470,61 +5445,61 @@
         "en": {
           "questions": [
             "Yui no Sho",
-            "how to get to Yui no Sho",
-            "Yui no Sho shuttle",
-            "where is Yui no Sho",
             "Yui no Sho directions",
-            "Yui no Sho transport"
+            "Yui no Sho shuttle",
+            "how to get to Yui no Sho",
+            "Yui no Sho location",
+            "Yui no Sho pickup time"
           ],
-          "answer": "Yui no Sho is located behind the Michi-no-Eki Shirakawa-go roadside station, about three point one kilometres away. It takes roughly thirty to forty minutes on foot. Because National Route has heavy traffic, we recommend the riverside path. Shuttle service starts at two thirty PM.",
+          "answer": "Yui no Sho is located three point one kilometers behind Michi no Eki Shirakawa-go. It takes approximately thirty to forty minutes on foot. We recommend taking the path along the river, as the national highway has heavy traffic. The shuttle service begins at two thirty in the afternoon.",
           "audio": ""
         },
         "zh": {
           "questions": [
             "结之庄",
-            "怎么去结之庄",
+            "结之庄 怎么走",
             "结之庄 接送",
-            "结之庄 在哪",
-            "结之庄 路线",
-            "结之庄 交通"
+            "结之庄 位置",
+            "结之庄 方向",
+            "结之庄 班车时间"
           ],
-          "answer": "结之庄位于白川郷道之驿的后方，距离约三点一公里，步行大约需要三十到四十分钟。由于国道车流量大，建议走河边小路。接送巴士从下午两点三十分开始。",
+          "answer": "结之庄位于道之驿白川乡的后侧，距离三点一公里。步行大约需要三十到四十分钟。由于国道交通繁忙，我们推荐沿着河边的道路前往。接送班车从下午两点三十分开始运营。",
           "audio": ""
         },
         "ko": {
           "questions": [
             "유이노쇼",
-            "유이노쇼 가는 방법",
+            "유이노쇼 가는길",
             "유이노쇼 셔틀",
-            "유이노쇼 어디에 있나요",
-            "유이노쇼 길 안내",
-            "유이노쇼 교통"
+            "유이노쇼 위치",
+            "유이노쇼 교통",
+            "유이노쇼 픽업"
           ],
-          "answer": "유이노쇼는 미치노에키(道の駅) 시라카와고 뒤쪽에 위치하며, 약 3.1킬로미터 떨어져 있습니다. 도보로는 약 30~40분 소요됩니다. 국도는 차량 통행량이 많으니 강가 길을 이용하시는 것을 권장합니다. 셔틀은 오후 2시 30분부터 시작됩니다.",
+          "answer": "유이노쇼는 미치노 에키 시라카와고 뒤쪽에 위치하고 있으며, 3.1킬로미터 떨어져 있습니다. 도보로 약 30분에서 40분이 소요됩니다. 국도는 교통량이 많으므로 강변 길을 추천드립니다. 셔틀 서비스는 오후 2시 30분부터 시작합니다.",
           "audio": ""
         },
         "es": {
           "questions": [
             "Yui no Sho",
-            "cómo llegar a Yui no Sho",
-            "transporte Yui no Sho",
-            "dónde está Yui no Sho",
-            "ruta a Yui no Sho",
-            "shuttle Yui no Sho"
+            "Yui no Sho cómo llegar",
+            "Yui no Sho transporte",
+            "Yui no Sho ubicación",
+            "Yui no Sho dirección",
+            "Yui no Sho servicio de transporte"
           ],
-          "answer": "Yui no Sho está detrás de la estación de carretera Shirakawa‑gō, a unos tres coma uno kilómetros. A pie se tarda entre treinta y cuarenta minutos. Como la Ruta Nacional tiene mucho tráfico, recomendamos el camino junto al río. El servicio de traslado comienza a las dos y treinta de la tarde.",
+          "answer": "Yui no Sho se encuentra a tres punto uno kilómetros detrás de Michi no Eki Shirakawa-go. A pie, el viaje toma aproximadamente treinta a cuarenta minutos. Le recomendamos que tome el camino junto al río, ya que la carretera nacional tiene mucho tráfico. El servicio de transporte comienza a las dos treinta de la tarde.",
           "audio": ""
         },
         "fr": {
           "questions": [
             "Yui no Sho",
-            "comment aller à Yui no Sho",
-            "navette Yui no Sho",
-            "où se trouve Yui no Sho",
-            "itinéraire Yui no Sho",
-            "transport Yui no Sho"
+            "Yui no Sho comment aller",
+            "Yui no Sho navette",
+            "Yui no Sho localisation",
+            "Yui no Sho trajet",
+            "Yui no Sho service de transport"
           ],
-          "answer": "Yui no Sho se trouve derrière la station-service Shirakawa‑gō, à environ trois virgule un kilomètres. La marche dure environ trente à quarante minutes. La route nationale étant très fréquentée, nous recommandons le sentier le long de la rivière. Le service de navette commence à quatorze heures trente.",
+          "answer": "Yui no Sho est situé trois point un kilomètres derrière Michi no Eki Shirakawa-go. La marche prend environ trente à quarante minutes. Nous vous recommandons de prendre le chemin le long de la rivière, car la route nationale a beaucoup de circulation. Le service de navette commence à deux heures trente de l'après-midi.",
           "audio": ""
         }
       }
