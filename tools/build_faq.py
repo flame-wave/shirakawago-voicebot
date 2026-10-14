@@ -375,9 +375,81 @@ def read_reference(book) -> list:
         body = cell_str(row.get("内容"))
         if not title or not body or title.startswith("※"):
             continue
+        # 以前シートに写していた質問回答集の中身。いまは書き出すたびに
+        # 質問回答集から組み立てる（faq_reference）ので、シートに残っていても使わない。
+        if title.startswith(FAQ_REFERENCE_PREFIX):
+            continue
         if cell_str(row.get("有効")).upper() in ("FALSE", "0", "×", "NO"):
             continue
         notes.append({"title": title, "text": body})
+    return notes
+
+
+# ---------------------------------------------------------------- 参考資料（質問回答集から）
+# 質問回答集の回答も、参考資料としてAIへ毎回渡す。
+#
+# 質問回答集は「この質問にはこう答える」という形なので、聞かれ方が
+# 登録した言い方と離れていると当たらない。回答を毎回渡しておけば、
+# 「この村について何が分かっているか」をAIが常に持っている状態になる。
+#
+# 以前はこれを「参考資料」シートに写していた（tools/fill_reference.py）。
+# しかし写しは手で作り直したときにしか新しくならず、管理画面で回答を直しても
+# AIは古い写しのまま答えていた。いまは書き出すたびに、その時点の回答から組み立てる。
+#
+# 【文章を書き換えない】 回答文はそのまま並べる。要約すると「小学生は半額」のような
+#   条件が落ちて、そこだけを読んだAIが条件なしで答えてしまう。
+# 【案内所ごとに違う回答は入れない】 ATMやロッカーは案内所ごとに答えが違う。
+#   全部を毎回渡すと、離れた案内所の答えを混ぜて案内してしまう。
+#   「この話題は案内所によって違う」とだけ伝え、中身は検索で選ばれたものに任せる。
+FAQ_REFERENCE_PREFIX = "【質問回答集より】"
+FAQ_REFERENCE_LABELS = {
+    "sightseeing": "見どころ・観光",
+    "bus": "交通・バス",
+    "facility": "施設・設備",
+    "food": "食事",
+    "season": "季節・天候",
+    "accessibility": "車椅子・バリアフリー",
+    "manner": "見学のマナー・注意",
+    "other": "その他",
+}
+
+
+def faq_reference(faqs) -> list:
+    """案内に出す回答から、AIに渡す参考資料を組み立てる。"""
+    common = [f for f in faqs if (f.get("place") or "共通") == "共通"]
+    by_place = [f for f in faqs if (f.get("place") or "共通") != "共通"]
+
+    groups = {}
+    for f in common:
+        key = f.get("category") if f.get("category") in FAQ_REFERENCE_LABELS else "other"
+        groups.setdefault(key, []).append(f)
+
+    notes = []
+    for key, label in FAQ_REFERENCE_LABELS.items():
+        if key not in groups:
+            continue
+        text = "　".join(f["answer"].replace("\r", " ").replace("\n", " ").strip()
+                        for f in groups[key] if f.get("answer"))
+        if text:
+            notes.append({"title": FAQ_REFERENCE_PREFIX + label, "text": text})
+
+    # 案内所ごとに違う話題は、中身ではなく「違う」ことだけ伝える。
+    # 話題の名前は、札の文字（chip）があればそれを、無ければ質問例を使う。
+    topics = {}
+    for f in by_place:
+        stem = f["id"].rsplit("_", 1)[0]
+        label = (f.get("chip") or "").strip()
+        if not label:
+            label = (f.get("questions") or [""])[0].replace(" ", "").replace("　", "")
+        topics.setdefault(stem, label)
+    listed = "、".join(sorted(v for v in topics.values() if v))
+    if listed:
+        notes.append({
+            "title": FAQ_REFERENCE_PREFIX + "案内所によって答えが違うこと",
+            "text": f"次の話題は、バスターミナルとであいの館で答えが違います: {listed}。"
+                    "これらは、いまいる案内所の資料に書かれている内容だけを使って答えてください。"
+                    "資料に無い案内所の情報を持ち出さないでください。",
+        })
     return notes
 
 
@@ -705,7 +777,7 @@ def build_from_bytes(raw: bytes, assets_dir: Path | None):
                 )
 
     return (faqs, errors, warnings, pending, read_synonyms(book), places,
-            read_voice_sets(book), read_reference(book),
+            read_voice_sets(book), read_reference(book) + faq_reference(faqs),
             read_characters(book, assets_dir), read_voice_settings(book),
             read_readings(book), read_layouts(book))
 

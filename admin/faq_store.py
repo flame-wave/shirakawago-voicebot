@@ -91,7 +91,11 @@ class GitHubStore:
             )
         if res.status_code not in (200, 201):
             raise StoreError(f"保存に失敗しました（{res.status_code}）: {res.text[:200]}")
-        return res.json()["content"]["sha"]
+        body = res.json()
+        # 保存してできたコミット。案内端末がこのコミットを指定して読めば、
+        # GitHub の配信が古い写しを返すことがない（page_publish.notify_relay）。
+        self.last_commit = (body.get("commit") or {}).get("sha", "")
+        return body["content"]["sha"]
 
 
 # ---------------------------------------------------------------- 共通の操作

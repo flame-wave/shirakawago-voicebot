@@ -380,6 +380,17 @@ function build_context(array $picked, string $lang): string
 }
 
 /**
+ * 管理画面で最後に反映したコミット（version.php が覚えている）。分からなければ空。
+ */
+function published_ref(array $config): string
+{
+    $path = (string) ($config['version_path'] ?? (__DIR__ . '/data/version.json'));
+    $row = is_file($path) ? json_decode((string) @file_get_contents($path), true) : null;
+    $ref = is_array($row) ? (string) ($row['ref'] ?? '') : '';
+    return preg_match('/^[0-9a-f]{40}$/', $ref) ? $ref : '';
+}
+
+/**
  * 資料（質問回答集）を読む。
  *
  * 管理画面から反映すると、新しい質問回答集はGitHubに置かれる。
@@ -397,8 +408,15 @@ function load_faq(array $config): ?array
     $cache = (string) ($config['faq_cache_path'] ?? '');
     $maxAge = (int) ($config['faq_cache_minutes'] ?? 30) * 60;
 
+    // 管理画面で反映したときのコミット（version.php が覚えている）。
+    // 控えが別のコミットのものなら、古くなくても取り直す（反映がすぐAIにも効くように）。
+    $ref = published_ref($config);
+    $cachedRef = ($cache !== '' && is_file($cache . '.ref'))
+        ? trim((string) @file_get_contents($cache . '.ref')) : '';
+    $sameRef = $ref === '' || $ref === $cachedRef;
+
     // 控えがまだ新しければ、それを使う
-    if ($cache !== '' && is_file($cache) && time() - filemtime($cache) < $maxAge) {
+    if ($cache !== '' && is_file($cache) && $sameRef && time() - filemtime($cache) < $maxAge) {
         $decoded = json_decode((string) @file_get_contents($cache), true);
         if (is_array($decoded)) {
             return $decoded;
@@ -411,11 +429,14 @@ function load_faq(array $config): ?array
             // 取りに行くのに失敗しても案内は続けるので、短めで切り上げる
             'header' => "User-Agent: shirakawago-voicebot\r\n",
         ]]);
-        $raw = @file_get_contents($url, false, $context);
+        // コミットを指定したURLなら、GitHub の配信が古い写しを返すことがない
+        $from = $ref !== '' ? str_replace('/main/', '/' . $ref . '/', $url) : $url;
+        $raw = @file_get_contents($from, false, $context);
         $decoded = $raw === false ? null : json_decode($raw, true);
         if (is_array($decoded) && !empty($decoded['faqs'])) {
             if ($cache !== '') {
                 @file_put_contents($cache, $raw, LOCK_EX);
+                @file_put_contents($cache . '.ref', $ref, LOCK_EX);
             }
             return $decoded;
         }

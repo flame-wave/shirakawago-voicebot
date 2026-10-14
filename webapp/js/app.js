@@ -5,6 +5,7 @@
 
 import {
   LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, KIOSK_REFRESH_MS, DAILY_RELOAD_HOUR,
+  VERSION_CHECK_MS, UPDATE_IDLE_MS, CONSENT_ROTATE_MS, KIOSK_FIRST_LANG,
 } from './config.js';
 import { LANGUAGES, LABEL, uiString } from './app-language.js';
 import { FaqService } from './faq-service.js';
@@ -710,9 +711,25 @@ function applySettings() {
   renderCharacterPill();
 }
 
-async function refreshInBackground() {
-  const remote = await repo.fetchRemote();
+/// いま使っている質問回答集のコミット（version.php で知ったもの）。'' なら分からない。
+let appliedRef = '';
+/// 最後に質問回答集そのものを取りに行った時刻
+let lastFullFetch = 0;
+
+/// 新しい質問回答集があれば入れ替える。
+///
+/// まず version.php に「管理画面で最後に反映したコミット」を聞く（小さな問い合わせ）。
+///   ・新しいコミットなら、そのコミットを指定して取りに行く（古い写しが返らない）
+///   ・同じなら、何もしない
+///   ・聞けないとき（version.php が無い等）は、full が true のときだけ取りに行く
+async function refreshInBackground({ full = true } = {}) {
+  const ref = await repo.latestRef();
+  if (ref && ref === appliedRef) return;
+  if (!ref && !full) return;
+  lastFullFetch = Date.now();
+  const remote = await repo.fetchRemote(ref);
   if (remote == null) return;
+  if (ref) appliedRef = ref;
   if (remote.version === state.dataVersion) {
     console.info(`FAQは最新です（${remote.version}）`);
     return;
@@ -813,6 +830,16 @@ async function init() {
   wireConsent();
 }
 
+/// 端末（ブラウザ）の言語のうち、案内できるもの。無ければ英語。
+function browserLanguage() {
+  const prefs = navigator.languages?.length ? navigator.languages : [navigator.language || ''];
+  for (const tag of prefs) {
+    const code = String(tag).toLowerCase().split('-')[0];
+    if (LANGUAGES.includes(code)) return code;
+  }
+  return 'en';
+}
+
 /// 使い始める前に、記録することをお伝えする。
 ///
 /// 観光客の端末は初回だけ。据え置き端末は、しばらく誰も触っていなければまた出す。
@@ -821,10 +848,19 @@ function wireConsent() {
   // 同意画面で言語を選べる。選んだ言語はそのまま案内にも引き継ぐ。
   consentScreen.onLanguage = (lang) => changeLanguage(lang);
 
-  const ask = () => {
+  const ask = (first) => {
     if (consentScreen.open) return;
     voice.stop();
-    consentScreen.ask(state.lang, () => {
+    // 上の見出しの横に、いま立っているキャラクターを出す
+    consentScreen.image = document.querySelector('.character-img')?.src ?? '';
+    let lang = first ?? state.lang;
+    if (isKiosk) {
+      // 据え置きは、次の方のために英語から始め、待っている間は言語を順に切り替える
+      lang = KIOSK_FIRST_LANG;
+      changeLanguage(lang);
+      consentScreen.rotate([lang, ...LANGUAGES.filter((l) => l !== lang)], CONSENT_ROTATE_MS);
+    }
+    consentScreen.ask(lang, () => {
       // 断られた場合もここへ来る（案内はそのまま使える）
       touch();
     });
@@ -842,10 +878,14 @@ function wireConsent() {
       ask();        // 起動直後は、次に来た方のために出しておく
     }
   } else {
+    // 観光客の端末は、その端末の言語で始める（日本語の端末なら日本語、
+    // 案内できない言語なら英語）。開くたびに日本語から始まると、海外の方が戸惑う。
+    const want = browserLanguage();
+    if (want !== state.lang) changeLanguage(want);
     // 観光客の端末でも、開くたびに出す。
     // 以前は一度お答えいただいた端末では出さなかったが、同じ端末を家族や
     // 連れの方が使うこともあり、使う方ごとに確かめた方がよいため。
-    ask();
+    ask(want);
   }
 }
 
@@ -869,22 +909,28 @@ function startIdleWatch(ask) {
     if (Date.now() - lastTouch >= CONSENT_IDLE_MS) {
       resetForNextVisitor();
       ask();
+      // 次の方を待つ間に、新しい内容があれば入れておく
+      refreshInBackground();
     }
   }, 10000);
 }
 
 /// 据え置き端末の手入れ。職員が毎晩開き直さなくて済むようにする。
 ///
-///   1. だれも使っていない間（同意画面が出ている間）に、新しい質問回答集を取りに行く。
-///      管理画面で「反映」した内容は、これで届く。
+///   1. 管理画面で「反映」した内容を、だれも使っていないときに入れ替える。
+///      ・1分ごとに version.php に反映の有無を聞く（反映から1〜2分で届く）
+///      ・5分ごとに質問回答集そのものも確かめる（version.php が使えないときの受け皿）
+///      使っている方がいる間は入れ替えない（読んでいる途中で画面が変わらないように）。
 ///   2. 1日に1回、夜中に画面を開き直す。案内アプリそのもの（js・css）を
 ///      新しくしたときは、開き直さないと読み込まれないため。
 const RELOADED_KEY = 'shirakawa_reloaded_on';
 
 function startKioskUpkeep() {
   setInterval(() => {
-    if (consentScreen.open) refreshInBackground();
-  }, KIOSK_REFRESH_MS);
+    const idle = consentScreen.open || Date.now() - lastTouch >= UPDATE_IDLE_MS;
+    if (!idle || showSetup) return;
+    refreshInBackground({ full: Date.now() - lastFullFetch >= KIOSK_REFRESH_MS });
+  }, VERSION_CHECK_MS);
 
   setInterval(async () => {
     const now = new Date();

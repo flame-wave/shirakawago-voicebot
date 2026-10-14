@@ -52,6 +52,11 @@ return [
     // ---- アンケート（〇△×）の答えを残す場所（書かなければ data/survey_log.jsonl）
     'survey_log_path' => __DIR__ . '/data/survey_log.jsonl',
 
+    // ---- 管理画面で最後に反映したコミットを覚える場所（書かなければ data/version.json）
+    // version.php が書き、案内端末と ask.php が読む（反映が1〜2分で届くように）。
+    // 書き込みに使う合言葉は、下の log_token と同じ。
+    'version_path' => __DIR__ . '/data/version.json',
+
     // ---- 記録を読み出すときの合言葉（管理者画面がこれを使う）
     // 決めないと誰も読めない。長い無作為の文字列にすること。
     //   例: php -r "echo bin2hex(random_bytes(24));"

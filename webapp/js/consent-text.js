@@ -17,6 +17,11 @@ export const PROVIDER = '名古屋大学 情報学部／大学院情報学研究
 export const CONSENT = {
   ja: {
     title: '白川郷AI観光ガイド',
+    // 同意画面の上の大きな見出しに出す（何ができるかを、ひと目で伝える）
+    lead: '白川郷のことを、声で聞くだけ。AIガイドがお答えします。',
+    examples: ['🚻 トイレはどこ？', '🚌 バスの時刻は？', '🏔️ 展望台への行き方', '🍜 おすすめの食事'],
+    languages: '6か国語に対応',
+    start: '下のボタンを押して、話しかけてください',
     provider: PROVIDER + ' が提供しています。',
     purpose: 'このアプリは、観光案内をよりよくするための研究として運用しています。'
       + 'ご利用の記録は、案内の改善と研究にのみ使います。',
@@ -46,6 +51,11 @@ export const CONSENT = {
 
   en: {
     title: 'Shirakawa-go AI Guide',
+    // 同意画面の上の大きな見出しに出す（何ができるかを、ひと目で伝える）
+    lead: 'Ask anything about Shirakawa-go — just speak. Our AI guide will answer.',
+    examples: ['🚻 Where is the toilet?', '🚌 Bus times', '🏔️ Way to the viewpoint', '🍜 Where to eat'],
+    languages: '6 languages',
+    start: 'Tap the button below and start talking',
     provider: 'Provided by the Endo and Urata Laboratory, School of Informatics and '
       + 'Graduate School of Informatics, Nagoya University.',
     purpose: 'This guide is operated as a research project to improve tourist '
@@ -79,6 +89,11 @@ export const CONSENT = {
 
   zh: {
     title: '白川乡AI旅游向导',
+    // 同意画面の上の大きな見出しに出す（何ができるかを、ひと目で伝える）
+    lead: '关于白川乡的问题，开口问就行。AI向导为您解答。',
+    examples: ['🚻 洗手间在哪里？', '🚌 巴士时刻', '🏔️ 怎么去观景台', '🍜 推荐美食'],
+    languages: '支持6种语言',
+    start: '请点击下方按钮，开始提问',
     provider: '由名古屋大学 信息学部／研究生院信息学研究科　远藤・浦田研究室提供。',
     purpose: '本导览作为改进旅游信息服务的研究项目运行。使用记录仅用于改进导览与研究。',
     recordTitle: '记录的内容',
@@ -107,6 +122,11 @@ export const CONSENT = {
 
   ko: {
     title: '시라카와고 AI 관광 가이드',
+    // 同意画面の上の大きな見出しに出す（何ができるかを、ひと目で伝える）
+    lead: '시라카와고에 대해 말로 물어보세요. AI 가이드가 답해 드립니다.',
+    examples: ['🚻 화장실은 어디예요?', '🚌 버스 시간', '🏔️ 전망대 가는 길', '🍜 추천 음식'],
+    languages: '6개 언어 지원',
+    start: '아래 버튼을 누르고 말씀해 주세요',
     provider: '나고야대학 정보학부／대학원 정보학연구과　엔도・우라타 연구실이 제공합니다.',
     purpose: '이 안내는 관광 안내를 개선하기 위한 연구로 운영되고 있습니다. '
       + '이용 기록은 안내 개선과 연구에만 사용합니다.',
@@ -136,6 +156,11 @@ export const CONSENT = {
 
   es: {
     title: 'Guía IA de Shirakawa-go',
+    // 同意画面の上の大きな見出しに出す（何ができるかを、ひと目で伝える）
+    lead: 'Pregunte lo que quiera sobre Shirakawa-go, solo con la voz. Nuestra guía IA le responde.',
+    examples: ['🚻 ¿Dónde está el baño?', '🚌 Horarios de autobús', '🏔️ Cómo llegar al mirador', '🍜 Dónde comer'],
+    languages: '6 idiomas',
+    start: 'Pulse el botón de abajo y hable',
     provider: 'Ofrecido por el Laboratorio Endo y Urata, Facultad de Informática y '
       + 'Escuela de Posgrado en Informática, Universidad de Nagoya.',
     purpose: 'Esta guía funciona como un proyecto de investigación para mejorar la '
@@ -169,6 +194,11 @@ export const CONSENT = {
 
   fr: {
     title: 'Guide IA de Shirakawa-go',
+    // 同意画面の上の大きな見出しに出す（何ができるかを、ひと目で伝える）
+    lead: 'Posez vos questions sur Shirakawa-go, simplement à voix haute. Notre guide IA vous répond.',
+    examples: ['🚻 Où sont les toilettes ?', '🚌 Horaires des bus', '🏔️ Accès au belvédère', '🍜 Où manger'],
+    languages: '6 langues',
+    start: 'Appuyez sur le bouton ci-dessous et parlez',
     provider: 'Proposé par le laboratoire Endo et Urata, Faculté d’informatique et '
       + 'École doctorale d’informatique, Université de Nagoya.',
     purpose: 'Ce guide est exploité dans le cadre d’un projet de recherche visant à '

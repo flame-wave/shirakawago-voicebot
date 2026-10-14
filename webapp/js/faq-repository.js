@@ -8,7 +8,7 @@
 // 端末内ファイルの代わりに localStorage を使う。
 // ブラウザを閉じても残るので、次回以降も通信なしで最新版から始められる。
 
-import { ASSET_BASE, REMOTE_URL, FETCH_TIMEOUT_MS } from './config.js';
+import { ASSET_BASE, REMOTE_URL, VERSION_URL, FETCH_TIMEOUT_MS } from './config.js';
 
 const CACHE_KEY = 'shirakawa_faq_cache';
 
@@ -60,18 +60,39 @@ export class FaqRepository {
     return data(raw, 'bundled');
   }
 
+  /// 管理画面で最後に反映したコミット（server/api/version.php）。分からなければ ''。
+  async latestRef() {
+    if (VERSION_URL === '' || REMOTE_URL === '') return '';
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+      const res = await fetch(VERSION_URL, { signal: controller.signal, cache: 'no-store' });
+      clearTimeout(timer);
+      if (!res.ok) return '';
+      const ref = String((await res.json())?.ref ?? '');
+      return /^[0-9a-f]{40}$/.test(ref) ? ref : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
   /// 裏で呼ぶ。取得できなければ null を返すだけで、例外は投げない。
-  async fetchRemote() {
+  ///
+  /// ref（コミット）を渡すと、そのコミットの質問回答集を読む。
+  /// 配信元（GitHub の raw）は5分ほど古い写しを返すことがあるが、
+  /// コミットを指定したURLならその心配が無い（反映がすぐ届く）。
+  async fetchRemote(ref = '') {
     if (REMOTE_URL === '') {
       console.info('配信URLが未設定のため、オンライン更新はしません');
       return null;
     }
+    const url = ref ? REMOTE_URL.replace('/main/', `/${ref}/`) : REMOTE_URL;
 
     let raw;
     try {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-      const res = await fetch(REMOTE_URL, { signal: controller.signal, cache: 'no-cache' });
+      const res = await fetch(url, { signal: controller.signal, cache: 'no-cache' });
       clearTimeout(timer);
       if (!res.ok) {
         console.warn(`取得失敗: HTTP ${res.status}`);

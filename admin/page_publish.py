@@ -40,10 +40,12 @@ def _show_result(result):
             f"<b>反映しました（{escape(_when(result['version']))}）</b><br>"
             f"案内に出す質問：{result['count']} 件　／　今回変わったもの：{result['changed']} 件"
             + (f"（{escape(parts)}）" if parts else "")
-            + "<br>案内端末に届くまで、少し時間がかかります"
-              "（配信元の GitHub が5分ごとに新しくするため）。"
-              "据え置きの端末は、だれも使っていない間に<b>20分ほどで自動で</b>新しくなります。"
-              "続けて何度も押す必要はありません。",
+            + ("<br>案内端末には<b>1〜2分ほどで</b>届きます"
+               "（使っている方がいる端末は、使い終わってから新しくなります）。"
+               if result.get("relayed") else
+               "<br>案内端末に届くまで、5〜10分ほどかかります"
+               "（配信元の GitHub が5分ごとに新しくするため）。")
+            + "続けて何度も押す必要はありません。",
             kind="ok", key="p-result-ok")
     else:
         ui.notice(
@@ -178,6 +180,27 @@ def _list(ctx, rows, level):
                 b.page_link(ctx.add_page, label="開く", query_params={"id": c["id"]})
 
 
+def notify_relay(ctx, commit, version):
+    """反映したことを中継サーバ（api/version.php）に知らせる。知らせられたら True。
+
+    案内端末は1分ごとに version.php を見て、新しいコミットがあればそれを指定して読む。
+    GitHub の配信（raw）は5分ほど古い写しを返すことがあるが、コミットを指定すれば
+    その心配が無いので、反映から1分ほどで届く。
+    知らせられなくても反映そのものは済んでいる（端末は数分ごとの確認で受け取る）。
+    """
+    url, token = ctx.relay if getattr(ctx, "relay", None) else (None, None)
+    if not commit or not url or not token:
+        return False
+    import requests
+    target = url.rsplit("/", 1)[0] + "/version.php"   # 記録の読み出し先（logs.php）と同じ場所
+    try:
+        res = requests.post(target, json={"token": token, "ref": commit, "version": version},
+                            timeout=8)
+        return res.ok and res.json().get("ok") is True
+    except Exception:
+        return False
+
+
 def _publish(ctx, built, changes):
     ss = st.session_state
     version = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -189,9 +212,10 @@ def _publish(ctx, built, changes):
     except Exception as e:
         ss.p_result = {"ok": False, "reason": str(e)[:200]}
         st.rerun()
+    relayed = notify_relay(ctx, getattr(ctx.json_store, "last_commit", ""), version)
 
     by_kind = {k: sum(1 for c in changes if c["kind"] == k) for k, _ in KINDS}
     ss.p_result = {"ok": True, "version": version, "count": len(built["faqs"]),
-                   "changed": len(changes), "by_kind": by_kind}
+                   "changed": len(changes), "by_kind": by_kind, "relayed": relayed}
     ss.pop("published", None)   # 公開中の内容を読み直す（ホーム・未反映の数も新しくなる）
     st.rerun()

@@ -1234,11 +1234,85 @@ body {
 .consent-box {
   display: flex;
   flex-direction: column;
-  width: min(680px, 100%);
+  width: min(820px, 100%);
   max-height: 100%;
   border-radius: 16px;
   background: #fff;
   overflow: hidden;
+}
+
+/* 上の大きな見出し。だれも使っていない間ずっと出ているので、
+   通りがかった方が「何ができるか」を読まずに分かるようにする。 */
+.consent-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex: none;
+  padding: clamp(18px, 3.2vh, 36px) clamp(18px, 4vw, 36px) clamp(14px, 2.4vh, 28px);
+  background: linear-gradient(135deg, var(--green) 0%, #3F7A41 60%, #6A9A5B 100%);
+  color: #fff;
+  overflow: hidden;
+  /* 言語が切り替わったことに気づけるよう、ふわっと出す */
+  animation: consent-in .5s ease-out;
+}
+.consent-hero-text { flex: 1 1 auto; min-width: 0; }
+.consent-title {
+  margin: 0;
+  font-size: clamp(28px, min(6.4vw, 5.4vh), 60px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: .01em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+}
+.consent-lead {
+  margin: .5em 0 0;
+  font-size: clamp(16px, min(3vw, 2.6vh), 26px);
+  font-weight: 600;
+  line-height: 1.45;
+}
+.consent-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.consent-examples li {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .95);
+  color: var(--green-dark);
+  font-size: clamp(14px, min(2.2vw, 1.9vh), 19px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.consent-tags {
+  margin: 12px 0 0;
+  font-size: clamp(13px, min(1.9vw, 1.6vh), 16px);
+  opacity: .92;
+}
+.consent-hero-char {
+  flex: none;
+  height: clamp(120px, 24vh, 300px);
+  max-width: 34%;
+  margin: 0 -8px calc(-1 * clamp(14px, 2.4vh, 28px)) 0;
+  object-fit: contain;
+  object-position: bottom;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .25));
+}
+@keyframes consent-in {
+  from { opacity: .35; }
+  to { opacity: 1; }
+}
+
+/* 押してほしいボタンへの一言（見出しの下の説明を読まなくても、次にすることが分かる） */
+.consent-start {
+  margin: 0 0 10px;
+  color: var(--green-dark);
+  font-size: clamp(15px, min(2.4vw, 2vh), 20px);
+  font-weight: 700;
 }
 
 /* 読める言語に切り替えられないと、同意をいただく意味がない */
@@ -1338,6 +1412,11 @@ body {
   border: none;
   background: var(--green);
   color: #fff;
+  animation: consent-pulse 2.4s ease-in-out infinite;
+}
+@keyframes consent-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(44, 95, 45, .45); }
+  50% { box-shadow: 0 0 0 10px rgba(44, 95, 45, 0); }
 }
 
 .consent-agree:active { background: var(--green-dark); }
@@ -1359,8 +1438,19 @@ body {
   line-height: 1.5;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .consent-hero, .consent-agree { animation: none; }
+}
+
+/* スマートフォン：見出しは控えめにして、ボタンが画面に残るようにする */
+@media (max-width: 480px) {
+  .consent-hero-char { display: none; }
+  .consent-examples li:nth-child(n+3) { display: none; }
+}
+
 @media (max-height: 520px) {
   /* 横向きの小さな画面では、本文を詰めてボタンを画面に残す */
+  .consent-hero-char, .consent-examples { display: none; }
   .consent-body {
     padding: 14px 16px 4px;
     font-size: 14px;
