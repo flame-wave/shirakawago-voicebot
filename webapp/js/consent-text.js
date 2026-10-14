@@ -29,6 +29,7 @@ export const CONSENT = {
       '記録しないもの：お声・お名前・現在地',
       '質問集にない質問は、外部のAIで回答を作ります',
     ],
+    locationNote: '近くの案内所に合わせて答えるため、このあと現在地の利用をおたずねします（現在地は記録しません）',
     more: '詳しく見る',
     less: '閉じる',
     provider: PROVIDER + ' が提供しています。',
@@ -72,6 +73,7 @@ export const CONSENT = {
       'We do not record: your voice, your name, or your location',
       'Questions not in our list are answered by an external AI service',
     ],
+    locationNote: 'To answer for the nearest information centre, we will ask to use your location next (it is not recorded)',
     more: 'Details',
     less: 'Hide details',
     provider: 'Provided by the Endo and Urata Laboratory, School of Informatics and '
@@ -119,6 +121,7 @@ export const CONSENT = {
       '不记录：您的声音、姓名、位置',
       '问题集中没有的问题，将由外部AI生成回答',
     ],
+    locationNote: '为了按最近的导览处回答，接下来会询问是否使用您的位置（不会记录）',
     more: '查看详情',
     less: '收起',
     provider: '由名古屋大学 信息学部／研究生院信息学研究科　远藤・浦田研究室提供。',
@@ -161,6 +164,7 @@ export const CONSENT = {
       '기록하지 않는 것: 음성, 이름, 현재 위치',
       '질문집에 없는 질문은 외부 AI로 답변을 만듭니다',
     ],
+    locationNote: '가까운 안내소에 맞춰 답변하기 위해, 다음에 현재 위치 사용을 여쭙니다(위치는 기록하지 않습니다)',
     more: '자세히 보기',
     less: '닫기',
     provider: '나고야대학 정보학부／대학원 정보학연구과　엔도・우라타 연구실이 제공합니다.',
@@ -204,6 +208,7 @@ export const CONSENT = {
       'No registramos: su voz, su nombre ni su ubicación',
       'Las preguntas que no están en nuestra lista se responden con una IA externa',
     ],
+    locationNote: 'Para responder según la oficina de información más cercana, a continuación le pediremos usar su ubicación (no se registra)',
     more: 'Ver detalles',
     less: 'Ocultar detalles',
     provider: 'Ofrecido por el Laboratorio Endo y Urata, Facultad de Informática y '
@@ -251,6 +256,7 @@ export const CONSENT = {
       'Nous n’enregistrons pas : votre voix, votre nom ni votre position',
       'Les questions absentes de notre liste reçoivent une réponse d’une IA externe',
     ],
+    locationNote: 'Pour répondre selon le point d’information le plus proche, nous allons vous demander d’utiliser votre position (elle n’est pas enregistrée)',
     more: 'Voir les détails',
     less: 'Masquer les détails',
     provider: 'Proposé par le laboratoire Endo et Urata, Faculté d’informatique et '

@@ -74,6 +74,8 @@ export class ConsentScreen {
     this.onLanguage = null;
     /// 上の見出しの横に出すキャラクターの絵（無ければ出さない）
     this.image = '';
+    /// 答えたあとに現在地をたずねるか（観光客の端末）。要約でそのことを先に伝える
+    this.asksLocation = false;
     this._rotation = null;
     this._rotTimer = null;
     /// スマートフォンで、言語の一覧・説明の全文を開いているか
@@ -152,8 +154,9 @@ export class ConsentScreen {
         </div>`;
 
     // スマートフォンで本文の代わりに出す要約
-    const marks = ['✅', '❌', 'ℹ️'];
-    const summary = (t.summary ?? []).map((line, i) =>
+    const marks = ['✅', '❌', 'ℹ️', '📍'];
+    const lines = [...(t.summary ?? []), ...(this.asksLocation && t.locationNote ? [t.locationNote] : [])];
+    const summary = lines.map((line, i) =>
       `<li><span class="consent-mark" aria-hidden="true">${marks[i] ?? '・'}</span>`
       + `<span>${escape(line)}</span></li>`).join('');
 

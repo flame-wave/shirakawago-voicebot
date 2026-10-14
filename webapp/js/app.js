@@ -860,9 +860,17 @@ function wireConsent() {
       changeLanguage(lang);
       consentScreen.rotate([lang, ...LANGUAGES.filter((l) => l !== lang)], CONSENT_ROTATE_MS);
     }
+    consentScreen.asksLocation = !isKiosk && !places.saved;
     consentScreen.ask(lang, () => {
       // 断られた場合もここへ来る（案内はそのまま使える）
       touch();
+      // 観光客の端末は、ここで現在地をたずねる（近くの案内所の答えを出すため）。
+      // 以前は上の「📍 現在地を選ぶ」を押したときだけたずねていたが、押す方がほとんどおらず、
+      // 案内所ごとの答え（ロッカー・ATMなど）が出ていなかった。
+      // ボタンを押した流れの中でたずねるので、開いた瞬間に許可を求めて驚かせることもない。
+      // 記録するかどうかとは関係ないので、どちらのボタンでもたずねる（現在地は記録しない）。
+      // 職員や利用者が案内所を選んでいる端末では、その選択を優先してたずねない。
+      if (!isKiosk && !places.saved) choosePlace('auto');
     });
   };
 
