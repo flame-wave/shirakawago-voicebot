@@ -487,6 +487,90 @@ def _csv(rows):
     return ("﻿" + buf.getvalue()).encode("utf-8")
 
 
+PICK_KINDS = {"question": "質問の記録", "ai": "AIが答えた記録", "survey": "アンケートの答え"}
+PICK_LIMIT = 300   # 一度に並べる件数（多すぎると画面が重くなる）
+
+
+def _pick_text(kind, r):
+    """1件ずつ消すときの表に出す中身"""
+    if kind == "ai":
+        answer = str(r.get("answer") or "")
+        result = {"answered": "", "not_found": "（答えられず）", "error": "（エラー）"}.get(
+            str(r.get("result") or ""), "")
+        return f"{r.get('question', '')} → {answer[:60]}{'…' if len(answer) > 60 else ''}{result}"
+    if kind == "survey":
+        return dict(VOTES).get(str(r.get("vote") or ""), str(r.get("vote") or ""))
+    source = L.SOURCES.get(str(r.get("source") or "none"), "")
+    return f"{r.get('recognized', '')}（{source}）" if source else str(r.get("recognized", ""))
+
+
+def _pick_delete(ctx):
+    """選んだ記録だけを消す（試しに聞いた質問・いたずら・職員の確かめなど）。
+
+    期間でまとめて消すと、本物の記録まで消えてしまう。
+    表で1件ずつ選んで消せるようにする。行の指し方は log_stats.parse の "_id"（行の sha1）。
+    """
+    ss = st.session_state
+    st.markdown("##### 選んだ記録だけを消す")
+    st.caption("試しに聞いた質問や、いたずらの記録などを1件ずつ消せます。"
+               "左の「消す」にチェックを入れて、下のボタンを押してください（新しい順・期間に関係なくすべて）。")
+    kind = st.segmented_control("消す記録の種類", list(PICK_KINDS), format_func=PICK_KINDS.get,
+                                default="question", key="stats_pick_kind",
+                                label_visibility="collapsed") or "question"
+    rows = load_rows(ctx.log_url, ctx.log_token, kind=kind)
+    word = st.text_input("言葉で絞り込む", key="stats_pick_word",
+                         placeholder="例：テスト（聞かれた言葉・答えの中を探します）").strip()
+
+    shown = []
+    for r in sorted(rows, key=lambda r: str(r.get("at") or ""), reverse=True):
+        text = _pick_text(kind, r)
+        if word and word.lower() not in text.lower():
+            continue
+        at = L._when(r)
+        lang = str(r.get("lang") or "")
+        shown.append({
+            "消す": False,
+            "日時": at.astimezone(JST).strftime("%Y-%m-%d %H:%M") if at else "",
+            "端末・場所": str(r.get("client") or r.get("place") or ""),
+            "言語": LANG_NAMES.get(lang, lang),
+            "中身": text,
+            "_id": r["_id"],
+        })
+    if not shown:
+        st.markdown(ui.box("当てはまる記録はありません", "", "info"), unsafe_allow_html=True)
+        return
+    if len(shown) > PICK_LIMIT:
+        st.caption(f"{len(shown)} 件のうち、新しい {PICK_LIMIT} 件を出しています。"
+                   "古いものは、言葉で絞り込むと出てきます。")
+        shown = shown[:PICK_LIMIT]
+
+    # 消したあとはチェックを外した表に戻す（名前に回数を入れて、別の表にする）
+    ver = ss.setdefault("stats_pick_ver", 0)
+    edited = st.data_editor(
+        pd.DataFrame(shown), key=f"stats_pick_{kind}_{ver}", hide_index=True,
+        use_container_width=True, height=min(420, 38 + 35 * len(shown)),
+        column_order=["消す", "日時", "端末・場所", "言語", "中身"],
+        disabled=["日時", "端末・場所", "言語", "中身"],
+        column_config={"消す": st.column_config.CheckboxColumn("消す", width="small"),
+                       "中身": st.column_config.TextColumn("中身", width="large")})
+    ids = edited.loc[edited["消す"], "_id"].tolist()
+
+    sure = st.checkbox("消した記録は元に戻せないことを確かめました", key=f"stats_pick_sure_{ver}",
+                       disabled=not ids)
+    if st.button(f"選んだ {len(ids)} 件を消す", type="primary", key="stats_pick_go",
+                 disabled=not (ids and sure), use_container_width=True):
+        try:
+            with st.spinner("記録を消しています…"):
+                result = L.delete(ctx.log_url, ctx.log_token, kind, ids)
+        except Exception as e:
+            st.error(str(e))
+            return
+        load_rows(ctx.log_url, ctx.log_token, force=True, kind=kind)
+        ss.stats_pick_ver = ver + 1
+        ss.stats_flash = f"{PICK_KINDS[kind]}から {result.get('deleted', 0)} 件を消しました。"
+        st.rerun()
+
+
 def _housekeeping(ctx, all_rows):
     ss = st.session_state
     with ui.card("stats-clear"):
@@ -498,6 +582,10 @@ def _housekeeping(ctx, all_rows):
             mime="text/csv", disabled=not all_rows, key="stats_csv")
 
         st.write("")
+        _pick_delete(ctx)
+
+        st.divider()
+        st.markdown("##### まとめて消す")
         ui.field_label("消す記録")
         mode = st.radio("消す記録", ["all", "before"], horizontal=True, key="stats_clear_mode",
                         format_func={"all": "すべての記録",

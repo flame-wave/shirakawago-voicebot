@@ -9,6 +9,7 @@
 その質問は、その案内所向けの回答を用意すれば解決する。
 """
 
+import hashlib
 import json
 from collections import Counter
 from datetime import datetime, timezone
@@ -43,7 +44,9 @@ def fetch(url, token, kind="question", timeout=30):
         )
     if res.status_code != 200:
         raise RuntimeError(f"記録を読み出せませんでした（{res.status_code}）")
-    return parse(res.text)
+    # 1件ずつ消すときは、行そのものの sha1 で指す。文字コードの推測で行が変わらないよう、
+    # 必ず UTF-8 として読む。
+    return parse(res.content.decode("utf-8", errors="replace"))
 
 
 def clear(url, token, before=None, timeout=30):
@@ -69,18 +72,46 @@ def clear(url, token, before=None, timeout=30):
     return data
 
 
+def delete(url, token, kind, ids, timeout=30):
+    """選んだ記録だけを消す。kind は "question" / "ai" / "survey"、ids は parse が付けた "_id"。
+
+    戻り値: {"deleted": 消した件数, "kept": 残った件数}
+    期間で消すときと違い、境目は動かさない（ほかの記録はこれまでどおり受け取る）。
+    """
+    body = {"token": token, "action": "delete", "kind": kind, "ids": list(ids)}
+    res = requests.post(url, json=body, timeout=timeout)
+    if res.status_code == 403:
+        raise RuntimeError("記録を消せませんでした。合言葉（log_token）が"
+                           "中継サーバの config.php と一致しているか確認してください。")
+    if res.status_code != 200:
+        raise RuntimeError(f"記録を消せませんでした（{res.status_code}）。"
+                           "中継サーバの logs.php を新しいものに上げ直してください。")
+    data = res.json()
+    if not data.get("ok"):
+        raise RuntimeError(f"記録を消せませんでした（{data.get('reason', '理由不明')}）")
+    return data
+
+
 def parse(text):
-    """JSONLを読む。壊れた行は飛ばす（1行壊れても他は読める）。"""
+    """JSONLを読む。壊れた行は飛ばす（1行壊れても他は読める）。
+
+    各行に "_id"（その行の sha1）を付ける。1件ずつ消すとき、中継サーバ（logs.php）は
+    同じ計算で行を見分ける。行番号で指さないのは、消すまでの間に新しい記録が
+    足されても、別の行を消さないため。
+    """
     rows = []
-    for line in (text or "").splitlines():
-        line = line.strip()
-        if not line:
+    # 中継サーバ（PHP の fgets と rtrim）と同じ区切り方にする。
+    # splitlines() は改行以外の記号でも区切るため、行の中身（sha1）がずれることがある。
+    for raw in (text or "").split("\n"):
+        line = raw.rstrip("\r\n")
+        if not line.strip():
             continue
         try:
             row = json.loads(line)
         except ValueError:
             continue
         if isinstance(row, dict):
+            row["_id"] = hashlib.sha1(line.encode("utf-8")).hexdigest()
             rows.append(row)
     return rows
 

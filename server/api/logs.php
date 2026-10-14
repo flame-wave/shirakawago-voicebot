@@ -12,6 +12,12 @@
  *        … 記録を消す（本番を始める前に、試しの記録を消すため）。
  *          before を付けると、その日より前の分だけを消す（日付は日本時間）。
  *
+ *   POST /api/logs.php   {"token": "…", "action": "delete", "kind": "ai", "ids": ["＜sha1＞", …]}
+ *        … 選んだ記録だけを消す（試しに聞いた質問・いたずらなど）。
+ *          ids は、消したい行（改行を除いた1行そのもの）の sha1。管理画面が読んだ行から計算する。
+ *          行に番号を振らずに中身で指すのは、消している間に新しい記録が足されても、
+ *          別の行を消してしまわないため。
+ *
  * 返すもの: GET は1行1件のJSONL、POST は {"ok": true, "deleted": 件数, ...}
  *
  * 【消したあとに古い記録が戻ってこないように】
@@ -47,8 +53,82 @@ if ($token === '' || !hash_equals($token, $given)) {
 }
 
 if ($isPost) {
-    clear_logs($config, is_array($body) ? $body : []);
+    $body = is_array($body) ? $body : [];
+    if (($body['action'] ?? '') === 'delete') {
+        delete_lines($config, $body);
+    } else {
+        clear_logs($config, $body);
+    }
     exit;
+}
+
+/** 記録の種類ごとの置き場所（question / ai / survey） */
+function log_path_of(array $config, string $kind): string
+{
+    $paths = [
+        'ai' => $config['log_path'] ?? (__DIR__ . '/data/ai_log.jsonl'),
+        'survey' => $config['survey_log_path'] ?? (__DIR__ . '/data/survey_log.jsonl'),
+    ];
+    return $paths[$kind] ?? ($config['question_log_path'] ?? (__DIR__ . '/data/question_log.jsonl'));
+}
+
+/**
+ * 選んだ記録だけを消す。ids（行の sha1）に当たる行を除いて書き直す。
+ * 境目（log_since）は動かさない（ほかの記録は、これまでどおり受け取る）。
+ */
+function delete_lines(array $config, array $body): void
+{
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+
+    $kind = (string) ($body['kind'] ?? 'question');
+    $ids = [];
+    foreach ((array) ($body['ids'] ?? []) as $id) {
+        $id = strtolower((string) $id);
+        if (preg_match('/^[0-9a-f]{40}$/', $id)) {
+            $ids[$id] = true;
+        }
+    }
+    if ($ids === [] || count($ids) > 5000) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'reason' => 'bad_ids'], JSON_UNESCAPED_UNICODE);
+        return;
+    }
+
+    $path = log_path_of($config, $kind);
+    if (!is_file($path)) {
+        echo json_encode(['ok' => true, 'deleted' => 0, 'kept' => 0], JSON_UNESCAPED_UNICODE);
+        return;
+    }
+    $fp = fopen($path, 'c+');
+    if ($fp === false || !flock($fp, LOCK_EX)) {
+        http_response_code(500);
+        echo json_encode(['ok' => false, 'reason' => 'cannot_open'], JSON_UNESCAPED_UNICODE);
+        return;
+    }
+    $keep = [];
+    $deleted = 0;
+    while (($line = fgets($fp)) !== false) {
+        $line = rtrim($line, "\r\n");
+        if ($line === '') {
+            continue;
+        }
+        if (isset($ids[sha1($line)])) {
+            $deleted++;
+        } else {
+            $keep[] = $line;
+        }
+    }
+    ftruncate($fp, 0);
+    rewind($fp);
+    if ($keep !== []) {
+        fwrite($fp, implode("\n", $keep) . "\n");
+    }
+    fflush($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+
+    echo json_encode(['ok' => true, 'deleted' => $deleted, 'kept' => count($keep)], JSON_UNESCAPED_UNICODE);
 }
 
 /**
@@ -132,11 +212,7 @@ function clear_logs(array $config, array $body): void
 }
 
 $kind = (string) ($_GET['kind'] ?? 'question');
-$paths = [
-    'ai' => $config['log_path'] ?? (__DIR__ . '/data/ai_log.jsonl'),
-    'survey' => $config['survey_log_path'] ?? (__DIR__ . '/data/survey_log.jsonl'),
-];
-$path = $paths[$kind] ?? ($config['question_log_path'] ?? (__DIR__ . '/data/question_log.jsonl'));
+$path = log_path_of($config, $kind);
 
 header('Content-Type: application/x-ndjson; charset=utf-8');
 header('Cache-Control: no-store');

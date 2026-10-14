@@ -6,6 +6,7 @@
 //
 // いま実際に起きていること（2026-09-30 時点）:
 //   送る     … 質問の内容（文字）／答えられたか／言語／日時／どの案内所か
+//              体験アンケート（〇△×）に答えた場合は、その答え
 //   送らない … 声そのもの・氏名や連絡先・現在地の座標
 //   ただし   … 音声認識のため、声はブラウザの音声認識サービスへ送られる
 //              （Chromeの場合はGoogle。こちらでは受け取らず、保存もしない）
@@ -22,6 +23,14 @@ export const CONSENT = {
     examples: ['🚻 トイレはどこ？', '🚌 バスの時刻は？', '🏔️ 展望台への行き方', '🍜 おすすめの食事'],
     languages: '6か国語に対応',
     start: '下のボタンを押して、話しかけてください',
+    // スマートフォンで本文の代わりに出す要約（全文は「詳しく見る」で開く）
+    summary: [
+      '記録するもの：質問の文字・言語・日時・体験アンケートの答え',
+      '記録しないもの：お声・お名前・現在地',
+      '質問集にない質問は、外部のAIで回答を作ります',
+    ],
+    more: '詳しく見る',
+    less: '閉じる',
     provider: PROVIDER + ' が提供しています。',
     purpose: 'このアプリは、観光案内をよりよくするための研究として運用しています。'
       + 'ご利用の記録は、案内の改善と研究にのみ使います。',
@@ -30,6 +39,7 @@ export const CONSENT = {
       '質問された内容（文字にしたもの）',
       '答えられたかどうか・選ばれた言語・日時',
       'どちらの案内所で使われたか',
+      '体験アンケート（〇△×）にお答えいただいた場合は、その答え',
     ],
     keepTitle: '記録しないこと',
     keep: [
@@ -56,6 +66,14 @@ export const CONSENT = {
     examples: ['🚻 Where is the toilet?', '🚌 Bus times', '🏔️ Way to the viewpoint', '🍜 Where to eat'],
     languages: '6 languages',
     start: 'Tap the button below and start talking',
+    // スマートフォンで本文の代わりに出す要約（全文は「詳しく見る」で開く）
+    summary: [
+      'We record: your question (as text), the language, the date and time, and your survey answers',
+      'We do not record: your voice, your name, or your location',
+      'Questions not in our list are answered by an external AI service',
+    ],
+    more: 'Details',
+    less: 'Hide details',
     provider: 'Provided by the Endo and Urata Laboratory, School of Informatics and '
       + 'Graduate School of Informatics, Nagoya University.',
     purpose: 'This guide is operated as a research project to improve tourist '
@@ -65,6 +83,7 @@ export const CONSENT = {
       'The content of your question (as text)',
       'Whether it could be answered, the language you chose, and the date and time',
       'Which information centre it was used at',
+      'Your answer to the short experience survey (〇△×), if you give one',
     ],
     keepTitle: 'What we do not record',
     keep: [
@@ -94,6 +113,14 @@ export const CONSENT = {
     examples: ['🚻 洗手间在哪里？', '🚌 巴士时刻', '🏔️ 怎么去观景台', '🍜 推荐美食'],
     languages: '支持6种语言',
     start: '请点击下方按钮，开始提问',
+    // スマートフォンで本文の代わりに出す要約（全文は「詳しく見る」で開く）
+    summary: [
+      '记录：问题文字、语言、日期时间、体验问卷的回答',
+      '不记录：您的声音、姓名、位置',
+      '问题集中没有的问题，将由外部AI生成回答',
+    ],
+    more: '查看详情',
+    less: '收起',
     provider: '由名古屋大学 信息学部／研究生院信息学研究科　远藤・浦田研究室提供。',
     purpose: '本导览作为改进旅游信息服务的研究项目运行。使用记录仅用于改进导览与研究。',
     recordTitle: '记录的内容',
@@ -101,6 +128,7 @@ export const CONSENT = {
       '您提问的内容（转换为文字）',
       '是否能够回答、所选语言、日期和时间',
       '在哪个导览处使用',
+      '如您回答体验问卷（〇△×），您的回答',
     ],
     keepTitle: '不记录的内容',
     keep: [
@@ -127,6 +155,14 @@ export const CONSENT = {
     examples: ['🚻 화장실은 어디예요?', '🚌 버스 시간', '🏔️ 전망대 가는 길', '🍜 추천 음식'],
     languages: '6개 언어 지원',
     start: '아래 버튼을 누르고 말씀해 주세요',
+    // スマートフォンで本文の代わりに出す要約（全文は「詳しく見る」で開く）
+    summary: [
+      '기록하는 것: 질문 내용(문자), 언어, 일시, 체험 설문 응답',
+      '기록하지 않는 것: 음성, 이름, 현재 위치',
+      '질문집에 없는 질문은 외부 AI로 답변을 만듭니다',
+    ],
+    more: '자세히 보기',
+    less: '닫기',
     provider: '나고야대학 정보학부／대학원 정보학연구과　엔도・우라타 연구실이 제공합니다.',
     purpose: '이 안내는 관광 안내를 개선하기 위한 연구로 운영되고 있습니다. '
       + '이용 기록은 안내 개선과 연구에만 사용합니다.',
@@ -135,6 +171,7 @@ export const CONSENT = {
       '질문하신 내용（문자로 변환한 것）',
       '답변 가능 여부・선택하신 언어・날짜와 시각',
       '어느 안내소에서 사용되었는지',
+      '체험 설문(〇△×)에 응답하신 경우 그 응답',
     ],
     keepTitle: '기록하지 않는 것',
     keep: [
@@ -161,6 +198,14 @@ export const CONSENT = {
     examples: ['🚻 ¿Dónde está el baño?', '🚌 Horarios de autobús', '🏔️ Cómo llegar al mirador', '🍜 Dónde comer'],
     languages: '6 idiomas',
     start: 'Pulse el botón de abajo y hable',
+    // スマートフォンで本文の代わりに出す要約（全文は「詳しく見る」で開く）
+    summary: [
+      'Registramos: su pregunta (en texto), el idioma, la fecha y hora, y sus respuestas a la encuesta',
+      'No registramos: su voz, su nombre ni su ubicación',
+      'Las preguntas que no están en nuestra lista se responden con una IA externa',
+    ],
+    more: 'Ver detalles',
+    less: 'Ocultar detalles',
     provider: 'Ofrecido por el Laboratorio Endo y Urata, Facultad de Informática y '
       + 'Escuela de Posgrado en Informática, Universidad de Nagoya.',
     purpose: 'Esta guía funciona como un proyecto de investigación para mejorar la '
@@ -171,6 +216,7 @@ export const CONSENT = {
       'El contenido de su pregunta (convertido en texto)',
       'Si se pudo responder, el idioma elegido, la fecha y la hora',
       'En qué oficina de información se utilizó',
+      'Su respuesta a la breve encuesta de experiencia (〇△×), si la responde',
     ],
     keepTitle: 'Lo que no registramos',
     keep: [
@@ -199,6 +245,14 @@ export const CONSENT = {
     examples: ['🚻 Où sont les toilettes ?', '🚌 Horaires des bus', '🏔️ Accès au belvédère', '🍜 Où manger'],
     languages: '6 langues',
     start: 'Appuyez sur le bouton ci-dessous et parlez',
+    // スマートフォンで本文の代わりに出す要約（全文は「詳しく見る」で開く）
+    summary: [
+      'Nous enregistrons : votre question (en texte), la langue, la date et l’heure, et vos réponses au sondage',
+      'Nous n’enregistrons pas : votre voix, votre nom ni votre position',
+      'Les questions absentes de notre liste reçoivent une réponse d’une IA externe',
+    ],
+    more: 'Voir les détails',
+    less: 'Masquer les détails',
     provider: 'Proposé par le laboratoire Endo et Urata, Faculté d’informatique et '
       + 'École doctorale d’informatique, Université de Nagoya.',
     purpose: 'Ce guide est exploité dans le cadre d’un projet de recherche visant à '
@@ -209,6 +263,7 @@ export const CONSENT = {
       'Le contenu de votre question (converti en texte)',
       'Si une réponse a pu être donnée, la langue choisie, la date et l’heure',
       'Le point d’information où le guide a été utilisé',
+      'Votre réponse au court sondage sur l’expérience (〇△×), si vous y répondez',
     ],
     keepTitle: 'Ce que nous n’enregistrons pas',
     keep: [

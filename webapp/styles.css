@@ -1442,10 +1442,134 @@ body {
   .consent-hero, .consent-agree { animation: none; }
 }
 
-/* スマートフォン：見出しは控えめにして、ボタンが画面に残るようにする */
-@media (max-width: 480px) {
+/* 言語の1つボタンと要約は、スマートフォンだけで使う */
+.consent-lang-toggle,
+.consent-summary { display: none; }
+
+/* スマートフォン：説明が読めるように詰めて出す（js/consent.js の冒頭を参照）。
+   以前はそのまま縮めていたため、見出しと言語ボタンに場所を取られ、
+   肝心の説明が1行ぶんしか見えなかった。 */
+@media (max-width: 600px) {
+  .consent {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  /* 画面いっぱいに出し、全体を1枚で流す（中の狭い枠だけが流れる作りはやめる） */
+  .consent-box {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* 箱の中で縮めない（縮めると中身が重なる）。流れるのは箱そのもの */
+  .consent-box > * { flex-shrink: 0; }
+
+  /* 見出しはタイトルと一言だけ。言語のボタンを右上に置く */
+  .consent-hero {
+    align-items: flex-start;
+    padding: 14px 14px 12px 18px;
+    padding-top: calc(14px + env(safe-area-inset-top));
+  }
+  .consent-title { font-size: 22px; }
+  .consent-lead { margin-top: 4px; font-size: 14px; font-weight: 500; }
+  .consent-examples,
+  .consent-tags,
   .consent-hero-char { display: none; }
-  .consent-examples li:nth-child(n+3) { display: none; }
+
+  .consent-lang-toggle {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid rgba(255, 255, 255, .7);
+    border-radius: 17px;
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  /* 言語の一覧は、ボタンを押したときだけ開く */
+  .consent-langs { display: none; }
+  .consent-langs.open { display: flex; }
+
+  /* 3行の要約。全文は「詳しく見る」で開く */
+  .consent-summary {
+    display: block;
+    padding: 16px 18px 6px;
+    color: var(--ink);
+  }
+  .consent-summary ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .consent-summary li {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 10px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .consent-mark { flex: none; }
+  .consent-summary .consent-provider {
+    margin: 4px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .consent-more {
+    margin: 6px 0 0;
+    padding: 6px 0;
+    border: none;
+    background: none;
+    color: var(--green);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* 全文は開いたときだけ。開いたら箱ごと流れるので、中ではスクロールしない */
+  .consent-body {
+    display: none;
+    overflow: visible;
+    padding: 4px 18px 12px;
+    font-size: 14px;
+  }
+  .consent-box.more .consent-body { display: block; }
+  .consent-box.more .consent-summary .consent-provider { display: none; }
+
+  /* 同意のボタンは、どこまで読んでも下に見えている */
+  .consent-actions {
+    position: sticky;
+    bottom: 0;
+    /* 説明が短くて画面が余るときも、ボタンは画面のいちばん下に置く */
+    margin-top: auto;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: #fff;
+    box-shadow: 0 -6px 14px rgba(0, 0, 0, .07);
+  }
+  .consent-start { margin-bottom: 8px; font-size: 14px; }
+  .consent-agree,
+  .consent-decline {
+    min-height: 46px;
+    font-size: 16px;
+  }
+  .consent-decline { margin-top: 6px; }
+  .consent-hint { margin-top: 6px; font-size: 11.5px; }
+}
+
+/* 背の高いスマートフォンでは空きができるので、聞ける例も出す */
+@media (max-width: 600px) and (min-height: 760px) {
+  .consent-examples { display: flex; gap: 6px; margin-top: 10px; }
+  .consent-examples li { padding: 4px 10px; font-size: 13px; }
 }
 
 @media (max-height: 520px) {

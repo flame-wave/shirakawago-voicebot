@@ -16,6 +16,14 @@
 // 同意画面は、だれも使っていない間ずっと出ている。そこで上に大きく
 // 「何ができるか」を出し、言語を順に切り替えて、通りがかった方の目を引く。
 // だれかが画面に触れたら、切り替えは止める（読んでいる途中で変わらないように）。
+//
+// 【スマートフォンでは詰めて出す】
+// 幅の狭い画面に全部を並べると、肝心の説明が1行ぶんしか見えなかった。
+// スマートフォンでは（styles.css の max-width: 600px）
+//   ・見出しはタイトルと一言だけ（呼び込みは要らない。自分でQRから開いた方なので）
+//   ・言語は「🌐 日本語 ▾」の1つのボタンにまとめ、押すと一覧が開く
+//   ・説明は3行の要約にし、全文は「詳しく見る」で開く（説明そのものは省かない）
+//   ・画面全体を1枚で流し、同意のボタンは常に下に見えるようにする
 
 import { LANGUAGES, LABEL } from './app-language.js';
 import { CONSENT } from './consent-text.js';
@@ -68,6 +76,9 @@ export class ConsentScreen {
     this.image = '';
     this._rotation = null;
     this._rotTimer = null;
+    /// スマートフォンで、言語の一覧・説明の全文を開いているか
+    this._langsOpen = false;
+    this._more = false;
     // 画面に触れたら、言語の切り替えを止める
     root.addEventListener('pointerdown', () => this._stopRotation());
   }
@@ -80,6 +91,8 @@ export class ConsentScreen {
   ask(lang, onDone) {
     this.lang = lang;
     this.onDone = onDone;
+    this._langsOpen = false;
+    this._more = false;
     this.root.hidden = false;
     this.render();
     this._schedule();
@@ -134,12 +147,27 @@ export class ConsentScreen {
             <p class="consent-tags">🌐 ${escape(t.languages ?? '')}</p>
           </div>
           ${this.image ? `<img class="consent-hero-char" src="${escape(this.image)}" alt="">` : ''}
+          <button class="consent-lang-toggle" type="button" aria-expanded="${this._langsOpen}"
+            aria-label="Language">🌐 ${escape(LABEL[this.lang] ?? this.lang)} ▾</button>
         </div>`;
 
+    // スマートフォンで本文の代わりに出す要約
+    const marks = ['✅', '❌', 'ℹ️'];
+    const summary = (t.summary ?? []).map((line, i) =>
+      `<li><span class="consent-mark" aria-hidden="true">${marks[i] ?? '・'}</span>`
+      + `<span>${escape(line)}</span></li>`).join('');
+
     this.root.innerHTML = `
-      <div class="consent-box" role="dialog" aria-modal="true" aria-label="${escape(t.title)}">
+      <div class="consent-box${this._more ? ' more' : ''}" role="dialog" aria-modal="true"
+        aria-label="${escape(t.title)}">
         ${hero}
-        <div class="consent-langs">${langs}</div>
+        <div class="consent-langs${this._langsOpen ? ' open' : ''}">${langs}</div>
+        <div class="consent-summary">
+          <ul>${summary}</ul>
+          <p class="consent-provider">${escape(t.provider)}</p>
+          <button class="consent-more" type="button" aria-expanded="${this._more}">
+            ${this._more ? '▾' : '▸'} ${escape(this._more ? (t.less ?? '') : (t.more ?? ''))}</button>
+        </div>
         <div class="consent-body">
           <p class="consent-provider">${escape(t.provider)}</p>
           <p>${escape(t.purpose)}</p>
@@ -166,16 +194,29 @@ export class ConsentScreen {
     for (const button of this.root.querySelectorAll('.consent-lang')) {
       button.onclick = () => {
         this.lang = button.dataset.lang;
+        this._langsOpen = false;   // 選んだら一覧は閉じる（スマートフォン）
         if (this.onLanguage) this.onLanguage(this.lang);
         this.render();
       };
     }
+    this.root.querySelector('.consent-lang-toggle').onclick = () => {
+      this._langsOpen = !this._langsOpen;
+      this.render();
+    };
+    this.root.querySelector('.consent-more').onclick = () => {
+      this._more = !this._more;
+      this.render();
+    };
 
     this.root.querySelector('.consent-agree').onclick = () => this._answer('agreed');
     this.root.querySelector('.consent-decline').onclick = () => this._answer('declined');
 
     // 長い文章なので、言語を変えたときは先頭から読めるようにする
-    this.root.querySelector('.consent-body').scrollTop = 0;
+    // （「詳しく見る」を開いたときは、読み進めた位置のままにする）
+    if (!this._more) {
+      this.root.querySelector('.consent-body').scrollTop = 0;
+      this.root.querySelector('.consent-box').scrollTop = 0;
+    }
   }
 
   _answer(value) {
