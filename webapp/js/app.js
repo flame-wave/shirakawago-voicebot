@@ -4,7 +4,7 @@
 // ブラウザ内で完結させる。各処理は差し替え可能な部品として分離してある。
 
 import {
-  LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, KIOSK_REFRESH_MS, DAILY_RELOAD_HOUR,
+  LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, KIOSK_REFRESH_MS, DAILY_RELOAD_HOURS,
   VERSION_CHECK_MS, UPDATE_IDLE_MS, ATTRACT_STEP_MS, ATTRACT_LANG_MS, KIOSK_FIRST_LANG,
 } from './config.js';
 import { LANGUAGES, LABEL, uiString } from './app-language.js';
@@ -1008,10 +1008,11 @@ function startKioskUpkeep() {
 
   setInterval(async () => {
     const now = new Date();
-    if (now.getHours() !== DAILY_RELOAD_HOUR) return;
+    if (!DAILY_RELOAD_HOURS.includes(now.getHours())) return;
     // 使っている方がいるとき、職員が設定画面を開いているときは開き直さない
     if (!attract.running || showSetup) return;
-    const today = now.toDateString();
+    // 「その日のその時刻」で覚える（3時に開き直しても、12時にもう一度開き直せるように）
+    const today = `${now.toDateString()} ${now.getHours()}`;
     if (readStore(RELOADED_KEY) === today) return;   // 開き直した直後に、また開き直さない
     // 通信できないときに開き直すと、エラーの画面のまま止まってしまう。先に確かめる
     try {

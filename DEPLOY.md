@@ -243,9 +243,9 @@ chrome.exe --kiosk --app=https://＜ドメイン＞/webapp/?place=バスター�
 - そのほか **5分ごと**に質問回答集そのものも確かめる（version.php が使えないときの受け皿）
 - 入れ替えるのは、だれも使っていないとき（待ち受けの間、または1分以上触られていない）だけ。
   5分触られずに待ち受けへ戻ったときにも確かめる
-- **毎日3時**に画面を開き直す（js・css を上げ直したときのため）。通信できないときは開き直さない
+- **毎日3時と12時**に画面を開き直す（js・css を上げ直したときのため）。使っている方がいる間は待ち、通信できないときは開き直さない
 
-間隔と時刻は `webapp/js/config.js` の `VERSION_CHECK_MS`・`KIOSK_REFRESH_MS`・`DAILY_RELOAD_HOUR` で変えられる。
+間隔と時刻は `webapp/js/config.js` の `VERSION_CHECK_MS`・`KIOSK_REFRESH_MS`・`DAILY_RELOAD_HOURS` で変えられる。
 `api/version.php` は管理画面が反映のたびに呼ぶ（合言葉は `log_token`、Secrets の `[logs]` と同じ）。
 `api/data/` に書き込めること（記録と同じ場所）。
 
