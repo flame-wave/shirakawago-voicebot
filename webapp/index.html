@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#2C5F2D">
 <title>白川郷AI観光ガイド</title>
+<!-- 「ホーム画面に追加」で、アドレスバーやタブの無いアプリとして入れられるようにする。
+     据え置きのタブレットは、こうして入れたアプリをピン止めして使う
+     （Chrome のタブの追加や、設定・アカウントの画面に触れられないように）。
+     start_url は ./ だけでよい。据え置きの役割（?place=…）はブラウザが覚えている。 -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="白川郷AIガイド">
 <link rel="stylesheet" href="styles.css">
 <!-- QRコードの生成（同梱。外部への通信は行わない） -->
 <script src="vendor/qrcode.js"></script>
@@ -125,6 +133,17 @@
 <!-- 利用前の同意（記録することを伝える）。
      観光客の端末では初回だけ、据え置き端末では次の方のたびに出す。 -->
 <div class="consent" id="consentScreen" hidden></div>
+
+<!-- 据え置き端末の待ち受け。触れると同意画面へ（js/attract.js） -->
+<div class="attract" id="attract" hidden>
+  <div class="attract-call">
+    <span class="attract-hand" aria-hidden="true">👆</span>
+    <span class="attract-words">
+      <span class="attract-text"></span>
+      <span class="attract-sub"></span>
+    </span>
+  </div>
+</div>
 
 <!-- 見え方の調整（?tune=1 を付けて開いたときだけ使う）。
      つまみを動かすと立ち絵と吹き出しがその場で動く。保存はしない。 -->

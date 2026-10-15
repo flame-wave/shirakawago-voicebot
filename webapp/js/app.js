@@ -5,7 +5,7 @@
 
 import {
   LOG_FLUSH_INTERVAL_MS, CONSENT_IDLE_MS, KIOSK_REFRESH_MS, DAILY_RELOAD_HOUR,
-  VERSION_CHECK_MS, UPDATE_IDLE_MS, CONSENT_ROTATE_MS, KIOSK_FIRST_LANG,
+  VERSION_CHECK_MS, UPDATE_IDLE_MS, ATTRACT_STEP_MS, ATTRACT_LANG_MS, KIOSK_FIRST_LANG,
 } from './config.js';
 import { LANGUAGES, LABEL, uiString } from './app-language.js';
 import { FaqService } from './faq-service.js';
@@ -25,6 +25,7 @@ import { SetupScreen } from './setup-screen.js';
 import { TunePanel } from './tune-panel.js';
 import { ConsentScreen, mayRecord } from './consent.js';
 import { SurveyView } from './survey.js';
+import { AttractMode } from './attract.js';
 import { fixedPlace, isKiosk, isPreview, showSetup, showTune } from './deployment.js';
 
 // --- 部品（差し替え可能な単位） ---
@@ -77,6 +78,7 @@ const layout = new LayoutView(
 const answerView = new AnswerView(document.getElementById('answer'));
 const setupScreen = new SetupScreen(document.getElementById('setupScreen'), log, voice);
 const consentScreen = new ConsentScreen(document.getElementById('consentScreen'));
+const attract = new AttractMode(document.getElementById('attract'));
 const tunePanel = new TunePanel(
   document.getElementById('tunePanel'), character,
   (lang) => changeLanguage(lang));
@@ -853,13 +855,8 @@ function wireConsent() {
     voice.stop();
     // 上の見出しの横に、いま立っているキャラクターを出す
     consentScreen.image = document.querySelector('.character-img')?.src ?? '';
-    let lang = first ?? state.lang;
-    if (isKiosk) {
-      // 据え置きは、次の方のために英語から始め、待っている間は言語を順に切り替える
-      lang = KIOSK_FIRST_LANG;
-      changeLanguage(lang);
-      consentScreen.rotate([lang, ...LANGUAGES.filter((l) => l !== lang)], CONSENT_ROTATE_MS);
-    }
+    // 据え置きは、待ち受けで触れられたときの言語のまま出す（その言語を見て触れた方なので）
+    const lang = first ?? state.lang;
     consentScreen.asksLocation = !isKiosk && !places.saved;
     consentScreen.ask(lang, () => {
       // 断られた場合もここへ来る（案内はそのまま使える）
@@ -875,15 +872,23 @@ function wireConsent() {
   };
 
   if (isKiosk) {
-    startIdleWatch(ask);
+    // 待ち受けで触れられたら、前の実演を消して同意画面を出す
+    attract.onTouch = () => {
+      touch();
+      resetForNextVisitor();
+      ask();
+    };
+    attract.onStep = demoStep;
+    attract.anchor = el.talkButton ?? document.getElementById('talkButton');
+    attract.stepMs = ATTRACT_STEP_MS;
+    startIdleWatch();
     startKioskUpkeep();
     if (showSetup) {
-      // 職員が設定画面（?setup=1）を開いて起動したときは、同意画面を後回しにする。
-      // 同意画面は設定画面より前に出るので、先に出すと設定のボタンが押せない。
-      // 設定画面を閉じたら、次に来た方のために出す。
-      setupScreen.onClose = ask;
+      // 職員が設定画面（?setup=1）を開いて起動したときは、待ち受けを後回しにする。
+      // 待ち受けは設定画面より前に出るので、先に出すと設定のボタンが押せない。
+      setupScreen.onClose = startAttract;
     } else {
-      ask();        // 起動直後は、次に来た方のために出しておく
+      startAttract();   // 起動直後は、次に来た方のために待ち受けにしておく
     }
   } else {
     // 観光客の端末は、その端末の言語で始める（日本語の端末なら日本語、
@@ -897,26 +902,87 @@ function wireConsent() {
   }
 }
 
-/// 据え置き端末で、無操作が続いたら同意画面に戻す。
+/// 据え置き端末の待ち受けを始める（だれも使っていないとき）。
+///
+/// 同意画面ではなく、ふだんの案内画面のまま受け答えの実演を流す。
+/// 何ができるかが見て分かり、触れたときに初めて同意画面を出す。
+function startAttract() {
+  if (consentScreen.open) consentScreen.close();
+  speech.stop(true);
+  voice.stop();
+  resetForNextVisitor();
+  attract.setLanguage(state.lang);
+  attract.start();
+}
+
+/// 待ち受けで見せる受け答え（よくある質問のうち、この案内所で使うもの）
+/// 長い答えは吹き出しからあふれて読み切れないので、短めのものを選ぶ。
+function demoFaqs() {
+  const usable = faqService.all.filter(
+    (f) => f.chip && (!f.place || f.place === '共通' || f.place === state.place),
+  );
+  const short = usable.filter((f) => faqService.answerFor(f, state.lang).text.length <= DEMO_MAX_CHARS[state.lang]);
+  return short.length >= 3 ? short : usable;
+}
+
+/// 実演に使う答えの長さの上限（言語ごと。日本語・中国語は1文字が大きいので短く）
+const DEMO_MAX_CHARS = { ja: 70, zh: 70, ko: 110, en: 170, es: 190, fr: 190 };
+
+/// 待ち受けの1こま。質問を出し、少し置いて答えを出す（音は出さない）。
+/// 言語は ATTRACT_LANG_MS ごとに、英語から順に切り替える。
+async function demoStep(n) {
+  const order = [KIOSK_FIRST_LANG, ...LANGUAGES.filter((l) => l !== KIOSK_FIRST_LANG)];
+  const perLang = Math.max(1, Math.round(ATTRACT_LANG_MS / ATTRACT_STEP_MS));
+  const lang = order[Math.floor(n / perLang) % order.length];
+  if (lang !== state.lang) await changeLanguage(lang);
+  if (!attract.running) return;
+  attract.setLanguage(lang);
+
+  const faqs = demoFaqs();
+  if (faqs.length === 0) return;
+  const faq = faqs[n % faqs.length];
+  state.recognized = chipLabel(faq);
+  state.answer = '';
+  state.photo = '';
+  state.link = '';
+  state.isAi = false;
+  state.isFallback = false;
+  character.setState(CharacterState.listening);
+  render();
+
+  setTimeout(() => {
+    if (!attract.running) return;
+    const localized = faqService.answerFor(faq, state.lang);
+    state.answer = localized.text;
+    state.isFallback = localized.isFallback;
+    state.photo = faq.photo || '';
+    character.setState(CharacterState.talking);
+    render();
+    setTimeout(() => {
+      if (attract.running) character.setState(CharacterState.idle);
+    }, Math.min(4000, ATTRACT_STEP_MS - 2500));
+  }, 1500);
+}
+
+/// 据え置き端末で、無操作が続いたら待ち受けに戻す。
 let lastTouch = Date.now();
 
 function touch() {
   lastTouch = Date.now();
 }
 
-function startIdleWatch(ask) {
+function startIdleWatch() {
   for (const ev of ['pointerdown', 'keydown']) {
     window.addEventListener(ev, touch, { passive: true });
   }
   setInterval(() => {
-    if (consentScreen.open) {
-      // 出ている間は数えない（読んでいる途中で作り直すと読めなくなる）
+    if (attract.running || showSetup) {
       touch();
       return;
     }
+    // 使っている途中でも、同意画面のまま離れた場合でも、しばらく触られなければ待ち受けへ
     if (Date.now() - lastTouch >= CONSENT_IDLE_MS) {
-      resetForNextVisitor();
-      ask();
+      startAttract();
       // 次の方を待つ間に、新しい内容があれば入れておく
       refreshInBackground();
     }
@@ -935,7 +1001,7 @@ const RELOADED_KEY = 'shirakawa_reloaded_on';
 
 function startKioskUpkeep() {
   setInterval(() => {
-    const idle = consentScreen.open || Date.now() - lastTouch >= UPDATE_IDLE_MS;
+    const idle = attract.running || Date.now() - lastTouch >= UPDATE_IDLE_MS;
     if (!idle || showSetup) return;
     refreshInBackground({ full: Date.now() - lastFullFetch >= KIOSK_REFRESH_MS });
   }, VERSION_CHECK_MS);
@@ -944,7 +1010,7 @@ function startKioskUpkeep() {
     const now = new Date();
     if (now.getHours() !== DAILY_RELOAD_HOUR) return;
     // 使っている方がいるとき、職員が設定画面を開いているときは開き直さない
-    if (!consentScreen.open || showSetup) return;
+    if (!attract.running || showSetup) return;
     const today = now.toDateString();
     if (readStore(RELOADED_KEY) === today) return;   // 開き直した直後に、また開き直さない
     // 通信できないときに開き直すと、エラーの画面のまま止まってしまう。先に確かめる

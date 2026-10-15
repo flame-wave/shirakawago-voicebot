@@ -1218,6 +1218,55 @@ body {
   cursor: ew-resize;
 }
 
+/* ── 据え置き端末の待ち受け（js/attract.js） ───────── */
+
+/* 画面全体を透明に覆い、触れた指を受け止める（下のボタンが押されないように）。
+   実演の受け答えは覆いの下に見えている。 */
+.attract {
+  position: fixed;
+  inset: 0;
+  z-index: 19;   /* 同意画面（20）のすぐ下 */
+  cursor: pointer;
+  touch-action: none;
+}
+.attract[hidden] { display: none; }
+
+/* 話すボタンの上に重ねる（top は js/attract.js が決める。決められないときは下の方） */
+.attract-call {
+  position: absolute;
+  left: 50%;
+  bottom: auto;
+  top: 70%;
+  transform: translateX(-50%);
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100% - 32px);
+  padding: 14px 28px;
+  border-radius: 999px;
+  background: var(--green-dark);   /* 下の話すボタンの文字が透けないよう、不透明にする */
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  animation: attract-bob 2.2s ease-in-out infinite;
+}
+.attract-hand { font-size: clamp(30px, 4vh, 44px); animation: attract-tap 1.1s ease-in-out infinite; }
+.attract-words { display: flex; flex-direction: column; }
+.attract-text { font-size: clamp(20px, 3vh, 32px); font-weight: 700; line-height: 1.3; }
+.attract-sub { font-size: clamp(13px, 1.7vh, 17px); opacity: .85; }
+
+@keyframes attract-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+@keyframes attract-tap {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(6px) scale(.92); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .attract-call, .attract-hand { animation: none; }
+}
+
 /* ── 利用前の同意 ──────────────────────────── */
 
 .consent {

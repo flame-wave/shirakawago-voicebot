@@ -9,13 +9,9 @@
 //
 // 【据え置き端末と観光客の端末で出し方が違う】
 //   観光客の端末 … 開くたびに出す（同じ端末を連れの方が使うこともあるため）。
-//   据え置き端末 … 開いたときと、しばらく誰も触っていなかったときに出す。
+//   据え置き端末 … 待ち受け（js/attract.js）で画面に触れられたときに出す。
 //                  次の方にとっては「初めて」なので、その人に確かめる必要がある。
-//
-// 【据え置き端末では、待っている間の「呼び込み」も兼ねる】
-// 同意画面は、だれも使っていない間ずっと出ている。そこで上に大きく
-// 「何ができるか」を出し、言語を順に切り替えて、通りがかった方の目を引く。
-// だれかが画面に触れたら、切り替えは止める（読んでいる途中で変わらないように）。
+//                  言語は、触れたときに待ち受けで流れていた言語のまま出す。
 //
 // 【スマートフォンでは詰めて出す】
 // 幅の狭い画面に全部を並べると、肝心の説明が1行ぶんしか見えなかった。
@@ -76,13 +72,9 @@ export class ConsentScreen {
     this.image = '';
     /// 答えたあとに現在地をたずねるか（観光客の端末）。要約でそのことを先に伝える
     this.asksLocation = false;
-    this._rotation = null;
-    this._rotTimer = null;
     /// スマートフォンで、言語の一覧・説明の全文を開いているか
     this._langsOpen = false;
     this._more = false;
-    // 画面に触れたら、言語の切り替えを止める
-    root.addEventListener('pointerdown', () => this._stopRotation());
   }
 
   get open() {
@@ -97,37 +89,11 @@ export class ConsentScreen {
     this._more = false;
     this.root.hidden = false;
     this.render();
-    this._schedule();
   }
 
   close() {
-    this._stopRotation();
     this.root.hidden = true;
     this.root.innerHTML = '';
-  }
-
-  /// 待っている間、言語を順に切り替える（据え置き端末の呼び込み）。
-  /// langs の順に、ms ごとに次の言語へ。画面に触れると止まり、次に出したときにまた始める。
-  rotate(langs, ms) {
-    this._rotation = langs.length > 1 && ms > 0 ? { langs, ms } : null;
-    this._schedule();
-  }
-
-  _schedule() {
-    clearTimeout(this._rotTimer);
-    if (!this._rotation || !this.open) return;
-    this._rotTimer = setTimeout(() => {
-      const { langs } = this._rotation;
-      this.lang = langs[(langs.indexOf(this.lang) + 1) % langs.length];
-      if (this.onLanguage) this.onLanguage(this.lang);
-      this.render();
-      this._schedule();
-    }, this._rotation.ms);
-  }
-
-  _stopRotation() {
-    clearTimeout(this._rotTimer);
-    this._rotTimer = null;
   }
 
   render() {

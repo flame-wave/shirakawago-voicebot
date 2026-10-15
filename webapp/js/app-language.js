@@ -98,6 +98,15 @@ const TABLE = {
     es: 'Elegir ubicación',
     fr: 'Choisir votre position',
   },
+  // 据え置き端末の待ち受け（js/attract.js）
+  touchToStart: {
+    ja: '画面にタッチして、はじめてください',
+    en: 'Touch the screen to start',
+    zh: '请触摸屏幕开始',
+    ko: '화면을 터치하여 시작하세요',
+    es: 'Toque la pantalla para empezar',
+    fr: 'Touchez l’écran pour commencer',
+  },
   placeChecking: {
     ja: '現在地を確認中…',
     en: 'Checking your location…',
