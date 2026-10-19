@@ -477,6 +477,16 @@ def read_layouts(book) -> list:
             return default
         return value if low <= value <= high else default
 
+    def clock(row, column):
+        """「18:00」「8:00」「18時」などを "18:00" の形にする。書いていなければ ""。"""
+        m = re.match(r"^\s*(\d{1,2})\s*[:：時]\s*(\d{1,2})?", cell_str(row.get(column)))
+        if not m:
+            return ""
+        h, mi = int(m.group(1)), int(m.group(2) or 0)
+        if h > 24 or mi > 59:
+            return ""
+        return f"{h % 24:02d}:{mi:02d}"
+
     out = []
     for _, row in sheet.iterrows():
         place = cell_str(row.get("設置場所"))
@@ -506,6 +516,12 @@ def read_layouts(book) -> list:
             "bubble": {
                 "width": ratio(row, "吹き出しの幅"),
                 "text": ratio(row, "文字の大きさ", 1.0, 0.5, 2.5),
+            },
+            # 据え置きの端末の画面を真っ黒にする時間（夜に虫が集まらないように）。
+            # どちらかが空なら一日中つけたまま。webapp/js/night.js が使う。
+            "night": {
+                "off": clock(row, "消灯の時刻"),
+                "on": clock(row, "点灯の時刻"),
             },
         })
     return out

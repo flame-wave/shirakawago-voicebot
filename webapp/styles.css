@@ -1218,6 +1218,31 @@ body {
   cursor: ew-resize;
 }
 
+/* ── 据え置き端末の夜間（js/night.js） ───────────── */
+
+/* 画面を真っ黒にする。光らせないことが目的なので、何も描かない。
+   触れたときだけ、暗い灰色で一言出す（明るい色にすると、また虫が寄る）。 */
+.night {
+  position: fixed;
+  inset: 0;
+  z-index: 40;   /* 同意画面・待ち受けより前 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  cursor: none;
+  touch-action: none;
+}
+.night[hidden] { display: none; }
+.night-note {
+  margin: 0;
+  padding: 0 24px;
+  color: #3a3a3a;
+  font-size: clamp(16px, 2.4vh, 24px);
+  text-align: center;
+  line-height: 1.6;
+}
+
 /* ── 据え置き端末の待ち受け（js/attract.js） ───────── */
 
 /* 画面全体を透明に覆い、触れた指を受け止める（下のボタンが押されないように）。

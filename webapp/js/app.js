@@ -26,6 +26,7 @@ import { TunePanel } from './tune-panel.js';
 import { ConsentScreen, mayRecord } from './consent.js';
 import { SurveyView } from './survey.js';
 import { AttractMode } from './attract.js';
+import { NightMode, isNight } from './night.js';
 import { fixedPlace, isKiosk, isPreview, showSetup, showTune } from './deployment.js';
 
 // --- 部品（差し替え可能な単位） ---
@@ -79,6 +80,7 @@ const answerView = new AnswerView(document.getElementById('answer'));
 const setupScreen = new SetupScreen(document.getElementById('setupScreen'), log, voice);
 const consentScreen = new ConsentScreen(document.getElementById('consentScreen'));
 const attract = new AttractMode(document.getElementById('attract'));
+const night = new NightMode(document.getElementById('night'));
 const tunePanel = new TunePanel(
   document.getElementById('tunePanel'), character,
   (lang) => changeLanguage(lang));
@@ -873,10 +875,12 @@ function wireConsent() {
 
   if (isKiosk) {
     // 待ち受けで触れられたら、前の実演を消して同意画面を出す
-    attract.onTouch = () => {
+    // 言語のボタンの所に触れたときは、その言語で出す
+    attract.onTouch = (lang) => {
       touch();
       resetForNextVisitor();
-      ask();
+      if (lang && lang !== state.lang) changeLanguage(lang);
+      ask(lang || undefined);
     };
     attract.onStep = demoStep;
     attract.anchor = el.talkButton ?? document.getElementById('talkButton');
@@ -886,10 +890,12 @@ function wireConsent() {
     if (showSetup) {
       // 職員が設定画面（?setup=1）を開いて起動したときは、待ち受けを後回しにする。
       // 待ち受けは設定画面より前に出るので、先に出すと設定のボタンが押せない。
-      setupScreen.onClose = startAttract;
+      setupScreen.onClose = () => { startAttract(); checkNight(); };
     } else {
       startAttract();   // 起動直後は、次に来た方のために待ち受けにしておく
+      checkNight();     // 夜に開き直したとき（3時など）は、すぐ真っ黒に戻す
     }
+    setInterval(checkNight, 30 * 1000);
   } else {
     // 観光客の端末は、その端末の言語で始める（日本語の端末なら日本語、
     // 案内できない言語なら英語）。開くたびに日本語から始まると、海外の方が戸惑う。
@@ -907,12 +913,43 @@ function wireConsent() {
 /// 同意画面ではなく、ふだんの案内画面のまま受け答えの実演を流す。
 /// 何ができるかが見て分かり、触れたときに初めて同意画面を出す。
 function startAttract() {
+  if (night.on) return;   // 夜間は真っ黒のまま
   if (consentScreen.open) consentScreen.close();
   speech.stop(true);
   voice.stop();
   resetForNextVisitor();
   attract.setLanguage(state.lang);
   attract.start();
+}
+
+/// いまの案内所の消灯・点灯の時刻（管理画面の「画面レイアウト」）
+function nightHours() {
+  return (faqService.layouts ?? []).find((l) => l.place === fixedPlace)?.night ?? null;
+}
+
+/// 消灯の時刻になったら画面を真っ黒にし、点灯の時刻になったら待ち受けに戻す。
+///
+/// 夜に画面が明るいと、虫（カメムシなど）が集まってくる。
+/// 電源を切ると朝に立ち上げ直す手間がかかるので、画面を黒くするだけにする。
+/// 職員が設定画面（?setup=1）を開いているときは消さない。
+function checkNight() {
+  if (!isKiosk || showSetup) return;
+  const hours = nightHours();
+  const dark = isNight(hours);
+  if (dark && !night.on) {
+    attract.stop();
+    if (consentScreen.open) consentScreen.close();
+    speech.stop(true);
+    voice.stop();
+    resetForNextVisitor();
+    // 夜に触れたときの一言は、日本語と英語で出す（待ち受けで流れていた言語に左右されないように）
+    night.enter('ja', hours.on);
+    console.info(`夜間：画面を消しました（${hours.on} に点けます）`);
+  } else if (!dark && night.on) {
+    night.leave();
+    startAttract();
+    console.info('夜間が終わりました。待ち受けに戻します');
+  }
 }
 
 /// 待ち受けで見せる受け答え（よくある質問のうち、この案内所で使うもの）
@@ -976,7 +1013,7 @@ function startIdleWatch() {
     window.addEventListener(ev, touch, { passive: true });
   }
   setInterval(() => {
-    if (attract.running || showSetup) {
+    if (attract.running || night.on || showSetup) {
       touch();
       return;
     }
@@ -1001,7 +1038,7 @@ const RELOADED_KEY = 'shirakawa_reloaded_on';
 
 function startKioskUpkeep() {
   setInterval(() => {
-    const idle = attract.running || Date.now() - lastTouch >= UPDATE_IDLE_MS;
+    const idle = attract.running || night.on || Date.now() - lastTouch >= UPDATE_IDLE_MS;
     if (!idle || showSetup) return;
     refreshInBackground({ full: Date.now() - lastFullFetch >= KIOSK_REFRESH_MS });
   }, VERSION_CHECK_MS);
@@ -1010,7 +1047,7 @@ function startKioskUpkeep() {
     const now = new Date();
     if (!DAILY_RELOAD_HOURS.includes(now.getHours())) return;
     // 使っている方がいるとき、職員が設定画面を開いているときは開き直さない
-    if (!attract.running || showSetup) return;
+    if (!(attract.running || night.on) || showSetup) return;
     // 「その日のその時刻」で覚える（3時に開き直しても、12時にもう一度開き直せるように）
     const today = `${now.toDateString()} ${now.getHours()}`;
     if (readStore(RELOADED_KEY) === today) return;   // 開き直した直後に、また開き直さない

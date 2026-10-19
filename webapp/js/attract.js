@@ -30,10 +30,46 @@ export class AttractMode {
     root.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (!this.running) return;
-      this.stop();
-      if (this.onTouch) this.onTouch();
+      if (!this.running || this._ending) return;
+      // 指の下に言語のボタンがあれば、その言語で同意画面を出す
+      const under = document.elementsFromPoint(e.clientX, e.clientY)
+        .map((el) => el.closest?.('.lang-button')).find(Boolean);
+      this._end(under?.dataset.lang || '');
     });
+  }
+
+  /// 触れられたあとの片付け。
+  ///
+  /// 指を置いた瞬間に覆いを消すと、指を離したときの「クリック」が、
+  /// そのとき指の下にある部品（すぐに出てくる同意画面の「記録せずに使う」など）に届き、
+  /// 同意画面が勝手に閉じてしまった（タッチの画面でだけ起きる）。
+  /// そこで、クリックが覆いに届くまで覆いを残し、それから同意画面を出す。
+  _end(lang) {
+    this._ending = true;
+    this._halt();
+    const finish = () => {
+      if (!this._ending) return;
+      this._ending = false;
+      clearTimeout(wait);
+      this.root.removeEventListener('click', swallow, true);
+      this.root.hidden = true;
+      if (this.onTouch) this.onTouch(lang);
+    };
+    const swallow = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      setTimeout(finish, 60);
+    };
+    this.root.addEventListener('click', swallow, true);
+    // 長押しなどでクリックが来ないときも、少し待てば出す
+    const wait = setTimeout(finish, 700);
+  }
+
+  /// 実演を止める（覆いは残す）
+  _halt() {
+    this.running = false;
+    clearTimeout(this._timer);
+    this._timer = null;
   }
 
   start() {
@@ -46,10 +82,9 @@ export class AttractMode {
   }
 
   stop() {
-    this.running = false;
+    this._ending = false;
+    this._halt();
     this.root.hidden = true;
-    clearTimeout(this._timer);
-    this._timer = null;
   }
 
   /// 「画面にタッチしてはじめてください」をその言語で出す。

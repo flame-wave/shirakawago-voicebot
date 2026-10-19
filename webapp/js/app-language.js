@@ -98,6 +98,15 @@ const TABLE = {
     es: 'Elegir ubicación',
     fr: 'Choisir votre position',
   },
+  // 夜間（画面を消している間）に触れたとき（js/night.js）。{on} は点灯の時刻
+  nightClosed: {
+    ja: '本日の案内は終了しました（{on} から）',
+    en: 'The guide is closed for today (opens at {on})',
+    zh: '今天的导览已结束（{on} 开始）',
+    ko: '오늘 안내는 종료되었습니다({on}부터)',
+    es: 'La guía ha terminado por hoy (abre a las {on})',
+    fr: 'Le guide est fermé pour aujourd’hui (ouverture à {on})',
+  },
   // 据え置き端末の待ち受け（js/attract.js）
   touchToStart: {
     ja: '画面にタッチして、はじめてください',

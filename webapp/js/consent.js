@@ -88,6 +88,7 @@ export class ConsentScreen {
     this._langsOpen = false;
     this._more = false;
     this.root.hidden = false;
+    this._shownAt = performance.now();
     this.render();
   }
 
@@ -189,6 +190,9 @@ export class ConsentScreen {
   }
 
   _answer(value) {
+    // 出た直前のタッチが、そのまま同意・記録しないのボタンに届くことがある（タッチの画面）。
+    // 出てすぐの押し下げは、読まずに押したものとして受け付けない。
+    if (performance.now() - (this._shownAt ?? 0) < 450) return;
     remember(value);
     this.close();
     if (this.onDone) this.onDone(value === 'agreed');
