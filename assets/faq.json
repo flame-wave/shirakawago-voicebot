@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-15 14:43",
-  "count": 72,
+  "version": "2026-10-20 15:02",
+  "count": 67,
   "faqs": [
     {
       "id": "shuttle_observatory",
@@ -2382,240 +2382,6 @@
       }
     },
     {
-      "id": "festival_doburoku_how_to_get",
-      "category": "other",
-      "questions": [
-        "どぶろく 飲みたい",
-        "どぶろく もらい方",
-        "どぶろく 料金",
-        "お酒 無料",
-        "盃 どこで買う"
-      ],
-      "answer": "どぶろくの振る舞いは、白川八幡神社の境内にて15時30分頃から17時頃まで行われます。どぶろくをいただくには、まず境内の受付で「奉納（初穂料）」を納めて専用の赤い記念盃（杯）をお受け取りください。その盃を持って列に並ぶと、神社で醸造された特製のどぶろくが注がれます。おかわりも可能ですが、境内限定での飲食となっており、持ち帰りはできません。",
-      "audio": "festival_doburoku_how_to_get.mp3",
-      "photo": "",
-      "link": "",
-      "chip": "",
-      "place": "共通",
-      "translations": {
-        "en": {
-          "questions": [
-            "doburoku drink",
-            "doburoku get",
-            "doburoku price",
-            "free sake",
-            "sake cup",
-            "cup buy"
-          ],
-          "answer": "Doburoku is served in the grounds of Shirakawa Hachiman Shrine from about 3:30 p.m. to about 5:00 p.m. To receive doburoku, first make an offering, called hatsuhoryo, at the reception in the shrine grounds and receive a special red commemorative sake cup. Take the cup and join the line, and you will be served special doburoku brewed at the shrine. You may have refills, but drinking is only allowed within the shrine grounds, and you cannot take any home.",
-          "audio": ""
-        },
-        "es": {
-          "questions": [
-            "doburoku beber",
-            "doburoku conseguir",
-            "doburoku precio",
-            "sake gratis",
-            "copa comprar",
-            "doburoku probar"
-          ],
-          "answer": "El doburoku se reparte en el recinto del Santuario Hachiman de Shirakawa aproximadamente de 15:30 a 17:00. Para recibirlo, primero entregue la ofrenda, llamada hatsuhoryo, en la recepción del recinto y reciba la copa conmemorativa roja especial. Con esa copa, póngase en la fila y le servirán el doburoku especial elaborado en el santuario. Puede repetir, pero solo se puede consumir dentro del recinto y no se puede llevar.",
-          "audio": ""
-        },
-        "fr": {
-          "questions": [
-            "boire doburoku",
-            "doburoku obtenir",
-            "doburoku prix",
-            "saké gratuit",
-            "coupe acheter",
-            "doburoku goûter"
-          ],
-          "answer": "La distribution de doburoku, un saké non filtré, a lieu dans l'enceinte du sanctuaire Shirakawa Hachiman, d'environ 15 h 30 à environ 17 h. Pour recevoir du doburoku, présentez d'abord une offrande, appelée hatsuhoryo, à l'accueil du sanctuaire, et recevez la coupe souvenir rouge prévue à cet effet. Faites ensuite la queue avec cette coupe, et l'on vous servira le doburoku spécial brassé par le sanctuaire. Vous pouvez vous resservir, mais il doit être consommé uniquement dans l'enceinte du sanctuaire et ne peut pas être emporté.",
-          "audio": ""
-        },
-        "ko": {
-          "questions": [
-            "도부로쿠 마시",
-            "도부로쿠 마실",
-            "도부로쿠 받",
-            "도부로쿠 요금",
-            "술 무료",
-            "잔 사는"
-          ],
-          "answer": "도부로쿠 나눔은 시라카와 하치만 신사 경내에서 오후 3시 30분쯤부터 오후 5시쯤까지 진행됩니다. 도부로쿠를 받으시려면 먼저 경내 접수처에서 봉납금인 하쓰호료를 내시고 전용 빨간 기념 잔을 받아 주세요. 그 잔을 들고 줄을 서시면 신사에서 빚은 특제 도부로쿠를 따라 드립니다. 더 받으실 수도 있지만, 경내에서만 드실 수 있으며 가지고 가실 수는 없습니다.",
-          "audio": ""
-        },
-        "zh": {
-          "questions": [
-            "喝浊酒",
-            "浊酒 怎么",
-            "浊酒 费用",
-            "免费 喝酒",
-            "酒杯 哪里买",
-            "浊酒 领取"
-          ],
-          "answer": "浊酒（doburoku）的免费分发在白川八幡神社院内进行，时间约为下午3点30分至下午5点。想要品尝浊酒，请先在院内的接待处缴纳供奉金（初穗料），领取专用的红色纪念酒杯。拿着酒杯排队，就会为您斟上神社酿造的特制浊酒。可以续杯，但仅限在神社院内饮用，不能带走。",
-          "audio": ""
-        }
-      }
-    },
-    {
-      "id": "festival_drinking_rules",
-      "category": "other",
-      "questions": [
-        "どぶろく 持ち帰り",
-        "車 運転",
-        "お土産 どぶろく",
-        "ペットボトル 入れる"
-      ],
-      "answer": "境内で振る舞われるどぶろくは神様へのお供えのお下がりであるため、水筒やペットボトル等に入れての持ち帰りは固く禁じられています。祭り期間中は、境内の受付で2000円を志納すると徳利を1本いただけます。お土産用のどぶろく（瓶詰め）は、村内の酒屋や土産品店でご購入いただけます。また、どぶろくはアルコール度数の高いお酒ですので飲みすぎにはご注意ください。お車や自転車を運転される方の飲酒は絶対におやめください。",
-      "audio": "festival_drinking_rules.mp3",
-      "photo": "",
-      "link": "",
-      "chip": "",
-      "place": "共通",
-      "translations": {
-        "en": {
-          "questions": [
-            "doburoku take home",
-            "drive car",
-            "doburoku souvenir",
-            "plastic bottle",
-            "sake bottle",
-            "doburoku buy"
-          ],
-          "answer": "The doburoku served in the shrine grounds is an offering shared from the gods, so taking it home in a flask, plastic bottle, or similar container is strictly prohibited. During the festival, if you make a donation of 2000 yen at the reception in the shrine grounds, you will receive 1 tokkuri, a sake flask. Bottled doburoku for souvenirs can be purchased at liquor stores and souvenir shops in the village. Doburoku has a high alcohol content, so please be careful not to drink too much. Anyone driving a car or riding a bicycle must never drink.",
-          "audio": ""
-        },
-        "es": {
-          "questions": [
-            "doburoku llevar",
-            "doburoku comprar",
-            "doburoku recuerdo",
-            "botella llenar",
-            "conducir beber",
-            "manejar beber"
-          ],
-          "answer": "El doburoku que se sirve en el recinto es una ofrenda a los dioses que luego se comparte, por lo que está estrictamente prohibido llevárselo en cantimploras, botellas de plástico u otros recipientes. Durante el festival, si hace una donación de 2000 yenes en la recepción del recinto, recibirá 1 tokkuri, una jarrita de sake. El doburoku embotellado de recuerdo se puede comprar en las licorerías y tiendas de recuerdos del pueblo. Además, el doburoku tiene un contenido alcohólico alto, así que no beba en exceso. Si va a conducir un vehículo o una bicicleta, no beba en absoluto.",
-          "audio": ""
-        },
-        "fr": {
-          "questions": [
-            "doburoku emporter",
-            "conduire voiture",
-            "doburoku souvenir",
-            "bouteille remplir",
-            "doburoku acheter",
-            "alcool conduire"
-          ],
-          "answer": "Le doburoku servi dans l'enceinte du sanctuaire est une offrande aux divinités que l'on partage ensuite : il est donc strictement interdit de l'emporter dans une gourde, une bouteille en plastique ou tout autre récipient. Pendant la période du festival, en faisant un don de 2000 yens à l'accueil du sanctuaire, vous recevez un tokkuri, un flacon à saké. Le doburoku en bouteille à rapporter en souvenir est en vente chez les marchands de saké et les boutiques de souvenirs du village. Le doburoku est un alcool fort : veillez à ne pas en boire trop. Si vous conduisez une voiture ou un vélo, ne buvez absolument pas d'alcool.",
-          "audio": ""
-        },
-        "ko": {
-          "questions": [
-            "도부로쿠 가져가",
-            "도부로쿠 포장",
-            "도부로쿠 선물",
-            "페트병",
-            "운전",
-            "음주 운전"
-          ],
-          "answer": "경내에서 나눠 드리는 도부로쿠는 신께 올린 공물을 물려받은 것이므로, 물병이나 페트병 등에 담아 가져가는 것은 엄격히 금지되어 있습니다. 축제 기간 중에는 경내 접수처에서 2000엔을 기부하시면 돗쿠리 술병을 1병 받으실 수 있습니다. 기념품용 병 도부로쿠는 마을 안의 주류 판매점이나 기념품 가게에서 구입하실 수 있습니다. 또한 도부로쿠는 알코올 도수가 높은 술이므로 과음하지 않도록 주의해 주세요. 자동차나 자전거를 운전하시는 분은 절대로 술을 드시지 마세요.",
-          "audio": ""
-        },
-        "zh": {
-          "questions": [
-            "浊酒 带走",
-            "开车",
-            "浊酒 伴手礼",
-            "买浊酒",
-            "塑料瓶"
-          ],
-          "answer": "院内分发的浊酒是供奉给神明后撤下的供品，因此严禁装入水壶或塑料瓶等带走。节日期间，在院内接待处捐献2000日元，可以获得1个德利（酒壶）。作为伴手礼的瓶装浊酒，可以在村内的酒铺和土特产店购买。另外，浊酒酒精度数较高，请注意不要饮酒过量。驾驶汽车或自行车的人请绝对不要饮酒。",
-          "audio": ""
-        }
-      }
-    },
-    {
-      "id": "festival_minors",
-      "category": "other",
-      "questions": [
-        "子ども どぶろく",
-        "未成年 飲め",
-        "子連れ 祭り",
-        "子供 参加",
-        "こども 飲み物"
-      ],
-      "answer": "未成年の方はどぶろくをお召し上がりいただけません。お子様連れでもお祭りはご覧いただけます。",
-      "audio": "festival_minors.mp3",
-      "photo": "",
-      "link": "",
-      "chip": "",
-      "place": "共通",
-      "translations": {
-        "en": {
-          "questions": [
-            "child doburoku",
-            "kid festival",
-            "minor drink",
-            "underage",
-            "children festival",
-            "kid drink"
-          ],
-          "answer": "Minors cannot drink doburoku. You are welcome to watch the festival with your children.",
-          "audio": ""
-        },
-        "es": {
-          "questions": [
-            "niño doburoku",
-            "menor beber",
-            "menores edad",
-            "niño festival",
-            "niño participar",
-            "niño bebida"
-          ],
-          "answer": "Los menores de edad no pueden tomar doburoku. Las familias con niños sí pueden ver el festival.",
-          "audio": ""
-        },
-        "fr": {
-          "questions": [
-            "enfant doburoku",
-            "mineur boire",
-            "enfant festival",
-            "enfant participer",
-            "boisson enfant",
-            "famille festival"
-          ],
-          "answer": "Les mineurs ne peuvent pas boire de doburoku. Vous pouvez toutefois assister au festival avec vos enfants.",
-          "audio": ""
-        },
-        "ko": {
-          "questions": [
-            "아이 도부로쿠",
-            "미성년자 마시",
-            "미성년 마실",
-            "아이 축제",
-            "어린이 참가",
-            "아이 음료"
-          ],
-          "answer": "미성년자는 도부로쿠를 드실 수 없습니다. 아이를 동반하셔도 축제는 관람하실 수 있습니다.",
-          "audio": ""
-        },
-        "zh": {
-          "questions": [
-            "小孩 浊酒",
-            "未成年 喝酒",
-            "带孩子 节日",
-            "儿童 参加",
-            "孩子 饮料"
-          ],
-          "answer": "未成年人不能饮用浊酒。带孩子也可以观看节日活动。",
-          "audio": ""
-        }
-      }
-    },
-    {
       "id": "festival_overview",
       "category": "other",
       "questions": [
@@ -2690,164 +2456,6 @@
             "祭典"
           ],
           "answer": "白川乡的浊酒节是每年秋季举行的传统祭神活动，祈求五谷丰登、家宅平安和乡里和平。白川八幡神社的祭典在10月14日和15日两天举行。之后依次在鸠谷八幡神社、饭岛八幡神社各举行2天。白天有热闹的村内巡游队伍（神幸祭），神社院内有浊酒分发，傍晚以后还有供奉的狮子舞和民谣白川乡春驹等，看点非常丰富。",
-          "audio": ""
-        }
-      }
-    },
-    {
-      "id": "festival_performance",
-      "category": "other",
-      "questions": [
-        "獅子舞 いつ",
-        "踊り 何時から",
-        "春駒",
-        "郷土芸能",
-        "夜のイベント"
-      ],
-      "answer": "神社の境内の舞台・拝殿前では、伝統の郷土芸能が奉納されます。勇壮な「白川連獅子（獅子舞）」や、県重要無形民俗文化財に指定されている民謡「春駒（はるこま）」の踊りなどが披露されます。昼の部のどぶろく振る舞いと同時に始まり、一度休憩を挟んだ後、19時頃からの夜の部でも獅子舞、民謡が披露されます。",
-      "audio": "festival_performance.mp3",
-      "photo": "",
-      "link": "",
-      "chip": "",
-      "place": "共通",
-      "translations": {
-        "en": {
-          "questions": [
-            "lion dance",
-            "dance time",
-            "Harukoma",
-            "folk dance",
-            "night event",
-            "performance"
-          ],
-          "answer": "Traditional local performing arts are offered on the stage and in front of the worship hall in the shrine grounds. Performances include the powerful Shirakawa Renjishi lion dance and the Harukoma folk dance, which is designated as an Important Intangible Folk Cultural Property of the prefecture. They begin at the same time as the doburoku serving in the daytime session, and after a break, the lion dance and folk songs are performed again in the evening session from about 7:00 p.m.",
-          "audio": ""
-        },
-        "es": {
-          "questions": [
-            "danza leon",
-            "baile hora",
-            "Harukoma",
-            "arte tradicional",
-            "evento noche",
-            "danza folclorica"
-          ],
-          "answer": "En el escenario del recinto del santuario y frente al salón de oración se ofrecen artes escénicas tradicionales locales. Se presentan el enérgico Shirakawa Renjishi, una danza del león, y la danza Harukoma, un baile folclórico declarado Bien Cultural Folclórico Inmaterial Importante de la prefectura. Comienzan al mismo tiempo que el reparto de doburoku de la sesión de día y, tras un descanso, la danza del león y los bailes folclóricos se vuelven a presentar en la sesión de noche, a partir de las 19:00 aproximadamente.",
-          "audio": ""
-        },
-        "fr": {
-          "questions": [
-            "danse lion",
-            "danse heure",
-            "harukoma",
-            "spectacle traditionnel",
-            "programme soir",
-            "shishimai"
-          ],
-          "answer": "Des arts traditionnels locaux sont présentés en offrande sur la scène du sanctuaire, devant le pavillon de culte. On peut notamment voir le spectaculaire Shirakawa Renjishi, une danse du lion, et la danse Harukoma, un chant folklorique classé bien culturel immatériel folklorique important de la préfecture. Les représentations commencent en même temps que la distribution de doburoku de l'après-midi, puis, après une pause, la danse du lion et les chants folkloriques sont de nouveau présentés lors de la séance du soir, à partir d'environ 19 h.",
-          "audio": ""
-        },
-        "ko": {
-          "questions": [
-            "사자춤",
-            "춤 시간",
-            "하루코마",
-            "향토 예능",
-            "밤 행사",
-            "공연 시간"
-          ],
-          "answer": "신사 경내의 무대와 배전 앞에서는 전통 향토 예능이 봉납됩니다. 용맹한 사자춤인 시라카와 렌지시와, 현 중요 무형 민속 문화재로 지정된 민요 하루코마 춤 등을 선보입니다. 낮 공연은 도부로쿠 나눔과 동시에 시작되며, 한 번 휴식을 가진 뒤 오후 7시쯤부터 시작되는 밤 공연에서도 사자춤과 민요를 선보입니다.",
-          "audio": ""
-        },
-        "zh": {
-          "questions": [
-            "狮子舞",
-            "跳舞 几点",
-            "春驹",
-            "乡土 表演",
-            "晚上 活动",
-            "民谣"
-          ],
-          "answer": "神社院内的舞台和拜殿前会供奉传统的乡土艺能表演，包括雄壮的白川连狮子（狮子舞），以及被指定为岐阜县重要无形民俗文化遗产的民谣春驹（Harukoma）舞蹈等。表演与白天的浊酒分发同时开始，中间休息一次后，从晚上7点左右开始的夜场也会表演狮子舞和民谣。",
-          "audio": ""
-        }
-      }
-    },
-    {
-      "id": "festival_schedule",
-      "category": "other",
-      "questions": [
-        "祭り スケジュール",
-        "時間割",
-        "何時から",
-        "タイムテーブル",
-        "この後 何がある"
-      ],
-      "answer": "両日ともおおむね以下の流れで進行します。 ・08:00～ 神事（本殿） ・09:00～ 村回り行列出発（神橋〜集落内を練り歩き） ・15:00～ 行列が神社に還御 ・15:30～17:00 どぶろくの振る舞い（境内） ・15:30～ 郷土芸能（獅子舞、民謡など）の奉納開始 ・19:00～ 夜の獅子舞・民謡奉納 進行状況や天候によって時間が前後する場合がありますので、時間に余裕をもってお越しください。",
-      "audio": "festival_schedule.mp3",
-      "photo": "",
-      "link": "",
-      "chip": "",
-      "place": "共通",
-      "translations": {
-        "en": {
-          "questions": [
-            "festival schedule",
-            "festival timetable",
-            "festival program",
-            "program",
-            "what next",
-            "start time"
-          ],
-          "answer": "On both days, the festival generally follows this schedule: 8:00 a.m., Shinto ritual at the main hall; 9:00 a.m., the village procession departs and parades from the sacred bridge through the village; 3:00 p.m., the procession returns to the shrine; 3:30 p.m. to 5:00 p.m., doburoku is served in the shrine grounds; 3:30 p.m., offering performances of local performing arts such as the lion dance and folk songs begin; 7:00 p.m., evening lion dance and folk song performances. Times may change depending on how things progress and the weather, so please allow plenty of time.",
-          "audio": ""
-        },
-        "es": {
-          "questions": [
-            "festival horario",
-            "festival programa",
-            "programa",
-            "cronograma",
-            "despues hay",
-            "festival empieza"
-          ],
-          "answer": "Ambos días, el programa es aproximadamente el siguiente: 08:00, rito sintoísta en el salón principal; 09:00, salida de la procesión por el pueblo, que parte del puente sagrado y recorre la aldea; 15:00, regreso de la procesión al santuario; de 15:30 a 17:00, reparto de doburoku en el recinto; 15:30, comienzo de las artes tradicionales locales, como la danza del león y los bailes folclóricos; 19:00, danza del león y bailes folclóricos de la noche. Los horarios pueden adelantarse o retrasarse según el desarrollo del festival y el tiempo, así que venga con tiempo de sobra.",
-          "audio": ""
-        },
-        "fr": {
-          "questions": [
-            "festival programme",
-            "festival horaire",
-            "programme heure",
-            "festival heure",
-            "déroulement festival",
-            "après programme"
-          ],
-          "answer": "Les deux jours, le programme se déroule à peu près ainsi : à partir de 8 h, cérémonie shinto au pavillon principal ; à partir de 9 h, départ de la procession à travers le village, depuis le pont du sanctuaire jusque dans le village ; à partir de 15 h, retour de la procession au sanctuaire ; de 15 h 30 à 17 h, distribution de doburoku dans l'enceinte du sanctuaire ; à partir de 15 h 30, début des offrandes d'arts traditionnels locaux, comme la danse du lion et les chants folkloriques ; à partir de 19 h, danse du lion et chants folkloriques du soir. Les horaires peuvent varier selon le déroulement et la météo : prévoyez donc un peu de marge.",
-          "audio": ""
-        },
-        "ko": {
-          "questions": [
-            "축제 일정",
-            "축제 스케줄",
-            "축제 시간표",
-            "타임테이블",
-            "몇 시부터",
-            "다음 행사"
-          ],
-          "answer": "이틀 모두 대체로 다음과 같은 순서로 진행됩니다. 오전 8시부터 본전에서 신사 의식, 오전 9시부터 마을 순회 행렬 출발로 신교 다리에서 마을 안을 행진, 오후 3시부터 행렬이 신사로 귀환, 오후 3시 30분부터 5시까지 경내에서 도부로쿠 나눔, 오후 3시 30분부터 사자춤과 민요 등 향토 예능 봉납 시작, 오후 7시부터 밤의 사자춤과 민요 봉납이 있습니다. 진행 상황이나 날씨에 따라 시간이 앞당겨지거나 늦어질 수 있으니, 시간 여유를 두고 와 주세요.",
-          "audio": ""
-        },
-        "zh": {
-          "questions": [
-            "节日 日程",
-            "时间表",
-            "几点 开始",
-            "日程表",
-            "接下来 活动",
-            "活动 安排"
-          ],
-          "answer": "两天的活动大致按以下流程进行：上午8点起，本殿举行祭神仪式；上午9点起，村内巡游队伍出发，从神桥出发在村落内巡游；下午3点起，巡游队伍返回神社；下午3点30分至5点，在神社院内分发浊酒；下午3点30分起，开始供奉乡土艺能表演，如狮子舞、民谣等；晚上7点起，供奉夜场狮子舞和民谣。时间可能因进行情况和天气有所提前或推后，请预留充足的时间前来。",
           "audio": ""
         }
       }
@@ -5952,7 +5560,7 @@
     },
     {
       "title": "【質問回答集より】その他",
-      "text": "当日にご予約いただける宿をお探しの際は、直接お電話をお願いいたします。民宿などは当日のご予約を承っておりません。　どぶろくの振る舞いは、白川八幡神社の境内にて15時30分頃から17時頃まで行われます。どぶろくをいただくには、まず境内の受付で「奉納（初穂料）」を納めて専用の赤い記念盃（杯）をお受け取りください。その盃を持って列に並ぶと、神社で醸造された特製のどぶろくが注がれます。おかわりも可能ですが、境内限定での飲食となっており、持ち帰りはできません。　境内で振る舞われるどぶろくは神様へのお供えのお下がりであるため、水筒やペットボトル等に入れての持ち帰りは固く禁じられています。祭り期間中は、境内の受付で2000円を志納すると徳利を1本いただけます。お土産用のどぶろく（瓶詰め）は、村内の酒屋や土産品店でご購入いただけます。また、どぶろくはアルコール度数の高いお酒ですので飲みすぎにはご注意ください。お車や自転車を運転される方の飲酒は絶対におやめください。　未成年の方はどぶろくをお召し上がりいただけません。お子様連れでもお祭りはご覧いただけます。　白川郷の「どぶろく祭」は、五穀豊穣・家内安全・里の平和を祈願して毎年秋に開催される伝統的な神事です。白川八幡神社では10月14日と15日の2日間にわたって行われます。その後、2日間ごとに鳩谷八幡神社、飯島八幡神社と続きます。日中の華やかな「村回り行列（神幸祭）」や、境内での「どぶろくの振る舞い」、夕方以降に奉納される「獅子舞」や「民謡・白川郷春駒」など、見どころが豊富にあります。　神社の境内の舞台・拝殿前では、伝統の郷土芸能が奉納されます。勇壮な「白川連獅子（獅子舞）」や、県重要無形民俗文化財に指定されている民謡「春駒（はるこま）」の踊りなどが披露されます。昼の部のどぶろく振る舞いと同時に始まり、一度休憩を挟んだ後、19時頃からの夜の部でも獅子舞、民謡が披露されます。　両日ともおおむね以下の流れで進行します。 ・08:00～ 神事（本殿） ・09:00～ 村回り行列出発（神橋〜集落内を練り歩き） ・15:00～ 行列が神社に還御 ・15:30～17:00 どぶろくの振る舞い（境内） ・15:30～ 郷土芸能（獅子舞、民謡など）の奉納開始 ・19:00～ 夜の獅子舞・民謡奉納 進行状況や天候によって時間が前後する場合がありますので、時間に余裕をもってお越しください。　白川八幡神社は、荻町合掌造り集落の南端にございます。鳥居と大きな杉の木が目印です。白川郷バスターミナルからは約800m、メイン通りを南へ徒歩15分から20分ほどです。　そちらの宿は鳩谷八幡神社の方面にございます。国道156号線を進み、川を渡る橋を左に曲がって川沿いを進む道をおすすめしております。　バス車内でのお忘れ物は、バス会社にお尋ねください。村内での落とし物は、拾得物の届け出があればお知らせできます。お名前、落とされた物の詳細、ご連絡先をご記入のうえメールをお願いいたします。貴重品は警察にもお電話をお願いいたします。　結の庄は道の駅白川郷の裏手、3.1km先にあり、歩くとおよそ30分から40分かかります。国道は交通量が多いため、川沿いの道をおすすめしております。送迎は午後2時30分から始まります。"
+      "text": "当日にご予約いただける宿をお探しの際は、直接お電話をお願いいたします。民宿などは当日のご予約を承っておりません。　白川郷の「どぶろく祭」は、五穀豊穣・家内安全・里の平和を祈願して毎年秋に開催される伝統的な神事です。白川八幡神社では10月14日と15日の2日間にわたって行われます。その後、2日間ごとに鳩谷八幡神社、飯島八幡神社と続きます。日中の華やかな「村回り行列（神幸祭）」や、境内での「どぶろくの振る舞い」、夕方以降に奉納される「獅子舞」や「民謡・白川郷春駒」など、見どころが豊富にあります。　白川八幡神社は、荻町合掌造り集落の南端にございます。鳥居と大きな杉の木が目印です。白川郷バスターミナルからは約800m、メイン通りを南へ徒歩15分から20分ほどです。　そちらの宿は鳩谷八幡神社の方面にございます。国道156号線を進み、川を渡る橋を左に曲がって川沿いを進む道をおすすめしております。　バス車内でのお忘れ物は、バス会社にお尋ねください。村内での落とし物は、拾得物の届け出があればお知らせできます。お名前、落とされた物の詳細、ご連絡先をご記入のうえメールをお願いいたします。貴重品は警察にもお電話をお願いいたします。　結の庄は道の駅白川郷の裏手、3.1km先にあり、歩くとおよそ30分から40分かかります。国道は交通量が多いため、川沿いの道をおすすめしております。送迎は午後2時30分から始まります。"
     },
     {
       "title": "【質問回答集より】案内所によって答えが違うこと",
@@ -7441,6 +7049,10 @@
       "bubble": {
         "width": 0.864,
         "text": 1.1
+      },
+      "night": {
+        "off": "18:00",
+        "on": "08:00"
       }
     },
     {
@@ -7465,6 +7077,10 @@
       "bubble": {
         "width": 0.753,
         "text": 1.1
+      },
+      "night": {
+        "off": "17:00",
+        "on": "08:00"
       }
     },
     {
@@ -7490,6 +7106,10 @@
       "bubble": {
         "width": 0.884,
         "text": 1.0
+      },
+      "night": {
+        "off": "",
+        "on": ""
       }
     }
   ]
