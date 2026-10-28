@@ -343,6 +343,19 @@ body {
 .survey      { order: var(--order-languages, 99); }
 .screen.survey-open > .languages { display: none; }
 
+/* 読み上げの音声のクレジット。画面のいちばん下・右寄せに小さく出す（js/app.js の renderCredit） */
+.voice-credit {
+  order: 100;
+  flex: none;
+  align-self: flex-end;
+  margin: 4px 2px -8px;
+  color: var(--sub);
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: .8;
+}
+
 /* 管理画面で「出さない」にしたブロック。
    hidden ではなく印で消すのは、言語の列のように
    他の理由で hidden を使っている所と取り違えないため。 */

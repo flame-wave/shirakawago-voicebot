@@ -157,6 +157,10 @@ def _edit(book, save_book, store, thumb, c, ver):
         for col, (lang, title) in zip(cols, LANGS):
             names[lang] = col.text_input(title, value=c["names"].get(lang, ""), key=f"{key}_n_{lang}",
                                          placeholder="空なら日本語の名前")
+    ui.field_label("クレジット", "絵の作者など。このキャラクターが立っている間、案内画面の右下に小さく出ます。"
+                                 "例：イラスト制作：秀")
+    credit = st.text_input("クレジット", value=c.get("credit", ""), key=f"{key}_credit",
+                           label_visibility="collapsed", placeholder="例：イラスト制作：秀（空なら出しません）")
     files = _image_inputs(key, {"idle": c["idle"], "listening": c.get("listening"),
                                 "talking": c.get("talking")}, thumb)
     show = st.checkbox("案内画面に出す（利用者が選べる一覧に入れる）", value=c["enabled"], key=f"{key}_show",
@@ -174,6 +178,7 @@ def _edit(book, save_book, store, thumb, c, ver):
                     if face != "idle" and files.get(f"clear_{face}") and column not in values:
                         values[column] = ""
                 values["名前"] = name.strip()
+                values["クレジット"] = credit.strip()
                 for lang, title in LANGS:
                     values[X.CHAR_NAME_COLS[lang]] = names[lang].strip()
                 values["有効"] = "TRUE" if show else "FALSE"
@@ -201,6 +206,9 @@ def _new(book, save_book, store, ver):
         cols = st.columns(len(LANGS))
         for col, (lang, title) in zip(cols, LANGS):
             names[lang] = col.text_input(title, key=f"{k}_n_{lang}", placeholder="空なら日本語の名前")
+    ui.field_label("クレジット", "絵の作者など。このキャラクターが立っている間、案内画面の右下に小さく出ます。")
+    credit = st.text_input("クレジット", key=f"{k}_credit", label_visibility="collapsed",
+                           placeholder="例：イラスト制作：秀（空なら出しません）")
     ui.field_label("絵の形", "吹き出しの△の向きと、立つ高さの最初の値が決まります。あとで「画面レイアウト」で合わせられます。")
     shape = st.radio("絵の形", list(SHAPES), key=f"{k}_shape", horizontal=True, label_visibility="collapsed")
     files = _image_inputs(k, required=True)
@@ -215,6 +223,7 @@ def _new(book, save_book, store, ver):
             with st.spinner("保存しています…"):
                 values, notes = _upload(store, cid, files)
                 values.update({"名前": name.strip(), "ID": cid, "有効": "TRUE" if show else "FALSE",
+                               "クレジット": credit.strip(),
                                "備考": "管理画面で追加", **SHAPES[shape]})
                 for lang, title in LANGS:
                     if names[lang].strip():

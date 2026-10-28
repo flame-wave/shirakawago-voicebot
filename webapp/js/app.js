@@ -10,7 +10,7 @@ import {
 import { LANGUAGES, LABEL, uiString } from './app-language.js';
 import { FaqService } from './faq-service.js';
 import { FaqRepository } from './faq-repository.js';
-import { VoiceService } from './voice-service.js';
+import { VoiceService, TTS_ONLY } from './voice-service.js';
 import { SpeechService } from './speech-service.js';
 import { AiService } from './ai-service.js';
 import { PlaceService, NOWHERE } from './place-service.js';
@@ -44,6 +44,7 @@ survey.onVote = (vote) => log.addSurvey(vote, state.lang, state.place);
 const el = {
   dataSource: document.getElementById('dataSource'),
   dataVersion: document.getElementById('dataVersion'),
+  voiceCredit: document.getElementById('voiceCredit'),
   dataStatus: document.getElementById('dataStatus'),
   questionBubble: document.getElementById('questionBubble'),
   talkButton: document.getElementById('talkButton'),
@@ -109,6 +110,33 @@ if (isPreview && el.appTitle) {
   el.appTitle.after(badge);
 }
 
+/// 画面の右下のクレジット。次の2つを、あるものだけ並べて出す。
+///
+///   ・絵の作者（例：「イラスト制作：秀」）… いま立っているキャラクターに書いてあるとき。
+///     管理画面の「キャラクター」の「クレジット」から取る
+///   ・読み上げの音声（例：「音声：VOICEVOX:春日部つむぎ」）… 用意した音声
+///     （VOICEVOX で作ったもの）を鳴らすのは日本語の回答だけなので、日本語を選んでいて、
+///     その音声を使っているときだけ。名前と作り方は「読み上げの声」の名前と備考から取る
+function renderCredit() {
+  if (!el.voiceCredit) return;
+  const parts = [];
+
+  const illustration = (character.current?.credit ?? '').trim();
+  if (illustration) parts.push(illustration);
+
+  const sets = faqService.voiceSets ?? [];
+  const id = voice.currentSet;
+  const set = id === TTS_ONLY ? null : sets.find((s) => s.id === id) ?? null;
+  const label = (set?.label ?? '').trim();
+  if (state.lang === 'ja' && label !== '') {
+    const tool = /VOICEVOX/i.test(set.note ?? '') && !/VOICEVOX/i.test(label) ? 'VOICEVOX:' : '';
+    parts.push(`音声：${tool}${label}`);
+  }
+
+  el.voiceCredit.hidden = parts.length === 0;
+  el.voiceCredit.textContent = parts.join('　');
+}
+
 function render() {
   renderPlacePill();
   const title = uiString('appTitle', state.lang);
@@ -116,6 +144,7 @@ function render() {
   document.title = isPreview ? `【プレビュー】${title}` : title;
   el.dataSource.textContent = state.dataSource;
   el.dataVersion.textContent = state.dataVersion;
+  renderCredit();
 
   // 聞き取った質問（観光客側の発話）
   const hasQuestion = state.recognized !== '';
@@ -248,6 +277,7 @@ function wireMute() {
 function renderCharacterPill() {
   if (!el.characterButton) return;
   el.characterButton.textContent = `🧑 ${nameIn(character.current, state.lang)}`;
+  renderCredit();   // キャラクターが変わったら、絵のクレジットも入れ替える
 }
 
 function openCharacterMenu() {

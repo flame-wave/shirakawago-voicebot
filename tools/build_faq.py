@@ -334,6 +334,12 @@ def read_characters(book, assets_dir: Path | None) -> list:
         if names:
             character["names"] = names
 
+        # 絵の作者などのクレジット（例：「イラスト制作：秀」）。
+        # このキャラクターが立っている間、案内画面の右下に出す。空なら入れない。
+        credit = cell_str(row.get("クレジット"))
+        if credit:
+            character["credit"] = credit
+
         # 縦横比は画像から読む。書き間違いが起きない方に寄せる。
         if assets_dir:
             size = png_size(Path(assets_dir) / "character" / idle)

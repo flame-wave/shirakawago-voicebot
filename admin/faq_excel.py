@@ -527,6 +527,8 @@ class FaqBook:
                 "names": {lang: self._get(ws, header, r, title)
                           for lang, title in CHAR_NAME_COLS.items()
                           if self._get(ws, header, r, title)},
+                # 絵の作者などのクレジット。案内画面の右下に出る（無い古いシートでは空）
+                "credit": self._get(ws, header, r, "クレジット") if "クレジット" in header else "",
                 "scale": self._ratio(ws, header, r, "大きさ", 1.0),
                 "rise": self._ratio(ws, header, r, "高さ位置", 0.0),
                 "row": r,
